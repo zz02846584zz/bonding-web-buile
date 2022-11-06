@@ -1,0 +1,1 @@
+import{al as u,X as r,a1 as l,b as i,am as n}from"./entry.13cd8dda.js";const h=u((t,a)=>{{const{user:e}=r(),{isLogin:s}=l(e),o=i("showAuth");if(!s.value&&t.fullPath!==a.fullPath)return o.value=!0,n()}});export{h as default};
