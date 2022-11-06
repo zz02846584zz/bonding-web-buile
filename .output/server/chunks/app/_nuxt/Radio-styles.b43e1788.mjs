@@ -1,4 +1,4 @@
-import { R as Radio_vue_vue_type_style_index_0_scoped_a4fece0e_lang } from '../styles.mjs';
+import { c as Radio_vue_vue_type_style_index_0_scoped_a4fece0e_lang } from '../styles.mjs';
 
 const RadioStyles_b43e1788 = [Radio_vue_vue_type_style_index_0_scoped_a4fece0e_lang];
 

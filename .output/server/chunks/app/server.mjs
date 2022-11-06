@@ -614,9 +614,9 @@ function useMeta(meta2) {
   return useHead(meta2);
 }
 const components = {
-  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.bbc9676d.mjs').then((c2) => c2.default || c2)),
-  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.1e0ed97a.mjs').then((c2) => c2.default || c2)),
-  Message: defineAsyncComponent(() => import('./_nuxt/Message.ba84afff.mjs').then((c2) => c2.default || c2))
+  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.1d97f817.mjs').then((c2) => c2.default || c2)),
+  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.93643aa3.mjs').then((c2) => c2.default || c2)),
+  Message: defineAsyncComponent(() => import('./_nuxt/Message.9e01b165.mjs').then((c2) => c2.default || c2))
 };
 const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
   for (const name in components) {
@@ -4985,7 +4985,7 @@ const _routes = [
     meta: meta$f,
     alias: [],
     redirect: void 0,
-    component: () => import('./_nuxt/404.4687724e.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/404.f4372aec.mjs').then((m2) => m2.default || m2)
   },
   {
     name: "index",
@@ -4995,7 +4995,7 @@ const _routes = [
     meta: meta$e,
     alias: (meta$e == null ? void 0 : meta$e.alias) || [],
     redirect: (meta$e == null ? void 0 : meta$e.redirect) || void 0,
-    component: () => import('./_nuxt/index.97f51e39.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.0dbfbf5c.mjs').then((m2) => m2.default || m2)
   },
   {
     name: "member-rule",
@@ -5005,7 +5005,7 @@ const _routes = [
     meta: meta$d,
     alias: [],
     redirect: void 0,
-    component: () => import('./_nuxt/member-rule.ffd02188.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/member-rule.d7bae0f1.mjs').then((m2) => m2.default || m2)
   },
   {
     name: "my",
@@ -5020,7 +5020,7 @@ const _routes = [
         meta: meta$b,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/change-phone.5d74d434.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/change-phone.2d5054e4.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-account-email-binding",
@@ -5030,7 +5030,7 @@ const _routes = [
         meta: meta$a,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/email-binding.2a6caf6e.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-binding.4db15fea.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-account-email-verify",
@@ -5040,7 +5040,7 @@ const _routes = [
         meta: meta$9,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/email-verify.86e4997c.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-verify.6a5fada8.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-account-identify-verify",
@@ -5050,7 +5050,7 @@ const _routes = [
         meta: meta$8,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/identify-verify.4bae69ba.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/identify-verify.e081d099.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-account",
@@ -5060,7 +5060,7 @@ const _routes = [
         meta: meta$7,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/index.b7a7841c.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.dafec58f.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-account-reset-password",
@@ -5070,7 +5070,7 @@ const _routes = [
         meta: meta$6,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/reset-password.855ea575.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/reset-password.f069217e.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-collections",
@@ -5080,7 +5080,7 @@ const _routes = [
         meta: meta$5,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/collections.5b66cfe6.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/collections.f01c8c28.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-history",
@@ -5090,7 +5090,7 @@ const _routes = [
         meta: meta$4,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/history.4de103a5.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/history.bbfcc987.mjs').then((m2) => m2.default || m2)
       },
       {
         name: "my-tips",
@@ -5100,13 +5100,13 @@ const _routes = [
         meta: meta$3,
         alias: [],
         redirect: void 0,
-        component: () => import('./_nuxt/tips.ac95dd7d.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/tips.14b2e129.mjs').then((m2) => m2.default || m2)
       }
     ],
     meta: meta$c,
     alias: (meta$c == null ? void 0 : meta$c.alias) || [],
     redirect: (meta$c == null ? void 0 : meta$c.redirect) || void 0,
-    component: () => import('./_nuxt/my.4b8bc3c3.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/my.9a210464.mjs').then((m2) => m2.default || m2)
   },
   {
     name: "news-article-articleSlug",
@@ -5116,7 +5116,7 @@ const _routes = [
     meta: meta$2,
     alias: (meta$2 == null ? void 0 : meta$2.alias) || [],
     redirect: (meta$2 == null ? void 0 : meta$2.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.0fd364fb.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_articleSlug_.54f5ac4d.mjs').then((m2) => m2.default || m2)
   },
   {
     name: "news-category-categorySlug",
@@ -5126,7 +5126,7 @@ const _routes = [
     meta: meta$1,
     alias: (meta$1 == null ? void 0 : meta$1.alias) || [],
     redirect: (meta$1 == null ? void 0 : meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.3c5f83e5.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.ada6db9e.mjs').then((m2) => m2.default || m2)
   },
   {
     name: "news-type-video",
@@ -5136,7 +5136,7 @@ const _routes = [
     meta,
     alias: [],
     redirect: void 0,
-    component: () => import('./_nuxt/video.d8cfa037.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/video.cc2c754c.mjs').then((m2) => m2.default || m2)
   }
 ];
 const routerOptions0 = {
@@ -5205,7 +5205,7 @@ const globalMiddleware = [
   validate
 ];
 const namedMiddleware = {
-  auth: () => import('./_nuxt/auth.5b16fa3a.mjs')
+  auth: () => import('./_nuxt/auth.f3a35da3.mjs')
 };
 const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlugin(async (nuxtApp) => {
   var _a, _b, _c, _d;
@@ -5463,7 +5463,7 @@ const _sfc_main$7 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.f117e8fc.mjs').then((r2) => r2.default || r2));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.2a36732c.mjs').then((r2) => r2.default || r2));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -6812,7 +6812,7 @@ _sfc_main$1.setup = (props, ctx) => {
   return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
 };
 const layouts = {
-  blog: () => import('./_nuxt/blog.d2a99fec.mjs').then((m2) => m2.default || m2)
+  blog: () => import('./_nuxt/blog.cafb5da6.mjs').then((m2) => m2.default || m2)
 };
 const LayoutLoader = defineComponent({
   props: {

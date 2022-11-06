@@ -1,0 +1,1 @@
+import{q as o,o as s,l as t,y as n}from"./entry.d135e3cc.js";const c={},_={class:"px-4 lg:px-8"};function r(e,a){return s(),t("div",_,[n(e.$slots,"default")])}const p=o(c,[["render",r]]);export{p as _};
