@@ -1443,30 +1443,30 @@ const client_manifest = {
       "node_modules/.pnpm/three@0.143.0/node_modules/three/build/three.module.js"
     ]
   },
-  "Navbar.css": {
-    "resourceType": "style",
-    "file": "Navbar.2d485208.css",
-    "src": "Navbar.css"
-  },
-  "node_modules/.pnpm/@nuxt+ui-templates@0.4.0/node_modules/@nuxt/ui-templates/dist/templates/error-404.css": {
-    "resourceType": "style",
-    "file": "error-404.eac13d93.css",
-    "src": "node_modules/.pnpm/@nuxt+ui-templates@0.4.0/node_modules/@nuxt/ui-templates/dist/templates/error-404.css"
-  },
   "node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/ContentNavigation.css": {
     "resourceType": "style",
     "file": "ContentNavigation.7e2038df.css",
     "src": "node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/ContentNavigation.css"
+  },
+  "node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/Prose/ProseCode.css": {
+    "resourceType": "style",
+    "file": "ProseCode.e63e49c6.css",
+    "src": "node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/Prose/ProseCode.css"
+  },
+  "Navbar.css": {
+    "resourceType": "style",
+    "file": "Navbar.2d485208.css",
+    "src": "Navbar.css"
   },
   "pages/index.css": {
     "resourceType": "style",
     "file": "index.7bdf2ff3.css",
     "src": "pages/index.css"
   },
-  "node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/Prose/ProseCode.css": {
+  "node_modules/.pnpm/@nuxt+ui-templates@0.4.0/node_modules/@nuxt/ui-templates/dist/templates/error-404.css": {
     "resourceType": "style",
-    "file": "ProseCode.e63e49c6.css",
-    "src": "node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/Prose/ProseCode.css"
+    "file": "error-404.eac13d93.css",
+    "src": "node_modules/.pnpm/@nuxt+ui-templates@0.4.0/node_modules/@nuxt/ui-templates/dist/templates/error-404.css"
   },
   "node_modules/.pnpm/@nuxt+ui-templates@0.4.0/node_modules/@nuxt/ui-templates/dist/templates/error-500.css": {
     "resourceType": "style",
