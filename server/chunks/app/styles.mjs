@@ -12,8 +12,8 @@ const interopDefault = r => r.default || r || [];
 const styles = {
   entry: () => [windiBase, windiComponents, windiUtilities, Gem_vue_vue_type_style_index_0_scoped_9fa2f2ec_lang, Switch_vue_vue_type_style_index_0_lang],
   "node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/Prose/ProseCode.vue": () => import('./_nuxt/ProseCode-styles.a510b10e.mjs').then(interopDefault),
-  "pages/index.vue": () => import('./_nuxt/index-styles.dc9a2c8d.mjs').then(interopDefault),
   "components/Gem.vue": () => import('./_nuxt/Gem-styles.237e27bc.mjs').then(interopDefault),
+  "pages/index.vue": () => import('./_nuxt/index-styles.dc9a2c8d.mjs').then(interopDefault),
   "node_modules/.pnpm/@nuxt+ui-templates@0.4.0/node_modules/@nuxt/ui-templates/dist/templates/welcome.vue": () => import('./_nuxt/welcome-styles.63f7a649.mjs').then(interopDefault),
   "components/Form/Switch.vue": () => import('./_nuxt/Switch-styles.8e2db277.mjs').then(interopDefault),
   "node_modules/.pnpm/@nuxt+ui-templates@0.4.0/node_modules/@nuxt/ui-templates/dist/templates/error-404.vue": () => import('./_nuxt/error-404-styles.b59a5da0.mjs').then(interopDefault),
