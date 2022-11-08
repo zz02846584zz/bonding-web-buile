@@ -1,10 +1,19 @@
-globalThis.entryURL = import.meta.url;import 'unenv/runtime/polyfill/fetch.node';
+globalThis._importMeta_={url:import.meta.url,env:process.env};import 'node-fetch-native/polyfill';
 import 'http';
 import 'https';
 import 'destr';
-export { s as default } from './chunks/nitro/server.mjs';
 import 'h3';
+export { n as default } from './chunks/nitro/node-server.mjs';
 import 'ohmyfetch';
 import 'unenv/runtime/fetch/index';
+import 'hookable';
+import 'scule';
+import 'ohash';
 import 'ufo';
+import 'unstorage';
 import 'defu';
+import 'radix3';
+import 'node:fs';
+import 'node:url';
+import 'pathe';
+//# sourceMappingURL=index.mjs.map
