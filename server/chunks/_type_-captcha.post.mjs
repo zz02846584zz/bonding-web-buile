@@ -40,7 +40,6 @@ const _type_Captcha_post = defineEventHandler(async (event) => {
       });
     };
     await Promise.all(rules.map(async (rule) => await validateRule(rule)));
-    console.log(type);
     const {
       code,
       message = "",

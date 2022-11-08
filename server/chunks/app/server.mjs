@@ -1,18 +1,18 @@
-import { toRef, isRef, getCurrentInstance, inject, defineAsyncComponent, version, h, onUnmounted, defineComponent, computed, unref, Suspense, nextTick, Transition, provide, reactive, useSSRContext, ref, resolveComponent, shallowRef, watch, Fragment as Fragment$1, mergeProps, withCtx, createVNode, createApp, onServerPrefetch, effectScope, markRaw, isReactive, toRaw, onErrorCaptured, watchEffect, Text, toRefs } from 'vue';
+import { toRef, isRef, getCurrentInstance, inject, defineAsyncComponent, version, h as h$1, onUnmounted, toRaw, isReactive, defineComponent, mergeProps, withCtx, renderSlot, createTextVNode, toDisplayString, useSSRContext, cloneVNode, Fragment as Fragment$1, provide, ref, computed, onMounted, watch, watchEffect, nextTick, unref, Suspense, Transition, reactive, createElementBlock, resolveComponent, shallowRef, openBlock, createBlock, createVNode, renderList, createCommentVNode, createApp, onServerPrefetch, effectScope, markRaw, onErrorCaptured, Text, toRefs } from 'vue';
 import { $fetch as $fetch$1 } from 'ohmyfetch';
 import { createHooks } from 'hookable';
 import { getContext, executeAsync } from 'unctx';
 import destr from 'destr';
 import { hasProtocol, isEqual, joinURL, parseURL } from 'ufo';
 import { createError as createError$1, sendRedirect, appendHeader } from 'h3';
-import { useRouter as useRouter$1, useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter } from 'vue-router';
-import { CoreWarnCodes, CompileErrorCodes, registerMessageResolver, resolveValue, registerLocaleFallbacker, fallbackWithLocaleChain, setDevToolsHook, createCompileError, DEFAULT_LOCALE as DEFAULT_LOCALE$1, updateFallbackLocale, NUMBER_FORMAT_OPTIONS_KEYS, DATETIME_FORMAT_OPTIONS_KEYS, setFallbackContext, createCoreContext, clearDateTimeFormat, clearNumberFormat, setAdditionalMeta, getFallbackContext, NOT_REOSLVED, parseTranslateArgs, translate, MISSING_RESOLVE_VALUE, parseDateTimeArgs, datetime, parseNumberArgs, number } from '@intlify/core-base';
+import { useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter } from 'vue-router';
 import { parse, serialize } from 'cookie-es';
 import isHTTPS from 'is-https';
-import { ssrRenderComponent, ssrRenderSuspense } from 'vue/server-renderer';
-import { defu } from 'defu';
-import { isEqual as isEqual$1 } from 'ohash';
+import { CoreWarnCodes, CompileErrorCodes, registerMessageResolver, resolveValue, registerLocaleFallbacker, fallbackWithLocaleChain, setDevToolsHook, createCompileError, DEFAULT_LOCALE as DEFAULT_LOCALE$1, updateFallbackLocale, NUMBER_FORMAT_OPTIONS_KEYS, DATETIME_FORMAT_OPTIONS_KEYS, setFallbackContext, createCoreContext, clearDateTimeFormat, clearNumberFormat, setAdditionalMeta, getFallbackContext, NOT_REOSLVED, parseTranslateArgs, translate, MISSING_RESOLVE_VALUE, parseDateTimeArgs, datetime, parseNumberArgs, number } from '@intlify/core-base';
+import { ssrRenderComponent, ssrRenderSlot, ssrInterpolate, ssrRenderAttrs, ssrRenderAttr, ssrRenderList, ssrRenderSuspense } from 'vue/server-renderer';
 import store from 'store';
+import { isEqual as isEqual$1 } from 'ohash';
+import { defu } from 'defu';
 import { a as useRuntimeConfig$1 } from '../nitro/node-server.mjs';
 import 'node-fetch-native/polyfill';
 import 'http';
@@ -26,7 +26,7 @@ import 'node:url';
 import 'pathe';
 import 'axios';
 
-var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t;
+var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S, _T, _U, _V, _W, _X, _Y, _Z, __, _$, _aa, _ba, _ca, _da, _ea, _fa, _ga, _ha, _ia, _ja, _ka, _la, _ma, _na;
 const appConfig = useRuntimeConfig$1().app;
 const baseURL = () => appConfig.baseURL;
 const nuxtAppCtx = getContext("nuxt-app");
@@ -162,6 +162,9 @@ function useRuntimeConfig() {
 }
 function defineGetter$1(obj, key, val) {
   Object.defineProperty(obj, key, { get: () => val });
+}
+function defineAppConfig(config) {
+  return config;
 }
 const useError = () => toRef(useNuxtApp().payload, "error");
 const showError = (_err) => {
@@ -367,11 +370,11 @@ function useFetch(request, arg1, arg2) {
   }
   const key = "$f" + _key;
   const _request = computed(() => {
-    let r = request;
-    if (typeof r === "function") {
-      r = r();
+    let r2 = request;
+    if (typeof r2 === "function") {
+      r2 = r2();
     }
-    return unref(r);
+    return unref(r2);
   });
   const {
     server,
@@ -565,7 +568,7 @@ function defineNuxtLink(options) {
       return () => {
         var _a2, _b2, _c2;
         if (!isExternal.value) {
-          return h(
+          return h$1(
             resolveComponent("RouterLink"),
             {
               ref: void 0,
@@ -598,12 +601,12 @@ function defineNuxtLink(options) {
             isExactActive: false
           });
         }
-        return h("a", { ref: el, href, rel, target }, (_c2 = slots.default) == null ? void 0 : _c2.call(slots));
+        return h$1("a", { ref: el, href, rel, target }, (_c2 = slots.default) == null ? void 0 : _c2.call(slots));
       };
     }
   });
 }
-const __nuxt_component_0 = defineNuxtLink({ componentName: "NuxtLink" });
+const __nuxt_component_0$1 = defineNuxtLink({ componentName: "NuxtLink" });
 function isObject$2(val) {
   return val !== null && typeof val === "object";
 }
@@ -634,7 +637,7 @@ function _defu(baseObj, defaults, namespace = ".", merger) {
   return obj;
 }
 function createDefu(merger) {
-  return (...args) => args.reduce((p, c) => _defu(p, c, "", merger), {});
+  return (...args) => args.reduce((p2, c2) => _defu(p2, c2, "", merger), {});
 }
 const defuFn = createDefu((obj, key, currentValue, _namespace) => {
   if (typeof obj[key] !== "undefined" && typeof currentValue === "function") {
@@ -642,15 +645,29 @@ const defuFn = createDefu((obj, key, currentValue, _namespace) => {
     return true;
   }
 });
+const cfg0 = defineAppConfig({
+  name: "\u9375\u7D50\u79D1\u6280",
+  author: {
+    name: "Bonding Tech",
+    link: "https://github.com/viandwi24"
+  }
+});
 const inlineConfig = {};
-defuFn(inlineConfig);
+const __appConfig = defuFn(cfg0, inlineConfig);
+function useAppConfig() {
+  const nuxtApp = useNuxtApp();
+  if (!nuxtApp._appConfig) {
+    nuxtApp._appConfig = reactive(__appConfig);
+  }
+  return nuxtApp._appConfig;
+}
 function useHead(meta) {
   useNuxtApp()._useHead(meta);
 }
 const components = {
-  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.2c325749.mjs').then((c) => c.default || c)),
-  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.64fe4a4d.mjs').then((c) => c.default || c)),
-  Message: defineAsyncComponent(() => import('./_nuxt/Message.99446ebe.mjs').then((c) => c.default || c))
+  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.5c47c617.mjs').then((c2) => c2.default || c2)),
+  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.b4cfa9f7.mjs').then((c2) => c2.default || c2)),
+  Message: defineAsyncComponent(() => import('./_nuxt/Message.5d8c72cd.mjs').then((c2) => c2.default || c2))
 };
 const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
   for (const name in components) {
@@ -660,8 +677,8 @@ const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
 });
 const isVue2 = false;
 const isVue3 = true;
-function resolveUnref(r) {
-  return typeof r === "function" ? r() : unref(r);
+function resolveUnref(r2) {
+  return typeof r2 === "function" ? r2() : unref(r2);
 }
 var PROVIDE_KEY = "usehead";
 var HEAD_COUNT_KEY = "head:count";
@@ -686,10 +703,10 @@ var tagToString = (tag) => {
   return SELF_CLOSING_TAGS.includes(tag.tag) ? openTag : `${openTag}${tag.children || ""}</${tag.tag}>`;
 };
 var resolveHeadEntries = (entries, force) => {
-  return entries.map((e) => {
-    if (e.input && (force || !e.resolved))
-      e.input = resolveUnrefHeadInput(e.input);
-    return e;
+  return entries.map((e2) => {
+    if (e2.input && (force || !e2.resolved))
+      e2.input = resolveUnrefHeadInput(e2.input);
+    return e2;
   });
 };
 var renderHeadToString = async (head) => {
@@ -771,9 +788,9 @@ var tagDedupeKey = (tag) => {
   const name = ["id"];
   if (tagName === "meta")
     name.push(...["name", "property", "http-equiv"]);
-  for (const n of name) {
-    if (typeof props[n] !== "undefined") {
-      return `${tagName}:${n}:${props[n]}`;
+  for (const n2 of name) {
+    if (typeof props[n2] !== "undefined") {
+      return `${tagName}:${n2}:${props[n2]}`;
     }
   }
   return tag.runtime.position;
@@ -800,17 +817,17 @@ function resolveUnrefHeadInput(ref2) {
   }
   return root;
 }
-var resolveTag = (name, input, e) => {
+var resolveTag = (name, input, e2) => {
   var _a2;
   input = { ...input };
   const tag = {
     tag: name,
     props: {},
     runtime: {
-      entryId: e.id
+      entryId: e2.id
     },
     options: {
-      ...e.options
+      ...e2.options
     }
   };
   ["hid", "vmid", "key"].forEach((key) => {
@@ -836,8 +853,8 @@ var resolveTag = (name, input, e) => {
   tag.props = input;
   return tag;
 };
-var headInputToTags = (e) => {
-  return Object.entries(e.input).filter(([, v]) => typeof v !== "undefined").map(([key, value]) => {
+var headInputToTags = (e2) => {
+  return Object.entries(e2.input).filter(([, v2]) => typeof v2 !== "undefined").map(([key, value]) => {
     return (Array.isArray(value) ? value : [value]).map((props) => {
       switch (key) {
         case "title":
@@ -846,8 +863,8 @@ var headInputToTags = (e) => {
             tag: key,
             children: props,
             props: {},
-            runtime: { entryId: e.id },
-            options: e.options
+            runtime: { entryId: e2.id },
+            options: e2.options
           };
         case "base":
         case "meta":
@@ -857,12 +874,12 @@ var headInputToTags = (e) => {
         case "noscript":
         case "htmlAttrs":
         case "bodyAttrs":
-          return resolveTag(key, props, e);
+          return resolveTag(key, props, e2);
         default:
           return false;
       }
     });
-  }).flat().filter((v) => !!v);
+  }).flat().filter((v2) => !!v2);
 };
 var renderTitleTemplate = (template, title) => {
   if (template == null)
@@ -882,7 +899,7 @@ var resolveHeadEntriesToTags = (entries) => {
       deduping[tagDedupeKey(tag)] = tag;
     });
   });
-  let resolvedTags = Object.values(deduping).sort((a, b) => a.runtime.position - b.runtime.position).sort(sortTags);
+  let resolvedTags = Object.values(deduping).sort((a2, b2) => a2.runtime.position - b2.runtime.position).sort(sortTags);
   const titleTemplateIdx = resolvedTags.findIndex((i) => i.tag === "titleTemplate");
   const titleIdx = resolvedTags.findIndex((i) => i.tag === "title");
   if (titleIdx !== -1 && titleTemplateIdx !== -1) {
@@ -948,9 +965,9 @@ var setAttrs = (el, attrs) => {
 var createElement = (tag, document2) => {
   var _a2;
   const $el = document2.createElement(tag.tag);
-  Object.entries(tag.props).forEach(([k, v]) => {
-    if (v !== false) {
-      $el.setAttribute(k, v === true ? "" : String(v));
+  Object.entries(tag.props).forEach(([k2, v2]) => {
+    if (v2 !== false) {
+      $el.setAttribute(k2, v2 === true ? "" : String(v2));
     }
   });
   if (tag.children) {
@@ -1014,23 +1031,23 @@ var updateElements = (document2 = window.document, type, tags) => {
     }
     return true;
   });
-  oldBodyElements.forEach((t) => {
+  oldBodyElements.forEach((t2) => {
     var _a22;
-    return (_a22 = t.parentNode) == null ? void 0 : _a22.removeChild(t);
+    return (_a22 = t2.parentNode) == null ? void 0 : _a22.removeChild(t2);
   });
-  oldHeadElements.forEach((t) => {
+  oldHeadElements.forEach((t2) => {
     var _a22;
-    return (_a22 = t.parentNode) == null ? void 0 : _a22.removeChild(t);
+    return (_a22 = t2.parentNode) == null ? void 0 : _a22.removeChild(t2);
   });
-  newElements.forEach((t) => {
-    if (t.body)
-      body.insertAdjacentElement("beforeend", t.element);
+  newElements.forEach((t2) => {
+    if (t2.body)
+      body.insertAdjacentElement("beforeend", t2.element);
     else
-      head.insertBefore(t.element, headCountEl);
+      head.insertBefore(t2.element, headCountEl);
   });
   headCountEl.setAttribute(
     "content",
-    `${headCount - oldHeadElements.length + newElements.filter((t) => !t.body).length}`
+    `${headCount - oldHeadElements.length + newElements.filter((t2) => !t2.body).length}`
   );
 };
 var updateDOM = async (head, previousTags, document2) => {
@@ -1038,8 +1055,8 @@ var updateDOM = async (head, previousTags, document2) => {
   const tags = {};
   if (!document2)
     document2 = window.document;
-  for (const k in head.hooks["before:dom"]) {
-    if (await head.hooks["before:dom"][k]() === false)
+  for (const k2 in head.hooks["before:dom"]) {
+    if (await head.hooks["before:dom"][k2]() === false)
       return;
   }
   const resolvedEntries = resolveHeadEntries(head.headEntries);
@@ -1065,8 +1082,8 @@ var updateDOM = async (head, previousTags, document2) => {
         break;
     }
   }
-  setAttrs(document2.documentElement, ((_a2 = headTags.find((t) => t.tag === "htmlAttrs")) == null ? void 0 : _a2.props) || {});
-  setAttrs(document2.body, ((_b2 = headTags.find((t) => t.tag === "bodyAttrs")) == null ? void 0 : _b2.props) || {});
+  setAttrs(document2.documentElement, ((_a2 = headTags.find((t2) => t2.tag === "htmlAttrs")) == null ? void 0 : _a2.props) || {});
+  setAttrs(document2.body, ((_b2 = headTags.find((t2) => t2.tag === "bodyAttrs")) == null ? void 0 : _b2.props) || {});
   const tagKeys = /* @__PURE__ */ new Set([...Object.keys(tags), ...previousTags]);
   for (const tag of tagKeys)
     updateElements(document2, tag, tags[tag] || []);
@@ -1080,10 +1097,10 @@ var createHead = (initHeadObject) => {
   const previousTags = /* @__PURE__ */ new Set();
   let domUpdateTick = null;
   const head = {
-    install(app) {
-      if (app.config.globalProperties)
-        app.config.globalProperties.$head = head;
-      app.provide(PROVIDE_KEY, head);
+    install(app2) {
+      if (app2.config.globalProperties)
+        app2.config.globalProperties.$head = head;
+      app2.provide(PROVIDE_KEY, head);
     },
     hooks: {
       "before:dom": [],
@@ -1118,10 +1135,10 @@ var createHead = (initHeadObject) => {
           entries = entries.filter((_objs) => _objs.id !== entry2.id);
         },
         update(updatedInput) {
-          entries = entries.map((e) => {
-            if (e.id === entry2.id)
-              e.input = updatedInput;
-            return e;
+          entries = entries.map((e2) => {
+            if (e2.id === entry2.id)
+              e2.input = updatedInput;
+            return e2;
           });
         }
       };
@@ -1159,9 +1176,9 @@ var createHead = (initHeadObject) => {
     head.addEntry(initHeadObject);
   return head;
 };
+const appPageTransition = { "name": "page" };
+const appLayoutTransition = { "name": "layout" };
 const appHead = { "meta": [{ "name": "viewport", "content": "width=device-width, initial-scale=1" }, { "charset": "utf-8" }], "link": [], "style": [], "script": [], "noscript": [] };
-const appLayoutTransition = false;
-const appPageTransition = false;
 const appKeepalive = false;
 const node_modules_nuxt_dist_head_runtime_lib_vueuse_head_plugin_mjs_D7WGfuP1A0 = defineNuxtPlugin((nuxtApp) => {
   const head = createHead();
@@ -1201,114 +1218,393 @@ const metaMixin = {
 const node_modules_nuxt_dist_head_runtime_mixin_plugin_mjs_prWV5EzJWI = defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.mixin(metaMixin);
 });
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta = {};
+const __nuxt_page_meta$4 = {
+  layout: "blog"
+};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta = {};
+const __nuxt_page_meta$3 = {
+  middleware: ["auth"]
+};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta = {};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta = {};
+const __nuxt_page_meta$2 = {
+  middleware: ["auth"]
+};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta = {};
+const __nuxt_page_meta$1 = {
+  layout: "blog"
+};
+const __nuxt_page_meta = {
+  layout: "blog"
+};
+const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta = {};
 const _routes = [
   {
-    name: (_a = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.name) != null ? _a : "index___en",
-    path: (_b = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.path) != null ? _b : "/en",
+    name: (_a = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.name) != null ? _a : "404___en",
+    path: (_b = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.path) != null ? _b : "/en/:catchAll(.*)*",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/404.vue",
+    children: [],
+    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta,
+    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/404.05acaeed.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: (_c = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.name) != null ? _c : "404___tr",
+    path: (_d = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.path) != null ? _d : "/:catchAll(.*)*",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/404.vue",
+    children: [],
+    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta,
+    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/404.05acaeed.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: (_e = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _e : "index___en",
+    path: (_f = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.path) != null ? _f : "/en",
     file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/index.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/index.b0ccd09b.mjs').then((m) => m.default || m)
+    meta: __nuxt_page_meta$4,
+    alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
+    redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
+    component: () => import('./_nuxt/index.d4afa42d.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_c = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.name) != null ? _c : "index___tr",
-    path: (_d = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.path) != null ? _d : "/",
+    name: (_g = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _g : "index___tr",
+    path: (_h = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.path) != null ? _h : "/",
     file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/index.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/index.b0ccd09b.mjs').then((m) => m.default || m)
+    meta: __nuxt_page_meta$4,
+    alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
+    redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
+    component: () => import('./_nuxt/index.d4afa42d.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_e = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.name) != null ? _e : "menu___en",
-    path: (_f = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.path) != null ? _f : "/en/menu",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/menu.vue",
+    name: (_i = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.name) != null ? _i : "member-rule___en",
+    path: (_j = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.path) != null ? _j : "/en/member-rule",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/member-rule.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/menu.72b17843.mjs').then((m) => m.default || m)
+    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta,
+    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/member-rule.3aa608a9.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_g = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.name) != null ? _g : "menu___tr",
-    path: (_h = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.path) != null ? _h : "/menu",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/menu.vue",
+    name: (_k = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.name) != null ? _k : "member-rule___tr",
+    path: (_l = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.path) != null ? _l : "/member-rule",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/member-rule.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/menu.72b17843.mjs').then((m) => m.default || m)
+    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta,
+    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/member-rule.3aa608a9.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_i = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.name) != null ? _i : "modal___en",
-    path: (_j = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.path) != null ? _j : "/en/modal",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/modal.vue",
-    children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/modal.126da652.mjs').then((m) => m.default || m)
+    path: (_m = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.path) != null ? _m : "/en/my",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my.vue",
+    children: [
+      {
+        name: (_n = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.name) != null ? _n : "my-account-change-phone___en",
+        path: (_o = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.path) != null ? _o : "account/change-phone",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/change-phone.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/change-phone.53f643da.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_p = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _p : "my-account-email-binding___en",
+        path: (_q = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.path) != null ? _q : "account/email-binding",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-binding.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-binding.4728e637.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_r = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _r : "my-account-email-verify___en",
+        path: (_s = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.path) != null ? _s : "account/email-verify",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-verify.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-verify.2cf2d46e.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_t = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _t : "my-account-identify-verify___en",
+        path: (_u = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _u : "account/identify-verify",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/identify-verify.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/identify-verify.e6d242a3.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_v = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _v : "my-account___en",
+        path: (_w = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.path) != null ? _w : "account",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/index.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/index.9efcdd6f.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_x = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _x : "my-account-reset-password___en",
+        path: (_y = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.path) != null ? _y : "account/reset-password",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/reset-password.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/reset-password.6c47db2a.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_z = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.name) != null ? _z : "my-collections___en",
+        path: (_A = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.path) != null ? _A : "collections",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/collections.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/collections.526d2eb9.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_B = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.name) != null ? _B : "my-history___en",
+        path: (_C = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.path) != null ? _C : "history",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/history.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/history.dadffdb6.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_D = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _D : "my___en",
+        path: (_E = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.path) != null ? _E : "",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/index.vue",
+        children: [],
+        meta: __nuxt_page_meta$2,
+        alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
+        redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
+        component: () => import('./_nuxt/index.79d8e930.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_F = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.name) != null ? _F : "my-tips___en",
+        path: (_G = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.path) != null ? _G : "tips",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/tips.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/tips.066a2f6f.mjs').then((m2) => m2.default || m2)
+      }
+    ],
+    name: (_H = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _H : void 0,
+    meta: __nuxt_page_meta$3,
+    alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
+    redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
+    component: () => import('./_nuxt/my.17aa1a85.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_k = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.name) != null ? _k : "modal___tr",
-    path: (_l = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.path) != null ? _l : "/modal",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/modal.vue",
-    children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/modal.126da652.mjs').then((m) => m.default || m)
+    path: (_I = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.path) != null ? _I : "/my",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my.vue",
+    children: [
+      {
+        name: (_J = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.name) != null ? _J : "my-account-change-phone___tr",
+        path: (_K = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.path) != null ? _K : "account/change-phone",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/change-phone.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/change-phone.53f643da.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_L = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _L : "my-account-email-binding___tr",
+        path: (_M = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.path) != null ? _M : "account/email-binding",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-binding.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-binding.4728e637.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_N = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _N : "my-account-email-verify___tr",
+        path: (_O = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.path) != null ? _O : "account/email-verify",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-verify.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-verify.2cf2d46e.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_P = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _P : "my-account-identify-verify___tr",
+        path: (_Q = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _Q : "account/identify-verify",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/identify-verify.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/identify-verify.e6d242a3.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_R = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _R : "my-account___tr",
+        path: (_S = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.path) != null ? _S : "account",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/index.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/index.9efcdd6f.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_T = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _T : "my-account-reset-password___tr",
+        path: (_U = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.path) != null ? _U : "account/reset-password",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/reset-password.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/reset-password.6c47db2a.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_V = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.name) != null ? _V : "my-collections___tr",
+        path: (_W = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.path) != null ? _W : "collections",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/collections.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/collections.526d2eb9.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_X = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.name) != null ? _X : "my-history___tr",
+        path: (_Y = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.path) != null ? _Y : "history",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/history.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/history.dadffdb6.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_Z = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _Z : "my___tr",
+        path: (__ = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.path) != null ? __ : "",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/index.vue",
+        children: [],
+        meta: __nuxt_page_meta$2,
+        alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
+        redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
+        component: () => import('./_nuxt/index.79d8e930.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_$ = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.name) != null ? _$ : "my-tips___tr",
+        path: (_aa = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.path) != null ? _aa : "tips",
+        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/tips.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta,
+        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/tips.066a2f6f.mjs').then((m2) => m2.default || m2)
+      }
+    ],
+    name: (_ba = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ba : void 0,
+    meta: __nuxt_page_meta$3,
+    alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
+    redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
+    component: () => import('./_nuxt/my.17aa1a85.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_m = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.name) != null ? _m : "naive___en",
-    path: (_n = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.path) != null ? _n : "/en/naive",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/naive.vue",
+    name: (_ca = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ca : "news-article-articleSlug___en",
+    path: (_da = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.path) != null ? _da : "/en/news/article/:articleSlug",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/article/[articleSlug].vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/naive.5252b256.mjs').then((m) => m.default || m)
+    meta: __nuxt_page_meta$1,
+    alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
+    redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
+    component: () => import('./_nuxt/_articleSlug_.a6c6ce35.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_o = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.name) != null ? _o : "naive___tr",
-    path: (_p = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.path) != null ? _p : "/naive",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/naive.vue",
+    name: (_ea = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ea : "news-article-articleSlug___tr",
+    path: (_fa = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.path) != null ? _fa : "/news/article/:articleSlug",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/article/[articleSlug].vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/naive.5252b256.mjs').then((m) => m.default || m)
+    meta: __nuxt_page_meta$1,
+    alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
+    redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
+    component: () => import('./_nuxt/_articleSlug_.a6c6ce35.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_q = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.name) != null ? _q : "pinia___en",
-    path: (_r = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.path) != null ? _r : "/en/pinia",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/pinia.vue",
+    name: (_ga = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _ga : "news-category-categorySlug___en",
+    path: (_ha = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.path) != null ? _ha : "/en/news/category/:categorySlug",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/category/[categorySlug].vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/pinia.e38c201f.mjs').then((m) => m.default || m)
+    meta: __nuxt_page_meta,
+    alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
+    redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
+    component: () => import('./_nuxt/_categorySlug_.f110f3dc.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_s = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.name) != null ? _s : "pinia___tr",
-    path: (_t = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.path) != null ? _t : "/pinia",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/pinia.vue",
+    name: (_ia = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _ia : "news-category-categorySlug___tr",
+    path: (_ja = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.path) != null ? _ja : "/news/category/:categorySlug",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/category/[categorySlug].vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/pinia.e38c201f.mjs').then((m) => m.default || m)
+    meta: __nuxt_page_meta,
+    alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
+    redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
+    component: () => import('./_nuxt/_categorySlug_.f110f3dc.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: (_ka = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.name) != null ? _ka : "news-type-video___en",
+    path: (_la = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.path) != null ? _la : "/en/news/type/video",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/type/video.vue",
+    children: [],
+    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta,
+    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/video.f89cd5c9.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: (_ma = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.name) != null ? _ma : "news-type-video___tr",
+    path: (_na = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.path) != null ? _na : "/news/type/video",
+    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/type/video.vue",
+    children: [],
+    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta,
+    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/video.f89cd5c9.mjs').then((m2) => m2.default || m2)
   }
 ];
 const routerOptions0 = {
+  scrollBehavior: (to, from, savedPosition) => {
+    const nuxtApp = useNuxtApp();
+    return new Promise((resolve) => {
+      nuxtApp.hooks.hookOnce("page:finish", async () => {
+        await nextTick();
+        setTimeout(() => {
+          if (savedPosition)
+            resolve(savedPosition);
+          resolve({ top: 0 });
+        }, 150);
+      });
+    });
+  }
+};
+const routerOptions1 = {
   scrollBehavior(to, from, savedPosition) {
     const nuxtApp = useNuxtApp();
     let position = savedPosition || void 0;
@@ -1343,12 +1639,12 @@ function _getHashElementScrollMarginTop(selector) {
   }
   return 0;
 }
-function _isDifferentRoute(a, b) {
-  const samePageComponent = a.matched[0] === b.matched[0];
+function _isDifferentRoute(a2, b2) {
+  const samePageComponent = a2.matched[0] === b2.matched[0];
   if (!samePageComponent) {
     return true;
   }
-  if (samePageComponent && JSON.stringify(a.params) !== JSON.stringify(b.params)) {
+  if (samePageComponent && JSON.stringify(a2.params) !== JSON.stringify(b2.params)) {
     return true;
   }
   return false;
@@ -1356,6 +1652,7 @@ function _isDifferentRoute(a, b) {
 const configRouterOptions = {};
 const routerOptions = {
   ...configRouterOptions,
+  ...routerOptions1,
   ...routerOptions0
 };
 const validate = defineNuxtRouteMiddleware(async (to) => {
@@ -1373,7 +1670,9 @@ const validate = defineNuxtRouteMiddleware(async (to) => {
 const globalMiddleware = [
   validate
 ];
-const namedMiddleware = {};
+const namedMiddleware = {
+  auth: () => import('./_nuxt/auth.7733863d.mjs')
+};
 const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlugin(async (nuxtApp) => {
   var _a2, _b2, _c2, _d2;
   let __temp, __restore;
@@ -1453,7 +1752,7 @@ const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlu
       }
     }
     for (const entry2 of middlewareEntries) {
-      const middleware = typeof entry2 === "string" ? nuxtApp._middleware.named[entry2] || await ((_b3 = namedMiddleware[entry2]) == null ? void 0 : _b3.call(namedMiddleware).then((r) => r.default || r)) : entry2;
+      const middleware = typeof entry2 === "string" ? nuxtApp._middleware.named[entry2] || await ((_b3 = namedMiddleware[entry2]) == null ? void 0 : _b3.call(namedMiddleware).then((r2) => r2.default || r2)) : entry2;
       if (!middleware) {
         throw new Error(`Unknown route middleware: '${entry2}'.`);
       }
@@ -1503,8 +1802,8 @@ const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlu
   return { provide: { router } };
 });
 const plugin = {
-  install: (app, options) => {
-    app.provide("n-config-provider", {
+  install: (app2, options) => {
+    app2.provide("n-config-provider", {
       mergedThemeHashRef: computed(() => ""),
       mergedBreakpointsRef: computed(() => void 0),
       mergedRtlRef: computed(() => void 0),
@@ -1530,41 +1829,13 @@ const node_modules__64huntersofbook_naive_ui_nuxt_dist_runtime_config_mjs_hyx03W
     nuxtApp.vueApp.use(plugin, config);
 });
 const ssrContextKey = Symbol("@css-render/vue3-ssr");
-function createStyleString(id, style) {
-  return `<style cssr-id="${id}">
-${style}
-</style>`;
-}
-function ssrAdapter(id, style) {
-  const ssrContext = inject(ssrContextKey, null);
-  if (ssrContext === null) {
-    console.error("[css-render/vue3-ssr]: no ssr context found.");
-    return;
-  }
-  const { styles, ids } = ssrContext;
-  if (ids.has(id))
-    return;
-  if (styles !== null) {
-    ids.add(id);
-    styles.push(createStyleString(id, style));
-  }
-}
-function useSsrAdapter() {
-  const context = inject(ssrContextKey, null);
-  if (context === null)
-    return void 0;
-  return {
-    adapter: ssrAdapter,
-    context
-  };
-}
-function setup(app) {
+function setup(app2) {
   const styles = [];
   const ssrContext = {
     styles,
     ids: /* @__PURE__ */ new Set()
   };
-  app.provide(ssrContextKey, ssrContext);
+  app2.provide(ssrContextKey, ssrContext);
   return {
     collect() {
       const res = styles.join("\n");
@@ -1924,7 +2195,7 @@ function createComposer(options = {}, VueI18nLegacy) {
       throw createI18nError(I18nErrorCodes.UNEXPECTED_RETURN_TYPE);
     }
   };
-  function t(...args) {
+  function t2(...args) {
     return wrapWithDeps((context) => Reflect.apply(translate, null, [context, ...args]), () => parseTranslateArgs(...args), "translate", (root) => Reflect.apply(root.t, root, [...args]), (key) => key, (val) => isString$1(val));
   }
   function rt(...args) {
@@ -1932,12 +2203,12 @@ function createComposer(options = {}, VueI18nLegacy) {
     if (arg3 && !isObject$1(arg3)) {
       throw createI18nError(I18nErrorCodes.INVALID_ARGUMENT);
     }
-    return t(...[arg1, arg2, assign$2({ resolvedMessage: true }, arg3 || {})]);
+    return t2(...[arg1, arg2, assign$2({ resolvedMessage: true }, arg3 || {})]);
   }
-  function d(...args) {
+  function d2(...args) {
     return wrapWithDeps((context) => Reflect.apply(datetime, null, [context, ...args]), () => parseDateTimeArgs(...args), "datetime format", (root) => Reflect.apply(root.d, root, [...args]), () => MISSING_RESOLVE_VALUE, (val) => isString$1(val));
   }
-  function n(...args) {
+  function n2(...args) {
     return wrapWithDeps((context) => Reflect.apply(number, null, [context, ...args]), () => parseNumberArgs(...args), "number format", (root) => Reflect.apply(root.n, root, [...args]), () => MISSING_RESOLVE_VALUE, (val) => isString$1(val));
   }
   function normalize(values) {
@@ -2139,7 +2410,7 @@ function createComposer(options = {}, VueI18nLegacy) {
       _escapeParameter = val;
       _context.escapeParameter = val;
     },
-    t,
+    t: t2,
     getLocaleMessage,
     setLocaleMessage: setLocaleMessage2,
     mergeLocaleMessage: mergeLocaleMessage2,
@@ -2155,8 +2426,8 @@ function createComposer(options = {}, VueI18nLegacy) {
     composer.rt = rt;
     composer.te = te;
     composer.tm = tm;
-    composer.d = d;
-    composer.n = n;
+    composer.d = d2;
+    composer.n = n2;
     composer.getDateTimeFormat = getDateTimeFormat;
     composer.setDateTimeFormat = setDateTimeFormat;
     composer.mergeDateTimeFormat = mergeDateTimeFormat;
@@ -2239,7 +2510,7 @@ const Translation = {
       const children = i18n[TransrateVNodeSymbol](props.keypath, arg, options);
       const assignedAttrs = assign$2({}, attrs);
       const tag = isString$1(props.tag) || isObject$1(props.tag) ? props.tag : getFragmentableTag();
-      return h(tag, assignedAttrs, children);
+      return h$1(tag, assignedAttrs, children);
     };
   }
 };
@@ -2280,7 +2551,7 @@ function renderFormatter(props, context, slotKeys, partFormatter) {
     }
     const assignedAttrs = assign$2({}, attrs);
     const tag = isString$1(props.tag) || isObject$1(props.tag) ? props.tag : getFragmentableTag();
-    return h(tag, assignedAttrs, children);
+    return h$1(tag, assignedAttrs, children);
   };
 }
 const NumberFormat = {
@@ -2395,17 +2666,17 @@ function makeParams(value) {
   }
   return [path, named, options];
 }
-function apply(app, i18n, ...options) {
+function apply(app2, i18n, ...options) {
   const pluginOptions = isPlainObject$1(options[0]) ? options[0] : {};
   const useI18nComponentName = !!pluginOptions.useI18nComponentName;
   const globalInstall = isBoolean$1(pluginOptions.globalInstall) ? pluginOptions.globalInstall : true;
   if (globalInstall) {
-    app.component(!useI18nComponentName ? Translation.name : "i18n", Translation);
-    app.component(NumberFormat.name, NumberFormat);
-    app.component(DatetimeFormat.name, DatetimeFormat);
+    app2.component(!useI18nComponentName ? Translation.name : "i18n", Translation);
+    app2.component(NumberFormat.name, NumberFormat);
+    app2.component(DatetimeFormat.name, DatetimeFormat);
   }
   {
-    app.directive("t", vTDirective(i18n));
+    app2.directive("t", vTDirective(i18n));
   }
 }
 const I18nInjectionKey = /* @__PURE__ */ makeSymbol$1("global-vue-i18n");
@@ -2432,17 +2703,17 @@ function createI18n(options = {}, VueI18nLegacy) {
       get allowComposition() {
         return __allowComposition;
       },
-      async install(app, ...options2) {
-        app.__VUE_I18N_SYMBOL__ = symbol;
-        app.provide(app.__VUE_I18N_SYMBOL__, i18n);
+      async install(app2, ...options2) {
+        app2.__VUE_I18N_SYMBOL__ = symbol;
+        app2.provide(app2.__VUE_I18N_SYMBOL__, i18n);
         if (__globalInjection) {
-          injectGlobalFields(app, i18n.global);
+          injectGlobalFields(app2, i18n.global);
         }
         {
-          apply(app, i18n, ...options2);
+          apply(app2, i18n, ...options2);
         }
-        const unmountApp = app.unmount;
-        app.unmount = () => {
+        const unmountApp = app2.unmount;
+        app2.unmount = () => {
           i18n.dispose();
           unmountApp();
         };
@@ -2557,7 +2828,7 @@ const globalExportProps = [
   "availableLocales"
 ];
 const globalExportMethods = ["t", "rt", "d", "n", "tm"];
-function injectGlobalFields(app, composer) {
+function injectGlobalFields(app2, composer) {
   const i18n = /* @__PURE__ */ Object.create(null);
   globalExportProps.forEach((prop) => {
     const desc = Object.getOwnPropertyDescriptor(composer, prop);
@@ -2578,13 +2849,13 @@ function injectGlobalFields(app, composer) {
     };
     Object.defineProperty(i18n, prop, wrap);
   });
-  app.config.globalProperties.$i18n = i18n;
+  app2.config.globalProperties.$i18n = i18n;
   globalExportMethods.forEach((method) => {
     const desc = Object.getOwnPropertyDescriptor(composer, method);
     if (!desc || !desc.value) {
       throw createI18nError(I18nErrorCodes.UNEXPECTED_ERROR);
     }
-    Object.defineProperty(app.config.globalProperties, `$${method}`, desc);
+    Object.defineProperty(app2.config.globalProperties, `$${method}`, desc);
   });
 }
 registerMessageResolver(resolveValue);
@@ -2639,8 +2910,8 @@ function withoutTrailingSlash(input = "", queryParams = false) {
   if (!hasTrailingSlash(input, true)) {
     return input || "/";
   }
-  const [s0, ...s] = input.split("?");
-  return (s0.slice(0, -1) || "/") + (s.length ? `?${s.join("?")}` : "");
+  const [s0, ...s2] = input.split("?");
+  return (s0.slice(0, -1) || "/") + (s2.length ? `?${s2.join("?")}` : "");
 }
 function withTrailingSlash(input = "", queryParams = false) {
   if (!queryParams) {
@@ -2649,8 +2920,8 @@ function withTrailingSlash(input = "", queryParams = false) {
   if (hasTrailingSlash(input, true)) {
     return input || "/";
   }
-  const [s0, ...s] = input.split("?");
-  return s0 + "/" + (s.length ? `?${s.join("?")}` : "");
+  const [s0, ...s2] = input.split("?");
+  return s0 + "/" + (s2.length ? `?${s2.join("?")}` : "");
 }
 function warn(msg, err) {
   if (typeof console !== "undefined") {
@@ -2738,7 +3009,7 @@ function resolveBaseUrl(baseUrl, context) {
 function matchBrowserLocale(locales, browserLocales) {
   const matchedLocales = [];
   for (const [index, browserCode] of browserLocales.entries()) {
-    const matchedLocale = locales.find((l) => l.iso.toLowerCase() === browserCode.toLowerCase());
+    const matchedLocale = locales.find((l2) => l2.iso.toLowerCase() === browserCode.toLowerCase());
     if (matchedLocale) {
       matchedLocales.push({ code: matchedLocale.code, score: 1 - index / browserLocales.length });
       break;
@@ -2746,7 +3017,7 @@ function matchBrowserLocale(locales, browserLocales) {
   }
   for (const [index, browserCode] of browserLocales.entries()) {
     const languageCode = browserCode.split("-")[0].toLowerCase();
-    const matchedLocale = locales.find((l) => l.iso.split("-")[0].toLowerCase() === languageCode);
+    const matchedLocale = locales.find((l2) => l2.iso.split("-")[0].toLowerCase() === languageCode);
     if (matchedLocale) {
       matchedLocales.push({ code: matchedLocale.code, score: 0.999 - index / browserLocales.length });
       break;
@@ -2755,18 +3026,18 @@ function matchBrowserLocale(locales, browserLocales) {
   return matchedLocales;
 }
 const DefaultBrowserLocaleMatcher = matchBrowserLocale;
-function compareBrowserLocale(a, b) {
-  if (a.score === b.score) {
-    return b.code.length - a.code.length;
+function compareBrowserLocale(a2, b2) {
+  if (a2.score === b2.score) {
+    return b2.code.length - a2.code.length;
   }
-  return b.score - a.score;
+  return b2.score - a2.score;
 }
 const DefaultBrowerLocaleComparer = compareBrowserLocale;
 function findBrowserLocale(locales, browserLocales, { matcher = DefaultBrowserLocaleMatcher, comparer = DefaultBrowerLocaleComparer } = {}) {
   const normalizedLocales = [];
-  for (const l of locales) {
-    const { code: code2 } = l;
-    const iso = l.iso || code2;
+  for (const l2 of locales) {
+    const { code: code2 } = l2;
+    const iso = l2.iso || code2;
     normalizedLocales.push({ code: code2, iso });
   }
   const matchedLocales = matcher(normalizedLocales, browserLocales);
@@ -2811,8 +3082,8 @@ function extendI18n(i18n, {
     if (isVueI18n(i18n.global)) {
       extendVueI18n(i18n.global, hooks.onExtendVueI18n);
     }
-    const app = vue;
-    const exported = i18n.mode === "composition" ? app.config.globalProperties.$i18n : null;
+    const app2 = vue;
+    const exported = i18n.mode === "composition" ? app2.config.globalProperties.$i18n : null;
     if (exported) {
       extendExportedGlobal(exported, composer, hooks.onExtendExportedGlobal);
     }
@@ -2830,9 +3101,9 @@ function extendI18n(i18n, {
         }
       });
     }
-    if (app.unmount) {
-      const unmountApp = app.unmount;
-      app.unmount = () => {
+    if (app2.unmount) {
+      const unmountApp = app2.unmount;
+      app2.unmount = () => {
         scope.stop();
         unmountApp();
       };
@@ -2859,27 +3130,27 @@ function extendComposer(composer, options) {
     options.hooks.onExtendComposer(composer);
   }
 }
-function extendExportedGlobal(exported, g, hook) {
+function extendExportedGlobal(exported, g2, hook) {
   const properties = [
     {
       locales: {
         get() {
-          return g.locales.value;
+          return g2.locales.value;
         }
       },
       localeCodes: {
         get() {
-          return g.localeCodes.value;
+          return g2.localeCodes.value;
         }
       },
       baseUrl: {
         get() {
-          return g.baseUrl.value;
+          return g2.baseUrl.value;
         }
       }
     }
   ];
-  hook && properties.push(hook(g));
+  hook && properties.push(hook(g2));
   for (const property of properties) {
     for (const [key, descriptor] of Object.entries(property)) {
       Object.defineProperty(exported, key, descriptor);
@@ -3077,8 +3348,8 @@ function resolveRoute(route, locale) {
       return resolvedRoute;
     }
     return router.resolve(route);
-  } catch (e) {
-    if (e.type === 1) {
+  } catch (e2) {
+    if (e2.type === 1) {
       return null;
     }
   }
@@ -3131,7 +3402,7 @@ function localeHead({ addDirAttribute = false, addSeoAttributes = false, identif
   }
   const locale = getLocale(i18n);
   const locales = getLocales(i18n);
-  const currentLocale = getNormalizedLocales(locales).find((l) => l.code === locale) || {
+  const currentLocale = getNormalizedLocales(locales).find((l2) => l2.code === locale) || {
     code: locale
   };
   const currentLocaleIso = currentLocale.iso;
@@ -3208,7 +3479,7 @@ function addCanonicalLinks(baseUrl, link, identifierAttribute, seoAttributesOpti
         if (queryParamName in currentRouteQueryParams) {
           const queryParamValue = currentRouteQueryParams[queryParamName];
           if (isArray(queryParamValue)) {
-            queryParamValue.forEach((v) => params.append(queryParamName, v || ""));
+            queryParamValue.forEach((v2) => params.append(queryParamName, v2 || ""));
           } else {
             params.append(queryParamName, queryParamValue || "");
           }
@@ -3259,58 +3530,6 @@ function toAbsoluteUrl(urlOrPath, baseUrl) {
     return urlOrPath;
   }
   return baseUrl + urlOrPath;
-}
-function proxyForComposable(options, target) {
-  const {
-    router,
-    route,
-    i18n,
-    defaultLocale,
-    strategy,
-    defaultLocaleRouteNameSuffix,
-    trailingSlash,
-    routesNameSeparator
-  } = options;
-  return function(...args) {
-    return Reflect.apply(
-      target,
-      {
-        router,
-        route,
-        i18n,
-        defaultLocale,
-        strategy,
-        defaultLocaleRouteNameSuffix,
-        trailingSlash,
-        routesNameSeparator
-      },
-      args
-    );
-  };
-}
-function useSwitchLocalePath({
-  router = useRouter$1(),
-  route = useRoute$1(),
-  i18n = useI18n(),
-  defaultLocale = void 0,
-  defaultLocaleRouteNameSuffix = void 0,
-  routesNameSeparator = void 0,
-  strategy = void 0,
-  trailingSlash = void 0
-} = {}) {
-  return proxyForComposable(
-    {
-      router,
-      route,
-      i18n,
-      defaultLocale,
-      defaultLocaleRouteNameSuffix,
-      routesNameSeparator,
-      strategy,
-      trailingSlash
-    },
-    switchLocalePath
-  );
 }
 const locale_tr = {
   "hello": (ctx) => {
@@ -3405,14 +3624,14 @@ function parseAcceptLanguage(input) {
 async function loadMessage(context, loader) {
   let message = null;
   try {
-    const getter = await loader().then((r) => r.default || r);
+    const getter = await loader().then((r2) => r2.default || r2);
     if (isFunction$1(getter)) {
       console.error(formatMessage("Not support executable file (e.g. js, cjs, mjs)"));
     } else {
       message = getter;
     }
-  } catch (e) {
-    console.error(formatMessage("Failed locale loading: " + e.message));
+  } catch (e2) {
+    console.error(formatMessage("Failed locale loading: " + e2.message));
   }
   return message;
 }
@@ -3794,7 +4013,7 @@ const node_modules__64nuxtjs_i18n_dist_runtime_plugin_mjs_vyNBGOI7EC = defineNux
   let __temp, __restore;
   const router = useRouter();
   const route = useRoute();
-  const { vueApp: app } = nuxt;
+  const { vueApp: app2 } = nuxt;
   const nuxtContext = nuxt;
   const nuxtI18nOptions = ([__temp, __restore] = executeAsync(() => resolveNuxtI18nOptions()), __temp = await __temp, __restore(), __temp);
   const useCookie2 = nuxtI18nOptions.detectBrowserLanguage && nuxtI18nOptions.detectBrowserLanguage.useCookie;
@@ -3858,7 +4077,7 @@ const node_modules__64nuxtjs_i18n_dist_runtime_plugin_mjs_vyNBGOI7EC = defineNux
       onExtendComposer(composer) {
         composer.strategy = nuxtI18nOptions.strategy;
         composer.localeProperties = computed(() => {
-          return normalizedLocales.find((l) => l.code === composer.locale.value) || {
+          return normalizedLocales.find((l2) => l2.code === composer.locale.value) || {
             code: composer.locale.value
           };
         });
@@ -3904,61 +4123,61 @@ const node_modules__64nuxtjs_i18n_dist_runtime_plugin_mjs_vyNBGOI7EC = defineNux
           }
         };
       },
-      onExtendExportedGlobal(g) {
+      onExtendExportedGlobal(g2) {
         return {
           strategy: {
             get() {
-              return g.strategy;
+              return g2.strategy;
             }
           },
           localeProperties: {
             get() {
-              return g.localeProperties.value;
+              return g2.localeProperties.value;
             }
           },
           setLocale: {
             get() {
-              return async (locale) => Reflect.apply(g.setLocale, g, [locale]);
+              return async (locale) => Reflect.apply(g2.setLocale, g2, [locale]);
             }
           },
           differentDomains: {
             get() {
-              return g.differentDomains;
+              return g2.differentDomains;
             }
           },
           getBrowserLocale: {
             get() {
-              return () => Reflect.apply(g.getBrowserLocale, g, []);
+              return () => Reflect.apply(g2.getBrowserLocale, g2, []);
             }
           },
           getLocaleCookie: {
             get() {
-              return () => Reflect.apply(g.getLocaleCookie, g, []);
+              return () => Reflect.apply(g2.getLocaleCookie, g2, []);
             }
           },
           setLocaleCookie: {
             get() {
-              return (locale) => Reflect.apply(g.setLocaleCookie, g, [locale]);
+              return (locale) => Reflect.apply(g2.setLocaleCookie, g2, [locale]);
             }
           },
           onBeforeLanguageSwitch: {
             get() {
-              return (oldLocale, newLocale, initialSetup, context) => Reflect.apply(g.onBeforeLanguageSwitch, g, [oldLocale, newLocale, initialSetup, context]);
+              return (oldLocale, newLocale, initialSetup, context) => Reflect.apply(g2.onBeforeLanguageSwitch, g2, [oldLocale, newLocale, initialSetup, context]);
             }
           },
           onLanguageSwitched: {
             get() {
-              return (oldLocale, newLocale) => Reflect.apply(g.onLanguageSwitched, g, [oldLocale, newLocale]);
+              return (oldLocale, newLocale) => Reflect.apply(g2.onLanguageSwitched, g2, [oldLocale, newLocale]);
             }
           },
           finalizePendingLocaleChange: {
             get() {
-              return () => Reflect.apply(g.finalizePendingLocaleChange, g, []);
+              return () => Reflect.apply(g2.finalizePendingLocaleChange, g2, []);
             }
           },
           waitForPendingLocaleChange: {
             get() {
-              return () => Reflect.apply(g.waitForPendingLocaleChange, g, []);
+              return () => Reflect.apply(g2.waitForPendingLocaleChange, g2, []);
             }
           }
         };
@@ -4024,7 +4243,7 @@ const node_modules__64nuxtjs_i18n_dist_runtime_plugin_mjs_vyNBGOI7EC = defineNux
       }
     }
   });
-  app.use(i18n);
+  app2.use(i18n);
   inejctNuxtHelpers(nuxtContext, i18n);
   [__temp, __restore] = executeAsync(() => mergeAdditionalMessages(nuxtContext, i18n, initialLocale)), await __temp, __restore();
   addRouteMiddleware(
@@ -4074,8 +4293,8 @@ const _nuxt_unocss_mjs_MzCDxu9LMj = defineNuxtPlugin(() => {
 let activePinia;
 const setActivePinia = (pinia) => activePinia = pinia;
 const piniaSymbol = Symbol();
-function isPlainObject(o) {
-  return o && typeof o === "object" && Object.prototype.toString.call(o) === "[object Object]" && typeof o.toJSON !== "function";
+function isPlainObject(o2) {
+  return o2 && typeof o2 === "object" && Object.prototype.toString.call(o2) === "[object Object]" && typeof o2.toJSON !== "function";
 }
 var MutationType;
 (function(MutationType2) {
@@ -4089,12 +4308,12 @@ function createPinia() {
   let _p2 = [];
   let toBeInstalled = [];
   const pinia = markRaw({
-    install(app) {
+    install(app2) {
       setActivePinia(pinia);
       {
-        pinia._a = app;
-        app.provide(piniaSymbol, pinia);
-        app.config.globalProperties.$pinia = pinia;
+        pinia._a = app2;
+        app2.provide(piniaSymbol, pinia);
+        app2.config.globalProperties.$pinia = pinia;
         toBeInstalled.forEach((plugin2) => _p2.push(plugin2));
         toBeInstalled = [];
       }
@@ -4161,8 +4380,8 @@ function shouldHydrate(obj) {
   return !isPlainObject(obj) || !obj.hasOwnProperty(skipHydrateSymbol);
 }
 const { assign } = Object;
-function isComputed(o) {
-  return !!(isRef(o) && o.effect);
+function isComputed(o2) {
+  return !!(isRef(o2) && o2.effect);
 }
 function createOptionsStore(id, options, pinia, hot) {
   const { state, actions, getters } = options;
@@ -4433,11 +4652,11 @@ const _plugins = [
   _nuxt_unocss_mjs_MzCDxu9LMj,
   node_modules__64pinia_nuxt_dist_runtime_plugin_vue3_mjs_A0OWXRrUgq
 ];
-const _sfc_main$1 = {
+const _sfc_main$9 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.e068ca68.mjs').then((r) => r.default || r));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.fdcfa216.mjs').then((r2) => r2.default || r2));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -4464,11 +4683,11 @@ const _sfc_main$1 = {
     };
   }
 };
-const _sfc_setup$1 = _sfc_main$1.setup;
-_sfc_main$1.setup = (props, ctx) => {
+const _sfc_setup$9 = _sfc_main$9.setup;
+_sfc_main$9.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/nuxt/dist/app/components/nuxt-root.vue");
-  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
+  return _sfc_setup$9 ? _sfc_setup$9(props, ctx) : void 0;
 };
 const removeUndefinedProps = (props) => Object.fromEntries(Object.entries(props).filter(([, value]) => value !== void 0));
 const setupForUseMeta = (metaFactory, renderChild) => (props, ctx) => {
@@ -4715,191 +4934,620 @@ const Body = defineComponent({
   },
   setup: setupForUseMeta((bodyAttrs) => ({ bodyAttrs }), true)
 });
-const Fragment = defineComponent({
-  setup(_props, { slots }) {
-    return () => {
-      var _a2;
-      return (_a2 = slots.default) == null ? void 0 : _a2.call(slots);
-    };
-  }
-});
-const _wrapIf = (component, props, slots) => {
-  return { default: () => props ? h(component, props === true ? {} : props, slots) : h(Fragment, {}, slots) };
-};
-const layouts = {
-  default: () => import('./_nuxt/default.de10ad06.mjs').then((m) => m.default || m)
-};
-const LayoutLoader = defineComponent({
+const _sfc_main$8 = /* @__PURE__ */ defineComponent({
+  __name: "Anchor",
+  __ssrInlineRender: true,
   props: {
-    name: String,
-    ...{}
-  },
-  async setup(props, context) {
-    const LayoutComponent = await layouts[props.name]().then((r) => r.default || r);
-    return () => {
-      return h(LayoutComponent, {}, context.slots);
-    };
-  }
-});
-const __nuxt_component_2 = defineComponent({
-  props: {
-    name: {
-      type: [String, Boolean, Object],
-      default: null
+    text: {
+      type: String,
+      default: ""
+    },
+    to: {
+      type: [String, Object],
+      default: void 0
+    },
+    href: {
+      type: String,
+      default: ""
     }
   },
-  setup(props, context) {
-    const injectedRoute = inject("_route");
-    const route = injectedRoute === useRoute() ? useRoute$1() : injectedRoute;
-    const layout = computed(() => {
-      var _a2, _b2;
-      return (_b2 = (_a2 = unref(props.name)) != null ? _a2 : route.meta.layout) != null ? _b2 : "default";
+  setup(__props) {
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_NuxtLink = __nuxt_component_0$1;
+      if (__props.to) {
+        _push(ssrRenderComponent(_component_NuxtLink, mergeProps({
+          tag: "a",
+          to: __props.to,
+          class: "transition-colors duration-300 dark:hover:text-white hover:text-gray-900 hover:underline"
+        }, _attrs), {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+                _push2(`${ssrInterpolate(__props.text)}`);
+              }, _push2, _parent2, _scopeId);
+            } else {
+              return [
+                renderSlot(_ctx.$slots, "default", {}, () => [
+                  createTextVNode(toDisplayString(__props.text), 1)
+                ])
+              ];
+            }
+          }),
+          _: 3
+        }, _parent));
+      } else {
+        _push(`<a${ssrRenderAttrs(mergeProps({
+          class: "transition-colors duration-300 dark:hover:text-white hover:text-gray-900 hover:underline",
+          href: __props.href
+        }, _attrs))}>`);
+        ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+          _push(`${ssrInterpolate(__props.text)}`);
+        }, _push, _parent);
+        _push(`</a>`);
+      }
+    };
+  }
+});
+const _sfc_setup$8 = _sfc_main$8.setup;
+_sfc_main$8.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Anchor.vue");
+  return _sfc_setup$8 ? _sfc_setup$8(props, ctx) : void 0;
+};
+const _sfc_main$7 = /* @__PURE__ */ defineComponent({
+  __name: "Button",
+  __ssrInlineRender: true,
+  props: {
+    text: {
+      type: String,
+      default: ""
+    },
+    type: {
+      type: String,
+      default: "primary"
+    },
+    size: {
+      type: String,
+      default: "md"
+    },
+    to: {
+      type: [String, Object],
+      default: void 0
+    },
+    href: {
+      type: String,
+      default: ""
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const defaultStyle = `
+  cursor-pointer
+  border transition-color duration-300
+  focus:outline-none focus:ring-1 focus:ring-offset-1 focus:dark:ring-offset-gray-50 focus:dark:ring-gray-400 focus:ring-gray-600/[0.6] focus:ring-offset-gray-800/[0.6]
+  flex items-center justify-center
+`;
+    const styles = reactive({
+      primary: "text-white bg-gray-800 hover:bg-white hover:text-gray-800 hover:border-gray-900 dark:text-gray-800 dark:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-100 dark:border-white",
+      secondary: "text-gray-800 bg-white hover:border-gray-900  dark:border-gray-900 dark:text-white dark:bg-gray-800 dark:hover:border-white"
     });
-    return () => {
-      var _a2;
-      const hasLayout = layout.value && layout.value in layouts;
-      const transitionProps = (_a2 = route.meta.layoutTransition) != null ? _a2 : appLayoutTransition;
-      return _wrapIf(Transition, hasLayout && transitionProps, {
-        default: () => _wrapIf(LayoutLoader, hasLayout && { key: layout.value, name: layout.value, hasTransition: void 0 }, context.slots).default()
-      }).default();
+    const sizes = reactive({
+      lg: "h-12 px-8 text-lg rounded-lg",
+      md: "h-10 px-6 text-base rounded",
+      sm: "h-8 px-4 text-sm rounded",
+      xs: "h-6 px-3 text-xs rounded"
+    });
+    const selectedStyle = computed(() => styles[props.type] || styles.primary);
+    const selectedSize = computed(() => sizes[props.size] || sizes.lg);
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_NuxtLink = __nuxt_component_0$1;
+      if (__props.to) {
+        _push(ssrRenderComponent(_component_NuxtLink, mergeProps({
+          tag: "a",
+          to: __props.to,
+          class: `${defaultStyle} ${unref(selectedStyle)} ${unref(selectedSize)}`
+        }, _attrs), {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+                _push2(`${ssrInterpolate(__props.text)}`);
+              }, _push2, _parent2, _scopeId);
+            } else {
+              return [
+                renderSlot(_ctx.$slots, "default", {}, () => [
+                  createTextVNode(toDisplayString(__props.text), 1)
+                ])
+              ];
+            }
+          }),
+          _: 3
+        }, _parent));
+      } else {
+        _push(`<a${ssrRenderAttrs(mergeProps({
+          class: `${defaultStyle} ${unref(selectedStyle)} ${unref(selectedSize)}`,
+          href: __props.href
+        }, _attrs))}>`);
+        ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+          _push(`${ssrInterpolate(__props.text)}`);
+        }, _push, _parent);
+        _push(`</a>`);
+      }
     };
   }
 });
-const interpolatePath = (route, match) => {
-  return match.path.replace(/(:\w+)\([^)]+\)/g, "$1").replace(/(:\w+)[?+*]/g, "$1").replace(/:\w+/g, (r) => {
-    var _a2;
-    return ((_a2 = route.params[r.slice(1)]) == null ? void 0 : _a2.toString()) || "";
-  });
+const _sfc_setup$7 = _sfc_main$7.setup;
+_sfc_main$7.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Button.vue");
+  return _sfc_setup$7 ? _sfc_setup$7(props, ctx) : void 0;
 };
-const generateRouteKey = (override, routeProps) => {
-  var _a2;
-  const matchedRoute = routeProps.route.matched.find((m) => {
-    var _a3;
-    return ((_a3 = m.components) == null ? void 0 : _a3.default) === routeProps.Component.type;
-  });
-  const source = (_a2 = override != null ? override : matchedRoute == null ? void 0 : matchedRoute.meta.key) != null ? _a2 : matchedRoute && interpolatePath(routeProps.route, matchedRoute);
-  return typeof source === "function" ? source(routeProps.route) : source;
+const _export_sfc = (sfc, props) => {
+  const target = sfc.__vccOpts || sfc;
+  for (const [key, val] of props) {
+    target[key] = val;
+  }
+  return target;
 };
-const wrapInKeepAlive = (props, children) => {
-  return { default: () => children };
+const _sfc_main$6 = {};
+function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
+  _push(`<div${ssrRenderAttrs(_attrs)}></div>`);
+}
+const _sfc_setup$6 = _sfc_main$6.setup;
+_sfc_main$6.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("../node_modules/@unocss/nuxt/runtime/UnoIcon.vue");
+  return _sfc_setup$6 ? _sfc_setup$6(props, ctx) : void 0;
 };
-const __nuxt_component_3 = defineComponent({
-  name: "NuxtPage",
-  inheritAttrs: false,
-  props: {
-    name: {
-      type: String
-    },
-    transition: {
-      type: [Boolean, Object],
-      default: void 0
-    },
-    keepalive: {
-      type: [Boolean, Object],
-      default: void 0
-    },
-    route: {
-      type: Object
-    },
-    pageKey: {
-      type: [Function, String],
-      default: null
+const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["ssrRender", _sfc_ssrRender]]);
+const _imports_0$1 = "" + globalThis.__publicAssetsURL("user.png");
+function u(r2, n2, ...a2) {
+  if (r2 in n2) {
+    let e2 = n2[r2];
+    return typeof e2 == "function" ? e2(...a2) : e2;
+  }
+  let t2 = new Error(`Tried to handle "${r2}" but there is no handler defined. Only defined handlers are: ${Object.keys(n2).map((e2) => `"${e2}"`).join(", ")}.`);
+  throw Error.captureStackTrace && Error.captureStackTrace(t2, u), t2;
+}
+var R = ((o2) => (o2[o2.None = 0] = "None", o2[o2.RenderStrategy = 1] = "RenderStrategy", o2[o2.Static = 2] = "Static", o2))(R || {}), O$1 = ((e2) => (e2[e2.Unmount = 0] = "Unmount", e2[e2.Hidden = 1] = "Hidden", e2))(O$1 || {});
+function P({ visible: r2 = true, features: t2 = 0, ourProps: e2, theirProps: o2, ...i }) {
+  var a2;
+  let n2 = k(o2, e2), s2 = Object.assign(i, { props: n2 });
+  if (r2 || t2 & 2 && n2.static)
+    return p$1(s2);
+  if (t2 & 1) {
+    let l2 = (a2 = n2.unmount) == null || a2 ? 0 : 1;
+    return u(l2, { [0]() {
+      return null;
+    }, [1]() {
+      return p$1({ ...i, props: { ...n2, hidden: true, style: { display: "none" } } });
+    } });
+  }
+  return p$1(s2);
+}
+function p$1({ props: r2, attrs: t2, slots: e2, slot: o2, name: i }) {
+  var y2;
+  let { as: n2, ...s2 } = w(r2, ["unmount", "static"]), a2 = (y2 = e2.default) == null ? void 0 : y2.call(e2, o2), l2 = {};
+  if (o2) {
+    let d2 = false, u2 = [];
+    for (let [f2, c2] of Object.entries(o2))
+      typeof c2 == "boolean" && (d2 = true), c2 === true && u2.push(f2);
+    d2 && (l2["data-headlessui-state"] = u2.join(" "));
+  }
+  if (n2 === "template") {
+    if (a2 = g(a2 != null ? a2 : []), Object.keys(s2).length > 0 || Object.keys(t2).length > 0) {
+      let [d2, ...u2] = a2 != null ? a2 : [];
+      if (!x$1(d2) || u2.length > 0)
+        throw new Error(['Passing props on "template"!', "", `The current component <${i} /> is rendering a "template".`, "However we need to passthrough the following props:", Object.keys(s2).concat(Object.keys(t2)).sort((f2, c2) => f2.localeCompare(c2)).map((f2) => `  - ${f2}`).join(`
+`), "", "You can apply a few solutions:", ['Add an `as="..."` prop, to ensure that we render an actual element instead of a "template".', "Render a single element as the child so that we can forward the props onto that element."].map((f2) => `  - ${f2}`).join(`
+`)].join(`
+`));
+      return cloneVNode(d2, Object.assign({}, s2, l2));
     }
-  },
-  setup(props, { attrs }) {
-    const nuxtApp = useNuxtApp();
-    return () => {
-      return h(RouterView, { name: props.name, route: props.route, ...attrs }, {
-        default: (routeProps) => {
-          var _a2, _b2, _c2, _d2;
-          if (!routeProps.Component) {
-            return;
-          }
-          const key = generateRouteKey(props.pageKey, routeProps);
-          const done = nuxtApp.deferHydration();
-          const hasTransition = !!((_b2 = (_a2 = props.transition) != null ? _a2 : routeProps.route.meta.pageTransition) != null ? _b2 : appPageTransition);
-          const transitionProps = hasTransition && _mergeTransitionProps([
-            props.transition,
-            routeProps.route.meta.pageTransition,
-            appPageTransition,
-            { onAfterLeave: () => {
-              nuxtApp.callHook("page:transition:finish", routeProps.Component);
-            } }
-          ].filter(Boolean));
-          return _wrapIf(
-            Transition,
-            hasTransition && transitionProps,
-            wrapInKeepAlive(
-              (_d2 = (_c2 = props.keepalive) != null ? _c2 : routeProps.route.meta.keepalive) != null ? _d2 : appKeepalive,
-              h(Suspense, {
-                onPending: () => nuxtApp.callHook("page:start", routeProps.Component),
-                onResolve: () => {
-                  nextTick(() => nuxtApp.callHook("page:finish", routeProps.Component).finally(done));
-                }
-              }, { default: () => h(Component, { key, routeProps, pageKey: key, hasTransition }) })
-            )
-          ).default();
+    return Array.isArray(a2) && a2.length === 1 ? a2[0] : a2;
+  }
+  return h$1(n2, Object.assign({}, s2, l2), { default: () => a2 });
+}
+function g(r2) {
+  return r2.flatMap((t2) => t2.type === Fragment$1 ? g(t2.children) : [t2]);
+}
+function k(...r2) {
+  if (r2.length === 0)
+    return {};
+  if (r2.length === 1)
+    return r2[0];
+  let t2 = {}, e2 = {};
+  for (let i of r2)
+    for (let n2 in i)
+      n2.startsWith("on") && typeof i[n2] == "function" ? (e2[n2] != null || (e2[n2] = []), e2[n2].push(i[n2])) : t2[n2] = i[n2];
+  if (t2.disabled || t2["aria-disabled"])
+    return Object.assign(t2, Object.fromEntries(Object.keys(e2).map((i) => [i, void 0])));
+  for (let i in e2)
+    Object.assign(t2, { [i](n2, ...s2) {
+      let a2 = e2[i];
+      for (let l2 of a2) {
+        if (n2 instanceof Event && n2.defaultPrevented)
+          return;
+        l2(n2, ...s2);
+      }
+    } });
+  return t2;
+}
+function V$1(r2) {
+  let t2 = Object.assign({}, r2);
+  for (let e2 in t2)
+    t2[e2] === void 0 && delete t2[e2];
+  return t2;
+}
+function w(r2, t2 = []) {
+  let e2 = Object.assign({}, r2);
+  for (let o2 of t2)
+    o2 in e2 && delete e2[o2];
+  return e2;
+}
+function x$1(r2) {
+  return r2 == null ? false : typeof r2.type == "string" || typeof r2.type == "object" || typeof r2.type == "function";
+}
+let e$2 = 0;
+function n$1() {
+  return ++e$2;
+}
+function t() {
+  return n$1();
+}
+var o$1 = ((r2) => (r2.Space = " ", r2.Enter = "Enter", r2.Escape = "Escape", r2.Backspace = "Backspace", r2.Delete = "Delete", r2.ArrowLeft = "ArrowLeft", r2.ArrowUp = "ArrowUp", r2.ArrowRight = "ArrowRight", r2.ArrowDown = "ArrowDown", r2.Home = "Home", r2.End = "End", r2.PageUp = "PageUp", r2.PageDown = "PageDown", r2.Tab = "Tab", r2))(o$1 || {});
+function f$3(r2) {
+  throw new Error("Unexpected object: " + r2);
+}
+var a$1 = ((e2) => (e2[e2.First = 0] = "First", e2[e2.Previous = 1] = "Previous", e2[e2.Next = 2] = "Next", e2[e2.Last = 3] = "Last", e2[e2.Specific = 4] = "Specific", e2[e2.Nothing = 5] = "Nothing", e2))(a$1 || {});
+function x(r2, n2) {
+  let t2 = n2.resolveItems();
+  if (t2.length <= 0)
+    return null;
+  let l2 = n2.resolveActiveIndex(), s2 = l2 != null ? l2 : -1, d2 = (() => {
+    switch (r2.focus) {
+      case 0:
+        return t2.findIndex((e2) => !n2.resolveDisabled(e2));
+      case 1: {
+        let e2 = t2.slice().reverse().findIndex((i, c2, u2) => s2 !== -1 && u2.length - c2 - 1 >= s2 ? false : !n2.resolveDisabled(i));
+        return e2 === -1 ? e2 : t2.length - 1 - e2;
+      }
+      case 2:
+        return t2.findIndex((e2, i) => i <= s2 ? false : !n2.resolveDisabled(e2));
+      case 3: {
+        let e2 = t2.slice().reverse().findIndex((i) => !n2.resolveDisabled(i));
+        return e2 === -1 ? e2 : t2.length - 1 - e2;
+      }
+      case 4:
+        return t2.findIndex((e2) => n2.resolveId(e2) === r2.id);
+      case 5:
+        return null;
+      default:
+        f$3(r2);
+    }
+  })();
+  return d2 === -1 ? l2 : d2;
+}
+function o(n2) {
+  var l2;
+  return n2 == null || n2.value == null ? null : (l2 = n2.value.$el) != null ? l2 : n2.value;
+}
+let n = Symbol("Context");
+var l = ((e2) => (e2[e2.Open = 0] = "Open", e2[e2.Closed = 1] = "Closed", e2))(l || {});
+function f$2() {
+  return p() !== null;
+}
+function p() {
+  return inject(n, null);
+}
+function c(o2) {
+  provide(n, o2);
+}
+function r(t2, e2) {
+  if (t2)
+    return t2;
+  let n2 = e2 != null ? e2 : "button";
+  if (typeof n2 == "string" && n2.toLowerCase() === "button")
+    return "button";
+}
+function b$1(t2, e2) {
+  let n2 = ref(r(t2.value.type, t2.value.as));
+  return onMounted(() => {
+    n2.value = r(t2.value.type, t2.value.as);
+  }), watchEffect(() => {
+    var o$12;
+    n2.value || !o(e2) || o(e2) instanceof HTMLButtonElement && !((o$12 = o(e2)) != null && o$12.hasAttribute("type")) && (n2.value = "button");
+  }), n2;
+}
+function m$1(r2) {
+  return null;
+}
+let m = ["[contentEditable=true]", "[tabindex]", "a[href]", "area[href]", "button:not([disabled])", "iframe", "input:not([disabled])", "select:not([disabled])", "textarea:not([disabled])"].map((e2) => `${e2}:not([tabindex='-1'])`).join(",");
+var M = ((n2) => (n2[n2.First = 1] = "First", n2[n2.Previous = 2] = "Previous", n2[n2.Next = 4] = "Next", n2[n2.Last = 8] = "Last", n2[n2.WrapAround = 16] = "WrapAround", n2[n2.NoScroll = 32] = "NoScroll", n2))(M || {}), N = ((o2) => (o2[o2.Error = 0] = "Error", o2[o2.Overflow = 1] = "Overflow", o2[o2.Success = 2] = "Success", o2[o2.Underflow = 3] = "Underflow", o2))(N || {}), b = ((r2) => (r2[r2.Previous = -1] = "Previous", r2[r2.Next = 1] = "Next", r2))(b || {});
+var F = ((r2) => (r2[r2.Strict = 0] = "Strict", r2[r2.Loose = 1] = "Loose", r2))(F || {});
+function h(e2, t2 = 0) {
+  var r2;
+  return e2 === ((r2 = m$1()) == null ? void 0 : r2.body) ? false : u(t2, { [0]() {
+    return e2.matches(m);
+  }, [1]() {
+    let l2 = e2;
+    for (; l2 !== null; ) {
+      if (l2.matches(m))
+        return true;
+      l2 = l2.parentElement;
+    }
+    return false;
+  } });
+}
+function O(e2, t2 = (r2) => r2) {
+  return e2.slice().sort((r2, l2) => {
+    let o2 = t2(r2), s2 = t2(l2);
+    if (o2 === null || s2 === null)
+      return 0;
+    let n2 = o2.compareDocumentPosition(s2);
+    return n2 & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : n2 & Node.DOCUMENT_POSITION_PRECEDING ? 1 : 0;
+  });
+}
+function y(f2, m2, i = computed(() => true)) {
+  ref(null);
+}
+var a = ((e2) => (e2[e2.None = 1] = "None", e2[e2.Focusable = 2] = "Focusable", e2[e2.Hidden = 4] = "Hidden", e2))(a || {});
+let f$1 = defineComponent({ name: "Hidden", props: { as: { type: [Object, String], default: "div" }, features: { type: Number, default: 1 } }, setup(r2, { slots: t2, attrs: d2 }) {
+  return () => {
+    let { features: e2, ...o2 } = r2, n2 = { "aria-hidden": (e2 & 2) === 2 ? true : void 0, style: { position: "fixed", top: 1, left: 1, width: 1, height: 0, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", borderWidth: "0", ...(e2 & 4) === 4 && (e2 & 2) !== 2 && { display: "none" } } };
+    return P({ ourProps: n2, theirProps: o2, slot: {}, attrs: d2, slots: t2, name: "Hidden" });
+  };
+} });
+function e(n2 = {}, r2 = null, t2 = []) {
+  for (let [i, o2] of Object.entries(n2))
+    f(t2, s(r2, i), o2);
+  return t2;
+}
+function s(n2, r2) {
+  return n2 ? n2 + "[" + r2 + "]" : r2;
+}
+function f(n2, r2, t2) {
+  if (Array.isArray(t2))
+    for (let [i, o2] of t2.entries())
+      f(n2, s(r2, i.toString()), o2);
+  else
+    t2 instanceof Date ? n2.push([r2, t2.toISOString()]) : typeof t2 == "boolean" ? n2.push([r2, t2 ? "1" : "0"]) : typeof t2 == "string" ? n2.push([r2, t2]) : typeof t2 == "number" ? n2.push([r2, `${t2}`]) : t2 == null ? n2.push([r2, ""]) : e(t2, r2, n2);
+}
+function d(u2, e2, r2) {
+  let i = ref(r2 == null ? void 0 : r2.value), f2 = computed(() => u2.value !== void 0);
+  return [computed(() => f2.value ? u2.value : i.value), function(t2) {
+    return f2.value || (i.value = t2), e2 == null ? void 0 : e2(t2);
+  }];
+}
+function ue(o2, m2) {
+  return o2 === m2;
+}
+var re = ((l2) => (l2[l2.Open = 0] = "Open", l2[l2.Closed = 1] = "Closed", l2))(re || {}), se = ((l2) => (l2[l2.Single = 0] = "Single", l2[l2.Multi = 1] = "Multi", l2))(se || {}), de = ((l2) => (l2[l2.Pointer = 0] = "Pointer", l2[l2.Other = 1] = "Other", l2))(de || {});
+function fe(o2) {
+  requestAnimationFrame(() => requestAnimationFrame(o2));
+}
+let H = Symbol("ListboxContext");
+function V(o2) {
+  let m2 = inject(H, null);
+  if (m2 === null) {
+    let l2 = new Error(`<${o2} /> is missing a parent <Listbox /> component.`);
+    throw Error.captureStackTrace && Error.captureStackTrace(l2, V), l2;
+  }
+  return m2;
+}
+let Me = defineComponent({ name: "Listbox", emits: { "update:modelValue": (o2) => true }, props: { as: { type: [Object, String], default: "template" }, disabled: { type: [Boolean], default: false }, by: { type: [String, Function], default: () => ue }, horizontal: { type: [Boolean], default: false }, modelValue: { type: [Object, String, Number, Boolean], default: void 0 }, defaultValue: { type: [Object, String, Number, Boolean], default: void 0 }, name: { type: String, optional: true }, multiple: { type: [Boolean], default: false } }, inheritAttrs: false, setup(o$12, { slots: m2, attrs: l$1, emit: L }) {
+  let e$12 = ref(1), p2 = ref(null), s2 = ref(null), O$12 = ref(null), d$1 = ref([]), S = ref(""), t2 = ref(null), i = ref(1);
+  function k2(a2 = (n2) => n2) {
+    let n2 = t2.value !== null ? d$1.value[t2.value] : null, u2 = O(a2(d$1.value.slice()), (y2) => o(y2.dataRef.domRef)), c2 = n2 ? u2.indexOf(n2) : null;
+    return c2 === -1 && (c2 = null), { options: u2, activeOptionIndex: c2 };
+  }
+  let h$2 = computed(() => o$12.multiple ? 1 : 0), [w$1, r2] = d(computed(() => o$12.modelValue), (a2) => L("update:modelValue", a2), computed(() => o$12.defaultValue)), f2 = { listboxState: e$12, value: w$1, mode: h$2, compare(a2, n2) {
+    if (typeof o$12.by == "string") {
+      let u2 = o$12.by;
+      return (a2 == null ? void 0 : a2[u2]) === (n2 == null ? void 0 : n2[u2]);
+    }
+    return o$12.by(a2, n2);
+  }, orientation: computed(() => o$12.horizontal ? "horizontal" : "vertical"), labelRef: p2, buttonRef: s2, optionsRef: O$12, disabled: computed(() => o$12.disabled), options: d$1, searchQuery: S, activeOptionIndex: t2, activationTrigger: i, closeListbox() {
+    o$12.disabled || e$12.value !== 1 && (e$12.value = 1, t2.value = null);
+  }, openListbox() {
+    o$12.disabled || e$12.value !== 0 && (e$12.value = 0);
+  }, goToOption(a2, n2, u2) {
+    if (o$12.disabled || e$12.value === 1)
+      return;
+    let c2 = k2(), y2 = x(a2 === a$1.Specific ? { focus: a$1.Specific, id: n2 } : { focus: a2 }, { resolveItems: () => c2.options, resolveActiveIndex: () => c2.activeOptionIndex, resolveId: (T) => T.id, resolveDisabled: (T) => T.dataRef.disabled });
+    S.value = "", t2.value = y2, i.value = u2 != null ? u2 : 1, d$1.value = c2.options;
+  }, search(a2) {
+    if (o$12.disabled || e$12.value === 1)
+      return;
+    let u2 = S.value !== "" ? 0 : 1;
+    S.value += a2.toLowerCase();
+    let y2 = (t2.value !== null ? d$1.value.slice(t2.value + u2).concat(d$1.value.slice(0, t2.value + u2)) : d$1.value).find((A) => A.dataRef.textValue.startsWith(S.value) && !A.dataRef.disabled), T = y2 ? d$1.value.indexOf(y2) : -1;
+    T === -1 || T === t2.value || (t2.value = T, i.value = 1);
+  }, clearSearch() {
+    o$12.disabled || e$12.value !== 1 && S.value !== "" && (S.value = "");
+  }, registerOption(a2, n2) {
+    let u2 = k2((c2) => [...c2, { id: a2, dataRef: n2 }]);
+    d$1.value = u2.options, t2.value = u2.activeOptionIndex;
+  }, unregisterOption(a2) {
+    let n2 = k2((u2) => {
+      let c2 = u2.findIndex((y2) => y2.id === a2);
+      return c2 !== -1 && u2.splice(c2, 1), u2;
+    });
+    d$1.value = n2.options, t2.value = n2.activeOptionIndex, i.value = 1;
+  }, select(a2) {
+    o$12.disabled || r2(u(h$2.value, { [0]: () => a2, [1]: () => {
+      let n2 = toRaw(f2.value.value).slice(), u2 = toRaw(a2), c2 = n2.findIndex((y2) => f2.compare(u2, toRaw(y2)));
+      return c2 === -1 ? n2.push(u2) : n2.splice(c2, 1), n2;
+    } }));
+  } };
+  return y([s2, O$12], (a2, n2) => {
+    var u2;
+    f2.closeListbox(), h(n2, F.Loose) || (a2.preventDefault(), (u2 = o(s2)) == null || u2.focus());
+  }, computed(() => e$12.value === 0)), provide(H, f2), c(computed(() => u(e$12.value, { [0]: l.Open, [1]: l.Closed }))), () => {
+    let { name: a$12, modelValue: n2, disabled: u2, ...c2 } = o$12, y2 = { open: e$12.value === 0, disabled: u2, value: w$1.value };
+    return h$1(Fragment$1, [...a$12 != null && w$1.value != null ? e({ [a$12]: w$1.value }).map(([T, A]) => h$1(f$1, V$1({ features: a.Hidden, key: T, as: "input", type: "hidden", hidden: true, readOnly: true, name: T, value: A }))) : [], P({ ourProps: {}, theirProps: { ...l$1, ...w(c2, ["defaultValue", "onUpdate:modelValue", "horizontal", "multiple", "by"]) }, slot: y2, slots: m2, attrs: l$1, name: "Listbox" })]);
+  };
+} }), Pe = defineComponent({ name: "ListboxLabel", props: { as: { type: [Object, String], default: "label" } }, setup(o$12, { attrs: m2, slots: l2 }) {
+  let L = V("ListboxLabel"), e2 = `headlessui-listbox-label-${t()}`;
+  function p2() {
+    var s2;
+    (s2 = o(L.buttonRef)) == null || s2.focus({ preventScroll: true });
+  }
+  return () => {
+    let s2 = { open: L.listboxState.value === 0, disabled: L.disabled.value }, O2 = { id: e2, ref: L.labelRef, onClick: p2 };
+    return P({ ourProps: O2, theirProps: o$12, slot: s2, attrs: m2, slots: l2, name: "ListboxLabel" });
+  };
+} }), Ie = defineComponent({ name: "ListboxButton", props: { as: { type: [Object, String], default: "button" } }, setup(o$2, { attrs: m2, slots: l2, expose: L }) {
+  let e2 = V("ListboxButton"), p2 = `headlessui-listbox-button-${t()}`;
+  L({ el: e2.buttonRef, $el: e2.buttonRef });
+  function s2(t2) {
+    switch (t2.key) {
+      case o$1.Space:
+      case o$1.Enter:
+      case o$1.ArrowDown:
+        t2.preventDefault(), e2.openListbox(), nextTick(() => {
+          var i;
+          (i = o(e2.optionsRef)) == null || i.focus({ preventScroll: true }), e2.value.value || e2.goToOption(a$1.First);
+        });
+        break;
+      case o$1.ArrowUp:
+        t2.preventDefault(), e2.openListbox(), nextTick(() => {
+          var i;
+          (i = o(e2.optionsRef)) == null || i.focus({ preventScroll: true }), e2.value.value || e2.goToOption(a$1.Last);
+        });
+        break;
+    }
+  }
+  function O2(t2) {
+    switch (t2.key) {
+      case o$1.Space:
+        t2.preventDefault();
+        break;
+    }
+  }
+  function d2(t2) {
+    e2.disabled.value || (e2.listboxState.value === 0 ? (e2.closeListbox(), nextTick(() => {
+      var i;
+      return (i = o(e2.buttonRef)) == null ? void 0 : i.focus({ preventScroll: true });
+    })) : (t2.preventDefault(), e2.openListbox(), fe(() => {
+      var i;
+      return (i = o(e2.optionsRef)) == null ? void 0 : i.focus({ preventScroll: true });
+    })));
+  }
+  let S = b$1(computed(() => ({ as: o$2.as, type: m2.type })), e2.buttonRef);
+  return () => {
+    var k2, h2;
+    let t2 = { open: e2.listboxState.value === 0, disabled: e2.disabled.value, value: e2.value.value }, i = { ref: e2.buttonRef, id: p2, type: S.value, "aria-haspopup": true, "aria-controls": (k2 = o(e2.optionsRef)) == null ? void 0 : k2.id, "aria-expanded": e2.disabled.value ? void 0 : e2.listboxState.value === 0, "aria-labelledby": e2.labelRef.value ? [(h2 = o(e2.labelRef)) == null ? void 0 : h2.id, p2].join(" ") : void 0, disabled: e2.disabled.value === true ? true : void 0, onKeydown: s2, onKeyup: O2, onClick: d2 };
+    return P({ ourProps: i, theirProps: o$2, slot: t2, attrs: m2, slots: l2, name: "ListboxButton" });
+  };
+} }), Ve = defineComponent({ name: "ListboxOptions", props: { as: { type: [Object, String], default: "ul" }, static: { type: Boolean, default: false }, unmount: { type: Boolean, default: true } }, setup(o$2, { attrs: m2, slots: l$1, expose: L }) {
+  let e2 = V("ListboxOptions"), p$12 = `headlessui-listbox-options-${t()}`, s2 = ref(null);
+  L({ el: e2.optionsRef, $el: e2.optionsRef });
+  function O2(t2) {
+    switch (s2.value && clearTimeout(s2.value), t2.key) {
+      case o$1.Space:
+        if (e2.searchQuery.value !== "")
+          return t2.preventDefault(), t2.stopPropagation(), e2.search(t2.key);
+      case o$1.Enter:
+        if (t2.preventDefault(), t2.stopPropagation(), e2.activeOptionIndex.value !== null) {
+          let i = e2.options.value[e2.activeOptionIndex.value];
+          e2.select(i.dataRef.value);
         }
-      });
-    };
-  }
-});
-function _toArray(val) {
-  return Array.isArray(val) ? val : val ? [val] : [];
-}
-function _mergeTransitionProps(routeProps) {
-  const _props = routeProps.map((prop) => ({
-    ...prop,
-    onAfterLeave: _toArray(prop.onAfterLeave)
-  }));
-  return defu(..._props);
-}
-const Component = defineComponent({
-  props: ["routeProps", "pageKey", "hasTransition"],
-  setup(props) {
-    const previousKey = props.pageKey;
-    const previousRoute = props.routeProps.route;
-    const route = {};
-    for (const key in props.routeProps.route) {
-      route[key] = computed(() => previousKey === props.pageKey ? props.routeProps.route[key] : previousRoute[key]);
+        e2.mode.value === 0 && (e2.closeListbox(), nextTick(() => {
+          var i;
+          return (i = o(e2.buttonRef)) == null ? void 0 : i.focus({ preventScroll: true });
+        }));
+        break;
+      case u(e2.orientation.value, { vertical: o$1.ArrowDown, horizontal: o$1.ArrowRight }):
+        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.Next);
+      case u(e2.orientation.value, { vertical: o$1.ArrowUp, horizontal: o$1.ArrowLeft }):
+        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.Previous);
+      case o$1.Home:
+      case o$1.PageUp:
+        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.First);
+      case o$1.End:
+      case o$1.PageDown:
+        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.Last);
+      case o$1.Escape:
+        t2.preventDefault(), t2.stopPropagation(), e2.closeListbox(), nextTick(() => {
+          var i;
+          return (i = o(e2.buttonRef)) == null ? void 0 : i.focus({ preventScroll: true });
+        });
+        break;
+      case o$1.Tab:
+        t2.preventDefault(), t2.stopPropagation();
+        break;
+      default:
+        t2.key.length === 1 && (e2.search(t2.key), s2.value = setTimeout(() => e2.clearSearch(), 350));
+        break;
     }
-    provide("_route", reactive(route));
-    return () => {
-      return h(props.routeProps.Component);
-    };
   }
-});
-function sizeController() {
-  const sizeUserSetting = useCookie("size");
-  if (!sizeUserSetting.value)
-    sizeUserSetting.value = "16px";
-  const getUserSize = () => sizeUserSetting.value;
-  const sizeSetting = useState("size.setting", () => getUserSize());
-  watch(sizeSetting, (val) => {
-    sizeUserSetting.value = val;
-    document.documentElement.style.fontSize = sizeSetting.value;
+  let d2 = p(), S = computed(() => d2 !== null ? d2.value === l.Open : e2.listboxState.value === 0);
+  return () => {
+    var h2, w2, r2, f2;
+    let t2 = { open: e2.listboxState.value === 0 }, i = { "aria-activedescendant": e2.activeOptionIndex.value === null || (h2 = e2.options.value[e2.activeOptionIndex.value]) == null ? void 0 : h2.id, "aria-multiselectable": e2.mode.value === 1 ? true : void 0, "aria-labelledby": (f2 = (w2 = o(e2.labelRef)) == null ? void 0 : w2.id) != null ? f2 : (r2 = o(e2.buttonRef)) == null ? void 0 : r2.id, "aria-orientation": e2.orientation.value, id: p$12, onKeydown: O2, role: "listbox", tabIndex: 0, ref: e2.optionsRef };
+    return P({ ourProps: i, theirProps: o$2, slot: t2, attrs: m2, slots: l$1, features: R.RenderStrategy | R.Static, visible: S.value, name: "ListboxOptions" });
+  };
+} }), Ae = defineComponent({ name: "ListboxOption", props: { as: { type: [Object, String], default: "li" }, value: { type: [Object, String, Number, Boolean] }, disabled: { type: Boolean, default: false } }, setup(o$12, { slots: m2, attrs: l2, expose: L }) {
+  let e2 = V("ListboxOption"), p2 = `headlessui-listbox-option-${t()}`, s2 = ref(null);
+  L({ el: s2, $el: s2 });
+  let O2 = computed(() => e2.activeOptionIndex.value !== null ? e2.options.value[e2.activeOptionIndex.value].id === p2 : false), d2 = computed(() => u(e2.mode.value, { [0]: () => e2.compare(toRaw(e2.value.value), toRaw(o$12.value)), [1]: () => toRaw(e2.value.value).some((r2) => e2.compare(toRaw(r2), toRaw(o$12.value))) })), S = computed(() => u(e2.mode.value, { [1]: () => {
+    var f2;
+    let r2 = toRaw(e2.value.value);
+    return ((f2 = e2.options.value.find((a2) => r2.some((n2) => e2.compare(toRaw(n2), toRaw(a2.dataRef.value))))) == null ? void 0 : f2.id) === p2;
+  }, [0]: () => d2.value })), t$1 = computed(() => ({ disabled: o$12.disabled, value: o$12.value, textValue: "", domRef: s2 }));
+  onMounted(() => {
+    var f2, a2;
+    let r2 = (a2 = (f2 = o(s2)) == null ? void 0 : f2.textContent) == null ? void 0 : a2.toLowerCase().trim();
+    r2 !== void 0 && (t$1.value.textValue = r2);
+  }), onMounted(() => e2.registerOption(p2, t$1)), onUnmounted(() => e2.unregisterOption(p2)), onMounted(() => {
+    watch([e2.listboxState, d2], () => {
+      e2.listboxState.value === 0 && (!d2.value || u(e2.mode.value, { [1]: () => {
+        S.value && e2.goToOption(a$1.Specific, p2);
+      }, [0]: () => {
+        e2.goToOption(a$1.Specific, p2);
+      } }));
+    }, { immediate: true });
+  }), watchEffect(() => {
+    e2.listboxState.value === 0 && (!O2.value || e2.activationTrigger.value !== 0 && nextTick(() => {
+      var r2, f2;
+      return (f2 = (r2 = o(s2)) == null ? void 0 : r2.scrollIntoView) == null ? void 0 : f2.call(r2, { block: "nearest" });
+    }));
   });
-  const init = () => {
-    sizeSetting.value = getUserSize();
-    if (sizeSetting.value)
-      document.documentElement.style.fontSize = sizeSetting.value;
+  function i(r2) {
+    if (o$12.disabled)
+      return r2.preventDefault();
+    e2.select(o$12.value), e2.mode.value === 0 && (e2.closeListbox(), nextTick(() => {
+      var f2;
+      return (f2 = o(e2.buttonRef)) == null ? void 0 : f2.focus({ preventScroll: true });
+    }));
+  }
+  function k2() {
+    if (o$12.disabled)
+      return e2.goToOption(a$1.Nothing);
+    e2.goToOption(a$1.Specific, p2);
+  }
+  function h2() {
+    o$12.disabled || O2.value || e2.goToOption(a$1.Specific, p2, 0);
+  }
+  function w$1() {
+    o$12.disabled || !O2.value || e2.goToOption(a$1.Nothing);
+  }
+  return () => {
+    let { disabled: r2 } = o$12, f2 = { active: O2.value, selected: d2.value, disabled: r2 }, a2 = { id: p2, ref: s2, role: "option", tabIndex: r2 === true ? void 0 : -1, "aria-disabled": r2 === true ? true : void 0, "aria-selected": d2.value, disabled: void 0, onClick: i, onFocus: k2, onPointermove: h2, onMousemove: h2, onPointerleave: w$1, onMouseleave: w$1 };
+    return P({ ourProps: a2, theirProps: w(o$12, ["value", "disabled"]), slot: f2, attrs: l2, slots: m2, name: "ListboxOption" });
   };
-  return {
-    sizeSetting,
-    init
-  };
-}
+} });
 const storage = {
   suffix: "_deadtime",
   get(key) {
     return store.get(key);
   },
   info() {
-    const d = {};
+    const d2 = {};
     store.each((value, key) => {
-      d[key] = value;
+      d2[key] = value;
     });
-    return d;
+    return d2;
   },
   set(key, value, expires) {
     store.set(key, value);
@@ -5044,7 +5692,7 @@ const useUserStore = defineStore("user", () => {
         await get();
         set2(data);
       }
-    } catch (e) {
+    } catch (e2) {
       logout();
     }
   }
@@ -5284,7 +5932,7 @@ const useTipStore = defineStore("tip", () => {
         set2(data);
         return data;
       }
-    } catch (e) {
+    } catch (e2) {
     }
   }
   function set2(value) {
@@ -5310,6 +5958,969 @@ function useBaseStore() {
     tip
   };
 }
+const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+  __name: "User",
+  __ssrInlineRender: true,
+  props: {
+    type: {
+      type: String,
+      default: "dropdown-right-top"
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const router = useRouter();
+    const { user } = useBaseStore();
+    const { info, isLogin } = storeToRefs(user);
+    const showAuth = useState("showAuth", () => false);
+    const userMenu = ref([
+      { id: 1, icon: "i-uil-user", label: "\u500B\u4EBA\u8CC7\u6599", path: "/my/account" },
+      { id: 2, icon: "i-uil-file-alt", label: "\u700F\u89BD\u7D00\u9304", path: "/my/history" },
+      { id: 3, icon: "i-ion-heart-outline", label: "\u6211\u7684\u6536\u85CF", path: "/my/collections" },
+      { id: 4, icon: "i-uil-lightbulb-alt", label: "\u5C0F\u77E5\u8B58", path: "/my/tips" },
+      { id: 5, icon: "i-uil-sign-out-alt", label: "\u767B\u51FA", action: () => user.logout() }
+    ]);
+    const clickNav = (id) => {
+      const item = userMenu.value.find((item2) => item2.id === id);
+      if (item == null ? void 0 : item.path)
+        router.push(item.path);
+      else if (item == null ? void 0 : item.action)
+        item.action();
+    };
+    const currentStyle = toRef(props, "type");
+    const sizeSetting = useState("size.setting");
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UnoIcon = __nuxt_component_1;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center relative" }, _attrs))}>`);
+      if (unref(currentStyle) === "dropdown-right-top") {
+        _push(ssrRenderComponent(unref(Me), {
+          modelValue: unref(sizeSetting),
+          "onUpdate:modelValue": ($event) => isRef(sizeSetting) ? sizeSetting.value = $event : null,
+          as: "div",
+          class: "flex items-center"
+        }, {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(` \u7528\u6236 `);
+                  } else {
+                    return [
+                      createTextVNode(" \u7528\u6236 ")
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+              _push2(ssrRenderComponent(unref(Ie), {
+                class: "block",
+                type: "button",
+                title: "\u7528\u6236\u4E2D\u5FC3"
+              }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  var _a2, _b2, _c2, _d2;
+                  if (_push3) {
+                    if (unref(isLogin)) {
+                      _push3(`<div class="flex items-center justify-center ml-6 cursor-pointer"${_scopeId2}><img class="w-6 h-6 rounded-full"${ssrRenderAttr("src", _imports_0$1)}${_scopeId2}><span class="ml-2 text-sm font-semibold"${_scopeId2}>${ssrInterpolate(`${((_a2 = unref(info)) == null ? void 0 : _a2.firstName) || ""}${((_b2 = unref(info)) == null ? void 0 : _b2.lastName) || ""}`)}</span>`);
+                      _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-uil-angle-down" }, null, _parent3, _scopeId2));
+                      _push3(`</div>`);
+                    } else {
+                      _push3(`<div class="flex items-center justify-center h-full ml-6 cursor-pointer"${_scopeId2}>`);
+                      _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-ph-user-circle w-6 h-6" }, null, _parent3, _scopeId2));
+                      _push3(`<span class="ml-2 text-sm font-semibold"${_scopeId2}>\u672A\u767B\u5165</span>`);
+                      _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-uil-angle-down" }, null, _parent3, _scopeId2));
+                      _push3(`</div>`);
+                    }
+                  } else {
+                    return [
+                      unref(isLogin) ? (openBlock(), createBlock("div", {
+                        key: 0,
+                        class: "flex items-center justify-center ml-6 cursor-pointer"
+                      }, [
+                        createVNode("img", {
+                          class: "w-6 h-6 rounded-full",
+                          src: _imports_0$1
+                        }),
+                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, toDisplayString(`${((_c2 = unref(info)) == null ? void 0 : _c2.firstName) || ""}${((_d2 = unref(info)) == null ? void 0 : _d2.lastName) || ""}`), 1),
+                        createVNode(_component_UnoIcon, { class: "i-uil-angle-down" })
+                      ])) : (openBlock(), createBlock("div", {
+                        key: 1,
+                        class: "flex items-center justify-center h-full ml-6 cursor-pointer",
+                        onClick: ($event) => showAuth.value = true
+                      }, [
+                        createVNode(_component_UnoIcon, { class: "i-ph-user-circle w-6 h-6" }),
+                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, "\u672A\u767B\u5165"),
+                        createVNode(_component_UnoIcon, { class: "i-uil-angle-down" })
+                      ], 8, ["onClick"]))
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+              if (unref(isLogin)) {
+                _push2(ssrRenderComponent(unref(Ve), { class: "absolute ring-1 ring-black mt-3 ring-opacity-5 top-full right-0 z-[999] mt-2 w-32 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+                  default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                    if (_push3) {
+                      _push3(`<!--[-->`);
+                      ssrRenderList(userMenu.value, (menu, index) => {
+                        _push3(ssrRenderComponent(unref(Ae), { key: index }, {
+                          default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                            if (_push4) {
+                              _push4(`<div class="flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30"${_scopeId3}>`);
+                              _push4(ssrRenderComponent(_component_UnoIcon, {
+                                class: [menu.icon, "mr-3"]
+                              }, null, _parent4, _scopeId3));
+                              _push4(`<span class="truncate"${_scopeId3}>${ssrInterpolate(menu.label)}</span></div>`);
+                            } else {
+                              return [
+                                createVNode("div", {
+                                  class: "flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30",
+                                  onClick: ($event) => clickNav(menu.id)
+                                }, [
+                                  createVNode(_component_UnoIcon, {
+                                    class: [menu.icon, "mr-3"]
+                                  }, null, 8, ["class"]),
+                                  createVNode("span", { class: "truncate" }, toDisplayString(menu.label), 1)
+                                ], 8, ["onClick"])
+                              ];
+                            }
+                          }),
+                          _: 2
+                        }, _parent3, _scopeId2));
+                      });
+                      _push3(`<!--]-->`);
+                    } else {
+                      return [
+                        (openBlock(true), createBlock(Fragment$1, null, renderList(userMenu.value, (menu, index) => {
+                          return openBlock(), createBlock(unref(Ae), { key: index }, {
+                            default: withCtx(() => [
+                              createVNode("div", {
+                                class: "flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30",
+                                onClick: ($event) => clickNav(menu.id)
+                              }, [
+                                createVNode(_component_UnoIcon, {
+                                  class: [menu.icon, "mr-3"]
+                                }, null, 8, ["class"]),
+                                createVNode("span", { class: "truncate" }, toDisplayString(menu.label), 1)
+                              ], 8, ["onClick"])
+                            ]),
+                            _: 2
+                          }, 1024);
+                        }), 128))
+                      ];
+                    }
+                  }),
+                  _: 1
+                }, _parent2, _scopeId));
+              } else {
+                _push2(`<!---->`);
+              }
+            } else {
+              return [
+                createVNode(unref(Pe), { class: "sr-only" }, {
+                  default: withCtx(() => [
+                    createTextVNode(" \u7528\u6236 ")
+                  ]),
+                  _: 1
+                }),
+                createVNode(unref(Ie), {
+                  class: "block",
+                  type: "button",
+                  title: "\u7528\u6236\u4E2D\u5FC3"
+                }, {
+                  default: withCtx(() => {
+                    var _a2, _b2;
+                    return [
+                      unref(isLogin) ? (openBlock(), createBlock("div", {
+                        key: 0,
+                        class: "flex items-center justify-center ml-6 cursor-pointer"
+                      }, [
+                        createVNode("img", {
+                          class: "w-6 h-6 rounded-full",
+                          src: _imports_0$1
+                        }),
+                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, toDisplayString(`${((_a2 = unref(info)) == null ? void 0 : _a2.firstName) || ""}${((_b2 = unref(info)) == null ? void 0 : _b2.lastName) || ""}`), 1),
+                        createVNode(_component_UnoIcon, { class: "i-uil-angle-down" })
+                      ])) : (openBlock(), createBlock("div", {
+                        key: 1,
+                        class: "flex items-center justify-center h-full ml-6 cursor-pointer",
+                        onClick: ($event) => showAuth.value = true
+                      }, [
+                        createVNode(_component_UnoIcon, { class: "i-ph-user-circle w-6 h-6" }),
+                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, "\u672A\u767B\u5165"),
+                        createVNode(_component_UnoIcon, { class: "i-uil-angle-down" })
+                      ], 8, ["onClick"]))
+                    ];
+                  }),
+                  _: 1
+                }),
+                unref(isLogin) ? (openBlock(), createBlock(unref(Ve), {
+                  key: 0,
+                  class: "absolute ring-1 ring-black mt-3 ring-opacity-5 top-full right-0 z-[999] mt-2 w-32 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0"
+                }, {
+                  default: withCtx(() => [
+                    (openBlock(true), createBlock(Fragment$1, null, renderList(userMenu.value, (menu, index) => {
+                      return openBlock(), createBlock(unref(Ae), { key: index }, {
+                        default: withCtx(() => [
+                          createVNode("div", {
+                            class: "flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30",
+                            onClick: ($event) => clickNav(menu.id)
+                          }, [
+                            createVNode(_component_UnoIcon, {
+                              class: [menu.icon, "mr-3"]
+                            }, null, 8, ["class"]),
+                            createVNode("span", { class: "truncate" }, toDisplayString(menu.label), 1)
+                          ], 8, ["onClick"])
+                        ]),
+                        _: 2
+                      }, 1024);
+                    }), 128))
+                  ]),
+                  _: 1
+                })) : createCommentVNode("", true)
+              ];
+            }
+          }),
+          _: 1
+        }, _parent));
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$5 = _sfc_main$5.setup;
+_sfc_main$5.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Navbar/User.vue");
+  return _sfc_setup$5 ? _sfc_setup$5(props, ctx) : void 0;
+};
+const availableSizes = {
+  sm: {
+    name: "\u5C0F",
+    iso: "14px"
+  },
+  md: {
+    name: "\u4E2D",
+    iso: "16px"
+  },
+  lg: {
+    name: "\u5927",
+    iso: "18px"
+  },
+  xl: {
+    name: "\u8D85\u5927",
+    iso: "20px"
+  }
+};
+function sizeController() {
+  const sizeUserSetting = useCookie("size");
+  if (!sizeUserSetting.value)
+    sizeUserSetting.value = "16px";
+  const getUserSize = () => sizeUserSetting.value;
+  const sizeSetting = useState("size.setting", () => getUserSize());
+  watch(sizeSetting, (val) => {
+    sizeUserSetting.value = val;
+    document.documentElement.style.fontSize = sizeSetting.value;
+  });
+  const init = () => {
+    sizeSetting.value = getUserSize();
+    if (sizeSetting.value)
+      document.documentElement.style.fontSize = sizeSetting.value;
+  };
+  return {
+    sizeSetting,
+    init
+  };
+}
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+  __name: "SizeChange",
+  __ssrInlineRender: true,
+  props: {
+    type: {
+      type: String,
+      default: "dropdown-right-top"
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const currentStyle = toRef(props, "type");
+    const sizeSetting = useState("size.setting");
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UnoIcon = __nuxt_component_1;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center" }, _attrs))}>`);
+      if (unref(currentStyle) === "dropdown-right-top") {
+        _push(ssrRenderComponent(unref(Me), {
+          modelValue: unref(sizeSetting),
+          "onUpdate:modelValue": ($event) => isRef(sizeSetting) ? sizeSetting.value = $event : null,
+          as: "div",
+          class: "relative flex items-center"
+        }, {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(` Theme `);
+                  } else {
+                    return [
+                      createTextVNode(" Theme ")
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+              _push2(ssrRenderComponent(unref(Ie), {
+                type: "button",
+                class: "flex w-7 h-7 items-center justify-center",
+                title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
+              }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(`<span class="flex items-center justify-center"${_scopeId2}>`);
+                    _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-octicon-text-size" }, null, _parent3, _scopeId2));
+                    _push3(`</span>`);
+                  } else {
+                    return [
+                      createVNode("span", { class: "flex items-center justify-center" }, [
+                        createVNode(_component_UnoIcon, { class: "i-octicon-text-size" })
+                      ])
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+              _push2(ssrRenderComponent(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(`<!--[-->`);
+                    ssrRenderList(unref(availableSizes), (size) => {
+                      _push3(ssrRenderComponent(unref(Ae), {
+                        key: size.iso,
+                        value: size.iso,
+                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
+                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
+                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
+                        }]
+                      }, {
+                        default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                          if (_push4) {
+                            _push4(`<span class="flex-1 truncate flex w-full items-center justify-between"${_scopeId3}><p${_scopeId3}>${ssrInterpolate(size.name)}</p><span class="text-xs"${_scopeId3}>(${ssrInterpolate(size.iso)})</span></span>`);
+                          } else {
+                            return [
+                              createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
+                                createVNode("p", null, toDisplayString(size.name), 1),
+                                createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
+                              ])
+                            ];
+                          }
+                        }),
+                        _: 2
+                      }, _parent3, _scopeId2));
+                    });
+                    _push3(`<!--]-->`);
+                  } else {
+                    return [
+                      (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
+                        return openBlock(), createBlock(unref(Ae), {
+                          key: size.iso,
+                          value: size.iso,
+                          class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
+                            "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
+                            "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
+                          }]
+                        }, {
+                          default: withCtx(() => [
+                            createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
+                              createVNode("p", null, toDisplayString(size.name), 1),
+                              createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
+                            ])
+                          ]),
+                          _: 2
+                        }, 1032, ["value", "class"]);
+                      }), 128))
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+            } else {
+              return [
+                createVNode(unref(Pe), { class: "sr-only" }, {
+                  default: withCtx(() => [
+                    createTextVNode(" Theme ")
+                  ]),
+                  _: 1
+                }),
+                createVNode(unref(Ie), {
+                  type: "button",
+                  class: "flex w-7 h-7 items-center justify-center",
+                  title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
+                }, {
+                  default: withCtx(() => [
+                    createVNode("span", { class: "flex items-center justify-center" }, [
+                      createVNode(_component_UnoIcon, { class: "i-octicon-text-size" })
+                    ])
+                  ]),
+                  _: 1
+                }),
+                createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+                  default: withCtx(() => [
+                    (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
+                      return openBlock(), createBlock(unref(Ae), {
+                        key: size.iso,
+                        value: size.iso,
+                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
+                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
+                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
+                        }]
+                      }, {
+                        default: withCtx(() => [
+                          createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
+                            createVNode("p", null, toDisplayString(size.name), 1),
+                            createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
+                          ])
+                        ]),
+                        _: 2
+                      }, 1032, ["value", "class"]);
+                    }), 128))
+                  ]),
+                  _: 1
+                })
+              ];
+            }
+          }),
+          _: 1
+        }, _parent));
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(currentStyle) === "select-box") {
+        _push(`<select class="w-full px-2 pr-3 py-1 outline-none rounded border bg-transparent text-gray-700 dark:text-gray-300 border-gray-900/10 dark:border-gray-50/[0.2]"><!--[-->`);
+        ssrRenderList(unref(availableSizes), (size) => {
+          _push(`<option${ssrRenderAttr("value", size.iso)} class="flex items-center space-x-2">${ssrInterpolate(size.name)} (${ssrInterpolate(size.iso)}) </option>`);
+        });
+        _push(`<!--]--></select>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$4 = _sfc_main$4.setup;
+_sfc_main$4.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/tem/SizeChange.vue");
+  return _sfc_setup$4 ? _sfc_setup$4(props, ctx) : void 0;
+};
+const useColorMode = () => {
+  return useState("color-mode").value;
+};
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+  __name: "ThemeChange",
+  __ssrInlineRender: true,
+  setup(__props) {
+    useColorMode();
+    const availableColor = ref([
+      {
+        id: 1,
+        name: "dark",
+        text: "\u6DF1\u8272\u6A21\u5F0F",
+        icon: "i-ph-moon-stars-duotone"
+      },
+      {
+        id: 2,
+        name: "light",
+        text: "\u6DFA\u8272\u6A21\u5F0F",
+        icon: "i-ph-sun-dim-duotone"
+      },
+      {
+        id: 3,
+        name: "sepia",
+        text: "\u8B77\u773C\u6A21\u5F0F",
+        icon: "i-ph-coffee"
+      },
+      {
+        id: 3,
+        name: "system",
+        text: "\u6839\u64DA\u7CFB\u7D71\u8A2D\u5B9A",
+        icon: "i-ph-laptop-duotone"
+      }
+    ]);
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UnoIcon = __nuxt_component_1;
+      _push(`<div${ssrRenderAttrs(_attrs)}>`);
+      _push(ssrRenderComponent(unref(Me), {
+        modelValue: _ctx.$colorMode.preference,
+        "onUpdate:modelValue": ($event) => _ctx.$colorMode.preference = $event,
+        as: "div",
+        class: "relative flex items-center"
+      }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(` Theme `);
+                } else {
+                  return [
+                    createTextVNode(" Theme ")
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+            _push2(ssrRenderComponent(unref(Ie), {
+              type: "button",
+              title: "Change Color"
+            }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(`<div class="flex w-7 h-7 items-center justify-center"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" }, null, _parent3, _scopeId2));
+                  _push3(`</div>`);
+                } else {
+                  return [
+                    createVNode("div", { class: "flex w-7 h-7 items-center justify-center" }, [
+                      createVNode(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" })
+                    ])
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+            _push2(ssrRenderComponent(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(`<!--[-->`);
+                  ssrRenderList(availableColor.value, (color) => {
+                    _push3(ssrRenderComponent(unref(Ae), {
+                      key: color.id,
+                      value: color.name,
+                      class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
+                    }, {
+                      default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                        if (_push4) {
+                          _push4(`<span class="truncate"${_scopeId3}>${ssrInterpolate(color.text)}</span><span class="flex items-center justify-center text-sm"${_scopeId3}>`);
+                          _push4(ssrRenderComponent(_component_UnoIcon, {
+                            class: [color.icon, "text-base"]
+                          }, null, _parent4, _scopeId3));
+                          _push4(`</span>`);
+                        } else {
+                          return [
+                            createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
+                            createVNode("span", { class: "flex items-center justify-center text-sm" }, [
+                              createVNode(_component_UnoIcon, {
+                                class: [color.icon, "text-base"]
+                              }, null, 8, ["class"])
+                            ])
+                          ];
+                        }
+                      }),
+                      _: 2
+                    }, _parent3, _scopeId2));
+                  });
+                  _push3(`<!--]-->`);
+                } else {
+                  return [
+                    (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
+                      return openBlock(), createBlock(unref(Ae), {
+                        key: color.id,
+                        value: color.name,
+                        class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
+                      }, {
+                        default: withCtx(() => [
+                          createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
+                          createVNode("span", { class: "flex items-center justify-center text-sm" }, [
+                            createVNode(_component_UnoIcon, {
+                              class: [color.icon, "text-base"]
+                            }, null, 8, ["class"])
+                          ])
+                        ]),
+                        _: 2
+                      }, 1032, ["value"]);
+                    }), 128))
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(unref(Pe), { class: "sr-only" }, {
+                default: withCtx(() => [
+                  createTextVNode(" Theme ")
+                ]),
+                _: 1
+              }),
+              createVNode(unref(Ie), {
+                type: "button",
+                title: "Change Color"
+              }, {
+                default: withCtx(() => [
+                  createVNode("div", { class: "flex w-7 h-7 items-center justify-center" }, [
+                    createVNode(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" })
+                  ])
+                ]),
+                _: 1
+              }),
+              createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+                default: withCtx(() => [
+                  (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
+                    return openBlock(), createBlock(unref(Ae), {
+                      key: color.id,
+                      value: color.name,
+                      class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
+                    }, {
+                      default: withCtx(() => [
+                        createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
+                        createVNode("span", { class: "flex items-center justify-center text-sm" }, [
+                          createVNode(_component_UnoIcon, {
+                            class: [color.icon, "text-base"]
+                          }, null, 8, ["class"])
+                        ])
+                      ]),
+                      _: 2
+                    }, 1032, ["value"]);
+                  }), 128))
+                ]),
+                _: 1
+              })
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$3 = _sfc_main$3.setup;
+_sfc_main$3.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/tem/ThemeChange.vue");
+  return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
+};
+const _imports_0 = "" + globalThis.__publicAssetsURL("logo.png");
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "Navbar",
+  __ssrInlineRender: true,
+  setup(__props) {
+    const app2 = useState("app");
+    const menus = ref([
+      { type: "link", text: "\u65B0\u805E", route: "/" }
+    ]);
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_NuxtLink = __nuxt_component_0$1;
+      const _component_UIAnchor = _sfc_main$8;
+      const _component_UIButton = _sfc_main$7;
+      const _component_LayoutNavbarUser = _sfc_main$5;
+      const _component_TemSizeChange = _sfc_main$4;
+      const _component_TemThemeChange = _sfc_main$3;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "h-12" }, _attrs))}><div class="h-12 fixed flex items-center w-screen top-0 left-0 backdrop-filter backdrop-blur top-0 flex-none transition-colors duration-300 z-20 border-b border-gray-900/10 dark:border-gray-50/[0.2] bg-white dark:bg-slate-900/[0.7]"><div class="cma"><div class="lg:px-8 lg:mx-0"><div class="relative flex items-center">`);
+      ssrRenderSlot(_ctx.$slots, "title", {}, () => {
+        _push(ssrRenderComponent(_component_NuxtLink, {
+          tag: "a",
+          class: "flex-none mr-3 overflow-hidden font-bold text-gray-900 md:w-auto text-md dark:text-gray-200",
+          to: "/"
+        }, {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              _push2(`<span class="sr-only"${_scopeId}>home</span><span class="flex items-center"${_scopeId}><img class="w-12 mr-2"${ssrRenderAttr("src", _imports_0)}${_scopeId}><span class="leading-7 mt-[1px]"${_scopeId}>${ssrInterpolate(unref(app2).name)}</span></span>`);
+            } else {
+              return [
+                createVNode("span", { class: "sr-only" }, "home"),
+                createVNode("span", { class: "flex items-center" }, [
+                  createVNode("img", {
+                    class: "w-12 mr-2",
+                    src: _imports_0
+                  }),
+                  createVNode("span", { class: "leading-7 mt-[1px]" }, toDisplayString(unref(app2).name), 1)
+                ])
+              ];
+            }
+          }),
+          _: 1
+        }, _parent));
+      }, _push, _parent);
+      _push(`<div class="relative ml-auto flex lt-lg:hidden"><nav class="flex items-center text-sm font-semibold leading-6 text-gray-600 dark:text-gray-300" role="navigation"><ul class="flex items-center space-x-8"><!--[-->`);
+      ssrRenderList(menus.value, (item, i) => {
+        _push(`<li>`);
+        if (item.type === "link") {
+          _push(ssrRenderComponent(_component_UIAnchor, {
+            to: item.route ? item.route : void 0,
+            href: item.href ? item.href : void 0,
+            class: "capitalize hover:no-underline hover:text-slate-900 hover:dark:text-white"
+          }, {
+            default: withCtx((_, _push2, _parent2, _scopeId) => {
+              if (_push2) {
+                _push2(`${ssrInterpolate(item.text)}`);
+              } else {
+                return [
+                  createTextVNode(toDisplayString(item.text), 1)
+                ];
+              }
+            }),
+            _: 2
+          }, _parent));
+        } else if (item.type === "button") {
+          _push(ssrRenderComponent(_component_UIButton, {
+            text: item.text,
+            size: "xs",
+            class: "font-extrabold capitalize",
+            to: item.route ? item.route : void 0,
+            href: item.href ? item.href : void 0
+          }, null, _parent));
+        } else {
+          _push(`<!---->`);
+        }
+        _push(`</li>`);
+      });
+      _push(`<!--]--></ul></nav>`);
+      _push(ssrRenderComponent(_component_LayoutNavbarUser, null, null, _parent));
+      _push(`<div class="flex space-x-4 border-l ml-4 pl-6 border-gray-900/10 dark:border-gray-50/[0.2]">`);
+      _push(ssrRenderComponent(_component_TemSizeChange, null, null, _parent));
+      _push(ssrRenderComponent(_component_TemThemeChange, null, null, _parent));
+      _push(`</div></div><div class="lg:hidden ml-auto"><div class="text-sm md:text-base flex space-x-2 md:space-x-4 border-l pl-4 md:pl-6 border-gray-900/10 dark:border-gray-50/[0.2]">`);
+      _push(ssrRenderComponent(_component_TemSizeChange, null, null, _parent));
+      _push(ssrRenderComponent(_component_TemThemeChange, null, null, _parent));
+      _push(`</div></div></div></div></div></div></div>`);
+    };
+  }
+});
+const _sfc_setup$2 = _sfc_main$2.setup;
+_sfc_main$2.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Navbar.vue");
+  return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
+};
+const Fragment = defineComponent({
+  setup(_props, { slots }) {
+    return () => {
+      var _a2;
+      return (_a2 = slots.default) == null ? void 0 : _a2.call(slots);
+    };
+  }
+});
+const _wrapIf = (component, props, slots) => {
+  return { default: () => props ? h$1(component, props === true ? {} : props, slots) : h$1(Fragment, {}, slots) };
+};
+const layouts = {
+  blog: () => import('./_nuxt/blog.b87e3d6a.mjs').then((m2) => m2.default || m2),
+  default: () => import('./_nuxt/default.2ae3704c.mjs').then((m2) => m2.default || m2)
+};
+const LayoutLoader = defineComponent({
+  props: {
+    name: String,
+    ...{}
+  },
+  async setup(props, context) {
+    const LayoutComponent = await layouts[props.name]().then((r2) => r2.default || r2);
+    return () => {
+      return h$1(LayoutComponent, {}, context.slots);
+    };
+  }
+});
+const __nuxt_component_3 = defineComponent({
+  props: {
+    name: {
+      type: [String, Boolean, Object],
+      default: null
+    }
+  },
+  setup(props, context) {
+    const injectedRoute = inject("_route");
+    const route = injectedRoute === useRoute() ? useRoute$1() : injectedRoute;
+    const layout = computed(() => {
+      var _a2, _b2;
+      return (_b2 = (_a2 = unref(props.name)) != null ? _a2 : route.meta.layout) != null ? _b2 : "default";
+    });
+    return () => {
+      var _a2;
+      const hasLayout = layout.value && layout.value in layouts;
+      const transitionProps = (_a2 = route.meta.layoutTransition) != null ? _a2 : appLayoutTransition;
+      return _wrapIf(Transition, hasLayout && transitionProps, {
+        default: () => _wrapIf(LayoutLoader, hasLayout && { key: layout.value, name: layout.value, hasTransition: void 0 }, context.slots).default()
+      }).default();
+    };
+  }
+});
+const interpolatePath = (route, match) => {
+  return match.path.replace(/(:\w+)\([^)]+\)/g, "$1").replace(/(:\w+)[?+*]/g, "$1").replace(/:\w+/g, (r2) => {
+    var _a2;
+    return ((_a2 = route.params[r2.slice(1)]) == null ? void 0 : _a2.toString()) || "";
+  });
+};
+const generateRouteKey = (override, routeProps) => {
+  var _a2;
+  const matchedRoute = routeProps.route.matched.find((m2) => {
+    var _a3;
+    return ((_a3 = m2.components) == null ? void 0 : _a3.default) === routeProps.Component.type;
+  });
+  const source = (_a2 = override != null ? override : matchedRoute == null ? void 0 : matchedRoute.meta.key) != null ? _a2 : matchedRoute && interpolatePath(routeProps.route, matchedRoute);
+  return typeof source === "function" ? source(routeProps.route) : source;
+};
+const wrapInKeepAlive = (props, children) => {
+  return { default: () => children };
+};
+const __nuxt_component_2 = defineComponent({
+  name: "NuxtPage",
+  inheritAttrs: false,
+  props: {
+    name: {
+      type: String
+    },
+    transition: {
+      type: [Boolean, Object],
+      default: void 0
+    },
+    keepalive: {
+      type: [Boolean, Object],
+      default: void 0
+    },
+    route: {
+      type: Object
+    },
+    pageKey: {
+      type: [Function, String],
+      default: null
+    }
+  },
+  setup(props, { attrs }) {
+    const nuxtApp = useNuxtApp();
+    return () => {
+      return h$1(RouterView, { name: props.name, route: props.route, ...attrs }, {
+        default: (routeProps) => {
+          var _a2, _b2, _c2, _d2;
+          if (!routeProps.Component) {
+            return;
+          }
+          const key = generateRouteKey(props.pageKey, routeProps);
+          const done = nuxtApp.deferHydration();
+          const hasTransition = !!((_b2 = (_a2 = props.transition) != null ? _a2 : routeProps.route.meta.pageTransition) != null ? _b2 : appPageTransition);
+          const transitionProps = hasTransition && _mergeTransitionProps([
+            props.transition,
+            routeProps.route.meta.pageTransition,
+            appPageTransition,
+            { onAfterLeave: () => {
+              nuxtApp.callHook("page:transition:finish", routeProps.Component);
+            } }
+          ].filter(Boolean));
+          return _wrapIf(
+            Transition,
+            hasTransition && transitionProps,
+            wrapInKeepAlive(
+              (_d2 = (_c2 = props.keepalive) != null ? _c2 : routeProps.route.meta.keepalive) != null ? _d2 : appKeepalive,
+              h$1(Suspense, {
+                onPending: () => nuxtApp.callHook("page:start", routeProps.Component),
+                onResolve: () => {
+                  nextTick(() => nuxtApp.callHook("page:finish", routeProps.Component).finally(done));
+                }
+              }, { default: () => h$1(Component, { key, routeProps, pageKey: key, hasTransition }) })
+            )
+          ).default();
+        }
+      });
+    };
+  }
+});
+function _toArray(val) {
+  return Array.isArray(val) ? val : val ? [val] : [];
+}
+function _mergeTransitionProps(routeProps) {
+  const _props = routeProps.map((prop) => ({
+    ...prop,
+    onAfterLeave: _toArray(prop.onAfterLeave)
+  }));
+  return defu(..._props);
+}
+const Component = defineComponent({
+  props: ["routeProps", "pageKey", "hasTransition"],
+  setup(props) {
+    const previousKey = props.pageKey;
+    const previousRoute = props.routeProps.route;
+    const route = {};
+    for (const key in props.routeProps.route) {
+      route[key] = computed(() => previousKey === props.pageKey ? props.routeProps.route[key] : previousRoute[key]);
+    }
+    provide("_route", reactive(route));
+    return () => {
+      return h$1(props.routeProps.Component);
+    };
+  }
+});
+const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+  __name: "NavbarMobile",
+  __ssrInlineRender: true,
+  setup(__props) {
+    useState("app");
+    const menus = ref([
+      { type: "link", text: "\u9996\u9801", icon: "i-uil-home-alt", route: "/" },
+      { type: "link", text: "\u5206\u985E", icon: "i-uil-create-dashboard", route: "/news/categories" },
+      { type: "link", text: "\u6536\u85CF", icon: "i-uil-heart", route: "/my/collections" },
+      { type: "link", text: "\u500B\u4EBA", icon: "i-uil-user", route: "/my" }
+    ]);
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_NuxtLink = __nuxt_component_0$1;
+      const _component_UnoIcon = __nuxt_component_1;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "md:hidden h-15 fixed flex items-center w-screen bottom-0 left-0 flex-none transition-colors duration-300 z-20 bg-white border-t border-gray-900/10 dark:bg-gray-900 dark:border-gray-700" }, _attrs))}><div class="flex justify-around w-full"><!--[-->`);
+      ssrRenderList(menus.value, (menu, index) => {
+        _push(ssrRenderComponent(_component_NuxtLink, {
+          key: index,
+          class: "text-center px-2",
+          to: menu.route
+        }, {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              _push2(ssrRenderComponent(_component_UnoIcon, {
+                class: ["mx-auto text-xl", menu.icon]
+              }, null, _parent2, _scopeId));
+              _push2(`<p class="text-xs -mt-1 transform scale-90"${_scopeId}>${ssrInterpolate(menu.text)}</p>`);
+            } else {
+              return [
+                createVNode(_component_UnoIcon, {
+                  class: ["mx-auto text-xl", menu.icon]
+                }, null, 8, ["class"]),
+                createVNode("p", { class: "text-xs -mt-1 transform scale-90" }, toDisplayString(menu.text), 1)
+              ];
+            }
+          }),
+          _: 2
+        }, _parent));
+      });
+      _push(`<!--]--></div></div>`);
+    };
+  }
+});
+const _sfc_setup$1 = _sfc_main$1.setup;
+_sfc_main$1.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/NavbarMobile.vue");
+  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
+};
+const __nuxt_component_0 = defineComponent({
+  name: "ClientOnly",
+  props: ["fallback", "placeholder", "placeholderTag", "fallbackTag"],
+  setup(_, { slots }) {
+    const mounted = ref(false);
+    return (props) => {
+      var _a2;
+      if (mounted.value) {
+        return (_a2 = slots.default) == null ? void 0 : _a2.call(slots);
+      }
+      const slot = slots.fallback || slots.placeholder;
+      if (slot) {
+        return slot();
+      }
+      const fallbackStr = props.fallback || props.placeholder || "";
+      const fallbackTag = props.fallbackTag || props.placeholderTag || "span";
+      return createElementBlock(fallbackTag, null, fallbackStr);
+    };
+  }
+});
 async function userController() {
   const isLogin = useState("isLogin", () => false);
   const route = useRoute();
@@ -5343,18 +6954,18 @@ async function userController() {
   return { token };
 }
 function InitApp() {
-  const app = {
+  const app2 = {
     name: "Bonding Tech.",
     author: {
       name: "\u9375\u7D50\u79D1\u6280",
       link: "https://bondingtech.co"
     }
   };
-  useState("app", () => app);
+  useState("app", () => app2);
   const size = sizeController();
   const user = userController();
   return {
-    app,
+    app: app2,
     size,
     user
   };
@@ -5365,18 +6976,36 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
   setup(__props) {
     InitApp();
     const locale = useState("locale.i18n");
+    const app2 = useAppConfig();
+    useHead({
+      title: app2.name,
+      titleTemplate: "%s",
+      meta: [
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          hid: "description",
+          name: "description",
+          content: "Nuxt 3 Awesome Starter"
+        }
+      ],
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
+    });
     return (_ctx, _push, _parent, _attrs) => {
       const _component_Html = Html;
       const _component_Body = Body;
-      const _component_NuxtLayout = __nuxt_component_2;
-      const _component_NuxtPage = __nuxt_component_3;
+      const _component_LayoutNavbar = _sfc_main$2;
+      const _component_NuxtLayout = __nuxt_component_3;
+      const _component_NuxtPage = __nuxt_component_2;
+      const _component_LayoutNavbarMobile = _sfc_main$1;
+      const _component_ClientOnly = __nuxt_component_0;
       _push(ssrRenderComponent(_component_Html, mergeProps({ lang: unref(locale) }, _attrs), {
         default: withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
             _push2(ssrRenderComponent(_component_Body, { class: "bg-white text-gray-800 antialiased transition-colors duration-300 dark:bg-gray-900 dark:text-gray-200" }, {
               default: withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_NuxtLayout, null, {
+                  _push3(ssrRenderComponent(_component_LayoutNavbar, null, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_NuxtLayout, { class: "lt-lg:pb-14" }, {
                     default: withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
                         _push4(ssrRenderComponent(_component_NuxtPage, null, null, _parent4, _scopeId3));
@@ -5388,14 +7017,19 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_LayoutNavbarMobile, null, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_ClientOnly, null, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_NuxtLayout, null, {
+                    createVNode(_component_LayoutNavbar),
+                    createVNode(_component_NuxtLayout, { class: "lt-lg:pb-14" }, {
                       default: withCtx(() => [
                         createVNode(_component_NuxtPage)
                       ]),
                       _: 1
-                    })
+                    }),
+                    createVNode(_component_LayoutNavbarMobile),
+                    createVNode(_component_ClientOnly)
                   ];
                 }
               }),
@@ -5405,12 +7039,15 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             return [
               createVNode(_component_Body, { class: "bg-white text-gray-800 antialiased transition-colors duration-300 dark:bg-gray-900 dark:text-gray-200" }, {
                 default: withCtx(() => [
-                  createVNode(_component_NuxtLayout, null, {
+                  createVNode(_component_LayoutNavbar),
+                  createVNode(_component_NuxtLayout, { class: "lt-lg:pb-14" }, {
                     default: withCtx(() => [
                       createVNode(_component_NuxtPage)
                     ]),
                     _: 1
-                  })
+                  }),
+                  createVNode(_component_LayoutNavbarMobile),
+                  createVNode(_component_ClientOnly)
                 ]),
                 _: 1
               })
@@ -5437,7 +7074,7 @@ let entry;
 const plugins = normalizePlugins(_plugins);
 {
   entry = async function createNuxtAppServer(ssrContext) {
-    const vueApp = createApp(_sfc_main$1);
+    const vueApp = createApp(_sfc_main$9);
     vueApp.component("App", _sfc_main);
     const nuxt = createNuxtApp({ vueApp, ssrContext });
     try {
@@ -5452,5 +7089,5 @@ const plugins = normalizePlugins(_plugins);
 }
 const entry$1 = (ctx) => entry(ctx);
 
-export { __nuxt_component_0 as _, useHttpPost as a, useSsrAdapter as b, useRoute as c, useRouter as d, entry$1 as default, useSwitchLocalePath as e, useI18n as f, defineStore as g, useHead as h, useState as u };
+export { O$1 as O, P, R, _export_sfc as _, u as a, __nuxt_component_1 as b, c, __nuxt_component_0$1 as d, entry$1 as default, useHead as e, f$2 as f, useHttpPost as g, useRouter as h, useHttpFetchPost as i, useBaseStore as j, useRoute as k, l, __nuxt_component_0 as m, __nuxt_component_2 as n, o, p, _imports_0$1 as q, defineNuxtRouteMiddleware as r, storeToRefs as s, t, useState as u, _sfc_main$8 as v, w };
 //# sourceMappingURL=server.mjs.map
