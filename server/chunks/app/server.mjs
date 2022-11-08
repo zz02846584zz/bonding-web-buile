@@ -1,4 +1,4 @@
-import { toRef, isRef, getCurrentInstance, inject, version, h, onUnmounted, defineComponent, computed, unref, Suspense, nextTick, Transition, provide, reactive, useSSRContext, ref, resolveComponent, shallowRef, watch, Fragment as Fragment$1, mergeProps, withCtx, createVNode, createApp, effectScope, markRaw, isReactive, toRaw, defineAsyncComponent, onErrorCaptured, watchEffect, Text, toRefs } from 'vue';
+import { toRef, isRef, getCurrentInstance, inject, defineAsyncComponent, version, h, onUnmounted, defineComponent, computed, unref, Suspense, nextTick, Transition, provide, reactive, useSSRContext, ref, resolveComponent, shallowRef, watch, Fragment as Fragment$1, mergeProps, withCtx, createVNode, createApp, onServerPrefetch, effectScope, markRaw, isReactive, toRaw, onErrorCaptured, watchEffect, Text, toRefs } from 'vue';
 import { $fetch as $fetch$1 } from 'ohmyfetch';
 import { createHooks } from 'hookable';
 import { getContext, executeAsync } from 'unctx';
@@ -181,6 +181,107 @@ const createError = (err) => {
   _err.__nuxt_error = true;
   return _err;
 };
+const getDefault = () => null;
+function useAsyncData(...args) {
+  var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2;
+  const autoKey = typeof args[args.length - 1] === "string" ? args.pop() : void 0;
+  if (typeof args[0] !== "string") {
+    args.unshift(autoKey);
+  }
+  let [key, handler, options = {}] = args;
+  if (typeof key !== "string") {
+    throw new TypeError("[nuxt] [asyncData] key must be a string.");
+  }
+  if (typeof handler !== "function") {
+    throw new TypeError("[nuxt] [asyncData] handler must be a function.");
+  }
+  options.server = (_a2 = options.server) != null ? _a2 : true;
+  options.default = (_b2 = options.default) != null ? _b2 : getDefault;
+  if (options.defer) {
+    console.warn("[useAsyncData] `defer` has been renamed to `lazy`. Support for `defer` will be removed in RC.");
+  }
+  options.lazy = (_d2 = (_c2 = options.lazy) != null ? _c2 : options.defer) != null ? _d2 : false;
+  options.initialCache = (_e2 = options.initialCache) != null ? _e2 : true;
+  options.immediate = (_f2 = options.immediate) != null ? _f2 : true;
+  const nuxt = useNuxtApp();
+  const useInitialCache = () => (nuxt.isHydrating || options.initialCache) && nuxt.payload.data[key] !== void 0;
+  if (!nuxt._asyncData[key]) {
+    nuxt._asyncData[key] = {
+      data: ref(useInitialCache() ? nuxt.payload.data[key] : (_h2 = (_g2 = options.default) == null ? void 0 : _g2.call(options)) != null ? _h2 : null),
+      pending: ref(!useInitialCache()),
+      error: ref(nuxt.payload._errors[key] ? createError(nuxt.payload._errors[key]) : null)
+    };
+  }
+  const asyncData = { ...nuxt._asyncData[key] };
+  asyncData.refresh = asyncData.execute = (opts = {}) => {
+    if (nuxt._asyncDataPromises[key]) {
+      if (opts.dedupe === false) {
+        return nuxt._asyncDataPromises[key];
+      }
+      nuxt._asyncDataPromises[key].cancelled = true;
+    }
+    if (opts._initial && useInitialCache()) {
+      return nuxt.payload.data[key];
+    }
+    asyncData.pending.value = true;
+    const promise = new Promise(
+      (resolve, reject) => {
+        try {
+          resolve(handler(nuxt));
+        } catch (err) {
+          reject(err);
+        }
+      }
+    ).then((result) => {
+      if (promise.cancelled) {
+        return nuxt._asyncDataPromises[key];
+      }
+      if (options.transform) {
+        result = options.transform(result);
+      }
+      if (options.pick) {
+        result = pick(result, options.pick);
+      }
+      asyncData.data.value = result;
+      asyncData.error.value = null;
+    }).catch((error) => {
+      var _a3, _b3;
+      if (promise.cancelled) {
+        return nuxt._asyncDataPromises[key];
+      }
+      asyncData.error.value = error;
+      asyncData.data.value = unref((_b3 = (_a3 = options.default) == null ? void 0 : _a3.call(options)) != null ? _b3 : null);
+    }).finally(() => {
+      if (promise.cancelled) {
+        return;
+      }
+      asyncData.pending.value = false;
+      nuxt.payload.data[key] = asyncData.data.value;
+      if (asyncData.error.value) {
+        nuxt.payload._errors[key] = createError(asyncData.error.value);
+      }
+      delete nuxt._asyncDataPromises[key];
+    });
+    nuxt._asyncDataPromises[key] = promise;
+    return nuxt._asyncDataPromises[key];
+  };
+  const initialFetch = () => asyncData.refresh({ _initial: true });
+  const fetchOnServer = options.server !== false && nuxt.payload.serverRendered;
+  if (fetchOnServer && options.immediate) {
+    const promise = initialFetch();
+    onServerPrefetch(() => promise);
+  }
+  const asyncDataPromise = Promise.resolve(nuxt._asyncDataPromises[key]).then(() => asyncData);
+  Object.assign(asyncDataPromise, asyncData);
+  return asyncDataPromise;
+}
+function pick(obj, keys) {
+  const newObj = {};
+  for (const key of keys) {
+    newObj[key] = obj[key];
+  }
+  return newObj;
+}
 function useState(...args) {
   const autoKey = typeof args[args.length - 1] === "string" ? args.pop() : void 0;
   if (typeof args[0] !== "string") {
@@ -255,6 +356,61 @@ const navigateTo = (to, options) => {
   }
   return (options == null ? void 0 : options.replace) ? router.replace(to) : router.push(to);
 };
+function useFetch(request, arg1, arg2) {
+  const [opts = {}, autoKey] = typeof arg1 === "string" ? [{}, arg1] : [arg1, arg2];
+  const _key = opts.key || autoKey;
+  if (!_key || typeof _key !== "string") {
+    throw new TypeError("[nuxt] [useFetch] key must be a string: " + _key);
+  }
+  if (!request) {
+    throw new Error("[nuxt] [useFetch] request is missing.");
+  }
+  const key = "$f" + _key;
+  const _request = computed(() => {
+    let r = request;
+    if (typeof r === "function") {
+      r = r();
+    }
+    return unref(r);
+  });
+  const {
+    server,
+    lazy,
+    default: defaultFn,
+    transform,
+    pick: pick2,
+    watch: watch2,
+    initialCache,
+    immediate,
+    ...fetchOptions
+  } = opts;
+  const _fetchOptions = reactive({
+    ...fetchOptions,
+    cache: typeof opts.cache === "boolean" ? void 0 : opts.cache
+  });
+  const _asyncDataOptions = {
+    server,
+    lazy,
+    default: defaultFn,
+    transform,
+    pick: pick2,
+    initialCache,
+    immediate,
+    watch: [
+      _fetchOptions,
+      _request,
+      ...watch2 || []
+    ]
+  };
+  let controller;
+  const asyncData = useAsyncData(key, () => {
+    var _a2;
+    (_a2 = controller == null ? void 0 : controller.abort) == null ? void 0 : _a2.call(controller);
+    controller = typeof AbortController !== "undefined" ? new AbortController() : {};
+    return $fetch(_request.value, { signal: controller.signal, ..._fetchOptions });
+  }, _asyncDataOptions);
+  return asyncData;
+}
 function useRequestHeaders(include) {
   var _a2, _b2;
   const headers = (_b2 = (_a2 = useNuxtApp().ssrContext) == null ? void 0 : _a2.event.req.headers) != null ? _b2 : {};
@@ -491,7 +647,11 @@ defuFn(inlineConfig);
 function useHead(meta) {
   useNuxtApp()._useHead(meta);
 }
-const components = {};
+const components = {
+  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.2c325749.mjs').then((c) => c.default || c)),
+  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.64fe4a4d.mjs').then((c) => c.default || c)),
+  Message: defineAsyncComponent(() => import('./_nuxt/Message.99446ebe.mjs').then((c) => c.default || c))
+};
 const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
   for (const name in components) {
     nuxtApp.vueApp.component(name, components[name]);
@@ -1055,7 +1215,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/index.8bd2e511.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index.b0ccd09b.mjs').then((m) => m.default || m)
   },
   {
     name: (_c = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.name) != null ? _c : "index___tr",
@@ -1065,7 +1225,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/index.8bd2e511.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index.b0ccd09b.mjs').then((m) => m.default || m)
   },
   {
     name: (_e = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.name) != null ? _e : "menu___en",
@@ -1075,7 +1235,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/menu.22090ce4.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/menu.72b17843.mjs').then((m) => m.default || m)
   },
   {
     name: (_g = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.name) != null ? _g : "menu___tr",
@@ -1085,7 +1245,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/menu.22090ce4.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/menu.72b17843.mjs').then((m) => m.default || m)
   },
   {
     name: (_i = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.name) != null ? _i : "modal___en",
@@ -1095,7 +1255,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/modal.f0e32250.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/modal.126da652.mjs').then((m) => m.default || m)
   },
   {
     name: (_k = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.name) != null ? _k : "modal___tr",
@@ -1105,7 +1265,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47modal_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/modal.f0e32250.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/modal.126da652.mjs').then((m) => m.default || m)
   },
   {
     name: (_m = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.name) != null ? _m : "naive___en",
@@ -1115,7 +1275,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/naive.edf15780.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/naive.5252b256.mjs').then((m) => m.default || m)
   },
   {
     name: (_o = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.name) != null ? _o : "naive___tr",
@@ -1125,7 +1285,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/naive.edf15780.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/naive.5252b256.mjs').then((m) => m.default || m)
   },
   {
     name: (_q = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.name) != null ? _q : "pinia___en",
@@ -1135,7 +1295,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/pinia.ed8601c2.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/pinia.e38c201f.mjs').then((m) => m.default || m)
   },
   {
     name: (_s = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.name) != null ? _s : "pinia___tr",
@@ -1145,7 +1305,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/pinia.ed8601c2.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/pinia.e38c201f.mjs').then((m) => m.default || m)
   }
 ];
 const routerOptions0 = {
@@ -4277,7 +4437,7 @@ const _sfc_main$1 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.4dc419de.mjs').then((r) => r.default || r));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.e068ca68.mjs').then((r) => r.default || r));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -4798,6 +4958,51 @@ function useGetFetchOptions(options = {}) {
     delete options.headers.Authorization;
   return options;
 }
+async function useHttp(key, url, options = {}) {
+  options = useGetFetchOptions(options);
+  options.key = key;
+  if (options.async) {
+    const res2 = await useAsyncData(
+      key,
+      () => $fetch(fetchConfig.baseURL + url, { ...options }),
+      "$8HXlY3lqR9"
+    );
+    return { ...res2 };
+  }
+  if (options.$) {
+    const data = ref(null);
+    const error = ref(null);
+    return await $fetch(url, options).then((res2) => {
+      data.value = res2.data;
+      return {
+        data,
+        error
+      };
+    }).catch((err) => {
+      var _a2;
+      const msg = (_a2 = err == null ? void 0 : err.data) == null ? void 0 : _a2.data;
+      error.value = msg;
+      return {
+        data,
+        error
+      };
+    });
+  }
+  const res = await useFetch(url, {
+    ...options,
+    onRequest({ options: options2 }) {
+      return useGetFetchOptions(options2);
+    },
+    transform: (res2) => {
+      return res2.data;
+    }
+  }, "$Nbwy13v9tA");
+  return res;
+}
+function useHttpPost(key, url, options = {}) {
+  options.method = "POST";
+  return useHttp(key, url, options);
+}
 async function useHttpFetch(url, options = {}) {
   options = useGetFetchOptions(options);
   const {
@@ -5247,5 +5452,5 @@ const plugins = normalizePlugins(_plugins);
 }
 const entry$1 = (ctx) => entry(ctx);
 
-export { __nuxt_component_0 as _, useRoute as a, useRouter as b, useSwitchLocalePath as c, useState as d, entry$1 as default, useSsrAdapter as e, defineStore as f, useHead as g, useI18n as u };
+export { __nuxt_component_0 as _, useHttpPost as a, useSsrAdapter as b, useRoute as c, useRouter as d, entry$1 as default, useSwitchLocalePath as e, useI18n as f, defineStore as g, useHead as h, useState as u };
 //# sourceMappingURL=server.mjs.map
