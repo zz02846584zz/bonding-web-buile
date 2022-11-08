@@ -18,6 +18,7 @@ import 'radix3';
 import 'node:fs';
 import 'node:url';
 import 'pathe';
+import 'axios';
 
 function defineRenderHandler(handler) {
   return eventHandler(async (event) => {

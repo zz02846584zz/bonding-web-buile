@@ -1,28 +1,30 @@
 import { toRef, isRef, getCurrentInstance, inject, version, h, onUnmounted, defineComponent, computed, unref, Suspense, nextTick, Transition, provide, reactive, useSSRContext, ref, resolveComponent, shallowRef, watch, Fragment as Fragment$1, mergeProps, withCtx, createVNode, createApp, effectScope, markRaw, isReactive, toRaw, defineAsyncComponent, onErrorCaptured, watchEffect, Text, toRefs } from 'vue';
-import { $fetch } from 'ohmyfetch';
+import { $fetch as $fetch$1 } from 'ohmyfetch';
 import { createHooks } from 'hookable';
 import { getContext, executeAsync } from 'unctx';
+import destr from 'destr';
 import { hasProtocol, isEqual, joinURL, parseURL } from 'ufo';
-import { createError as createError$1, sendRedirect } from 'h3';
+import { createError as createError$1, sendRedirect, appendHeader } from 'h3';
 import { useRouter as useRouter$1, useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter } from 'vue-router';
 import { CoreWarnCodes, CompileErrorCodes, registerMessageResolver, resolveValue, registerLocaleFallbacker, fallbackWithLocaleChain, setDevToolsHook, createCompileError, DEFAULT_LOCALE as DEFAULT_LOCALE$1, updateFallbackLocale, NUMBER_FORMAT_OPTIONS_KEYS, DATETIME_FORMAT_OPTIONS_KEYS, setFallbackContext, createCoreContext, clearDateTimeFormat, clearNumberFormat, setAdditionalMeta, getFallbackContext, NOT_REOSLVED, parseTranslateArgs, translate, MISSING_RESOLVE_VALUE, parseDateTimeArgs, datetime, parseNumberArgs, number } from '@intlify/core-base';
 import { parse, serialize } from 'cookie-es';
 import isHTTPS from 'is-https';
 import { ssrRenderComponent, ssrRenderSuspense } from 'vue/server-renderer';
 import { defu } from 'defu';
+import { isEqual as isEqual$1 } from 'ohash';
+import store from 'store';
 import { a as useRuntimeConfig$1 } from '../nitro/node-server.mjs';
 import 'node-fetch-native/polyfill';
 import 'http';
 import 'https';
-import 'destr';
 import 'unenv/runtime/fetch/index';
 import 'scule';
-import 'ohash';
 import 'unstorage';
 import 'radix3';
 import 'node:fs';
 import 'node:url';
 import 'pathe';
+import 'axios';
 
 var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t;
 const appConfig = useRuntimeConfig$1().app;
@@ -264,6 +266,48 @@ function useRequestHeaders(include) {
 function useRequestEvent(nuxtApp = useNuxtApp()) {
   var _a2;
   return (_a2 = nuxtApp.ssrContext) == null ? void 0 : _a2.event;
+}
+const CookieDefaults = {
+  path: "/",
+  decode: (val) => destr(decodeURIComponent(val)),
+  encode: (val) => encodeURIComponent(typeof val === "string" ? val : JSON.stringify(val))
+};
+function useCookie(name, _opts) {
+  var _a2, _b2;
+  const opts = { ...CookieDefaults, ..._opts };
+  const cookies = readRawCookies(opts) || {};
+  const cookie = ref((_b2 = cookies[name]) != null ? _b2 : (_a2 = opts.default) == null ? void 0 : _a2.call(opts));
+  {
+    const nuxtApp = useNuxtApp();
+    const writeFinalCookieValue = () => {
+      if (!isEqual$1(cookie.value, cookies[name])) {
+        writeServerCookie(useRequestEvent(nuxtApp), name, cookie.value, opts);
+      }
+    };
+    const unhook = nuxtApp.hooks.hookOnce("app:rendered", writeFinalCookieValue);
+    nuxtApp.hooks.hookOnce("app:redirected", () => {
+      unhook();
+      return writeFinalCookieValue();
+    });
+  }
+  return cookie;
+}
+function readRawCookies(opts = {}) {
+  var _a2;
+  {
+    return parse(((_a2 = useRequestEvent()) == null ? void 0 : _a2.req.headers.cookie) || "", opts);
+  }
+}
+function serializeCookie(name, value, opts = {}) {
+  if (value === null || value === void 0) {
+    return serialize(name, value, { ...opts, maxAge: -1 });
+  }
+  return serialize(name, value, opts);
+}
+function writeServerCookie(event, name, value, opts = {}) {
+  if (event) {
+    appendHeader(event, "Set-Cookie", serializeCookie(name, value, opts));
+  }
 }
 const firstNonUndefined = (...args) => args.find((arg) => arg !== void 0);
 const DEFAULT_EXTERNAL_REL_ATTRIBUTE = "noopener noreferrer";
@@ -1011,7 +1055,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/index.5e3c98a4.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index.8bd2e511.mjs').then((m) => m.default || m)
   },
   {
     name: (_c = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.name) != null ? _c : "index___tr",
@@ -1021,7 +1065,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47index_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/index.5e3c98a4.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/index.8bd2e511.mjs').then((m) => m.default || m)
   },
   {
     name: (_e = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47menu_46vueMeta.name) != null ? _e : "menu___en",
@@ -1071,7 +1115,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/naive.daab9931.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/naive.edf15780.mjs').then((m) => m.default || m)
   },
   {
     name: (_o = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.name) != null ? _o : "naive___tr",
@@ -1081,7 +1125,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47naive_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/naive.daab9931.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/naive.edf15780.mjs').then((m) => m.default || m)
   },
   {
     name: (_q = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.name) != null ? _q : "pinia___en",
@@ -1091,7 +1135,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/pinia.6bde2460.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/pinia.ed8601c2.mjs').then((m) => m.default || m)
   },
   {
     name: (_s = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.name) != null ? _s : "pinia___tr",
@@ -1101,7 +1145,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta,
     alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47pinia_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/pinia.6bde2460.mjs').then((m) => m.default || m)
+    component: () => import('./_nuxt/pinia.ed8601c2.mjs').then((m) => m.default || m)
   }
 ];
 const routerOptions0 = {
@@ -3248,11 +3292,11 @@ function getBrowserLocale(options, context) {
   return ret;
 }
 function getLocaleCookie(context, {
-  useCookie = nuxtI18nOptionsDefault.detectBrowserLanguage.useCookie,
+  useCookie: useCookie2 = nuxtI18nOptionsDefault.detectBrowserLanguage.useCookie,
   cookieKey = nuxtI18nOptionsDefault.detectBrowserLanguage.cookieKey,
   localeCodes: localeCodes2 = []
 } = {}) {
-  if (useCookie) {
+  if (useCookie2) {
     let localeCode;
     {
       const cookie = useRequestHeaders(["cookie"]);
@@ -3267,13 +3311,13 @@ function getLocaleCookie(context, {
   }
 }
 function setLocaleCookie(locale, context, {
-  useCookie = nuxtI18nOptionsDefault.detectBrowserLanguage.useCookie,
+  useCookie: useCookie2 = nuxtI18nOptionsDefault.detectBrowserLanguage.useCookie,
   cookieKey = nuxtI18nOptionsDefault.detectBrowserLanguage.cookieKey,
   cookieDomain = nuxtI18nOptionsDefault.detectBrowserLanguage.cookieDomain,
   cookieSecure = nuxtI18nOptionsDefault.detectBrowserLanguage.cookieSecure,
   cookieCrossOrigin = nuxtI18nOptionsDefault.detectBrowserLanguage.cookieCrossOrigin
 } = {}) {
-  if (!useCookie) {
+  if (!useCookie2) {
     return;
   }
   const date = new Date();
@@ -3301,7 +3345,7 @@ function setLocaleCookie(locale, context, {
 }
 function detectBrowserLanguage(route, context, nuxtI18nOptions, nuxtI18nInternalOptions2, localeCodes2 = [], locale = "") {
   const { strategy } = nuxtI18nOptions;
-  const { redirectOn, alwaysRedirect, useCookie, fallbackLocale } = nuxtI18nOptions.detectBrowserLanguage;
+  const { redirectOn, alwaysRedirect, useCookie: useCookie2, fallbackLocale } = nuxtI18nOptions.detectBrowserLanguage;
   const path = isString$1(route) ? route : route.path;
   if (strategy !== "no_prefix") {
     if (redirectOn === "root") {
@@ -3316,14 +3360,14 @@ function detectBrowserLanguage(route, context, nuxtI18nOptions, nuxtI18nInternal
   }
   const cookieLocale = getLocaleCookie(context, { ...nuxtI18nOptions.detectBrowserLanguage, localeCodes: localeCodes2 });
   let matchedLocale;
-  if (useCookie && (matchedLocale = cookieLocale))
+  if (useCookie2 && (matchedLocale = cookieLocale))
     ;
   else {
     matchedLocale = getBrowserLocale(nuxtI18nInternalOptions2);
   }
   const finalLocale = matchedLocale || fallbackLocale;
   const vueI18nLocale = locale || nuxtI18nOptions.vueI18n.locale;
-  if (finalLocale && (!useCookie || alwaysRedirect || !cookieLocale)) {
+  if (finalLocale && (!useCookie2 || alwaysRedirect || !cookieLocale)) {
     if (strategy === "no_prefix") {
       return finalLocale;
     } else {
@@ -3427,7 +3471,7 @@ async function mergeAdditionalMessages(context, i18n, locale) {
   );
 }
 async function loadAndSetLocale(newLocale, context, i18n, {
-  useCookie = nuxtI18nOptionsDefault.detectBrowserLanguage.useCookie,
+  useCookie: useCookie2 = nuxtI18nOptionsDefault.detectBrowserLanguage.useCookie,
   skipSettingLocaleOnNavigate = nuxtI18nOptionsDefault.skipSettingLocaleOnNavigate,
   differentDomains = nuxtI18nOptionsDefault.differentDomains,
   initial = false,
@@ -3468,7 +3512,7 @@ async function loadAndSetLocale(newLocale, context, i18n, {
   if (skipSettingLocaleOnNavigate) {
     return [ret, oldLocale];
   }
-  if (useCookie) {
+  if (useCookie2) {
     setCookieLocale(i18n, newLocale);
   }
   setLocale(i18n, newLocale);
@@ -3593,7 +3637,7 @@ const node_modules__64nuxtjs_i18n_dist_runtime_plugin_mjs_vyNBGOI7EC = defineNux
   const { vueApp: app } = nuxt;
   const nuxtContext = nuxt;
   const nuxtI18nOptions = ([__temp, __restore] = executeAsync(() => resolveNuxtI18nOptions()), __temp = await __temp, __restore(), __temp);
-  const useCookie = nuxtI18nOptions.detectBrowserLanguage && nuxtI18nOptions.detectBrowserLanguage.useCookie;
+  const useCookie2 = nuxtI18nOptions.detectBrowserLanguage && nuxtI18nOptions.detectBrowserLanguage.useCookie;
   const { __normalizedLocales: normalizedLocales } = nuxtI18nInternalOptions;
   const {
     defaultLocale,
@@ -3661,7 +3705,7 @@ const node_modules__64nuxtjs_i18n_dist_runtime_plugin_mjs_vyNBGOI7EC = defineNux
         composer.setLocale = async (locale) => {
           const localeSetup = isInitialLocaleSetup(locale);
           const [modified] = await loadAndSetLocale(locale, nuxtContext, i18n, {
-            useCookie,
+            useCookie: useCookie2,
             differentDomains,
             initial: localeSetup,
             skipSettingLocaleOnNavigate,
@@ -3840,7 +3884,7 @@ const node_modules__64nuxtjs_i18n_dist_runtime_plugin_mjs_vyNBGOI7EC = defineNux
       );
       const localeSetup = isInitialLocaleSetup(locale);
       const [modified] = ([__temp2, __restore2] = executeAsync(() => loadAndSetLocale(locale, nuxtContext, i18n, {
-        useCookie,
+        useCookie: useCookie2,
         differentDomains,
         initial: localeSetup,
         skipSettingLocaleOnNavigate,
@@ -3963,7 +4007,7 @@ function isComputed(o) {
 function createOptionsStore(id, options, pinia, hot) {
   const { state, actions, getters } = options;
   const initialState = pinia.state.value[id];
-  let store;
+  let store2;
   function setup2() {
     if (!initialState && (!("production" !== "production") )) {
       {
@@ -3974,20 +4018,20 @@ function createOptionsStore(id, options, pinia, hot) {
     return assign(localState, actions, Object.keys(getters || {}).reduce((computedGetters, name) => {
       computedGetters[name] = markRaw(computed(() => {
         setActivePinia(pinia);
-        const store2 = pinia._s.get(id);
-        return getters[name].call(store2, store2);
+        const store3 = pinia._s.get(id);
+        return getters[name].call(store3, store3);
       }));
       return computedGetters;
     }, {}));
   }
-  store = createSetupStore(id, setup2, options, pinia, hot, true);
-  store.$reset = function $reset() {
+  store2 = createSetupStore(id, setup2, options, pinia, hot, true);
+  store2.$reset = function $reset() {
     const newState = state ? state() : {};
     this.$patch(($state) => {
       assign($state, newState);
     });
   };
-  return store;
+  return store2;
 }
 function createSetupStore($id, setup2, options = {}, pinia, hot, isOptionsStore) {
   let scope;
@@ -4058,13 +4102,13 @@ function createSetupStore($id, setup2, options = {}, pinia, hot, isOptionsStore)
       triggerSubscriptions(actionSubscriptions, {
         args,
         name,
-        store,
+        store: store2,
         after,
         onError
       });
       let ret;
       try {
-        ret = action.apply(this && this.$id === $id ? this : store, args);
+        ret = action.apply(this && this.$id === $id ? this : store2, args);
       } catch (error) {
         triggerSubscriptions(onErrorCallbackList, error);
         throw error;
@@ -4103,8 +4147,8 @@ function createSetupStore($id, setup2, options = {}, pinia, hot, isOptionsStore)
     },
     $dispose
   };
-  const store = reactive(partialStore);
-  pinia._s.set($id, store);
+  const store2 = reactive(partialStore);
+  pinia._s.set($id, store2);
   const setupStore = pinia._e.run(() => {
     scope = effectScope();
     return scope.run(() => setup2());
@@ -4133,10 +4177,10 @@ function createSetupStore($id, setup2, options = {}, pinia, hot, isOptionsStore)
     } else ;
   }
   {
-    assign(store, setupStore);
-    assign(toRaw(store), setupStore);
+    assign(store2, setupStore);
+    assign(toRaw(store2), setupStore);
   }
-  Object.defineProperty(store, "$state", {
+  Object.defineProperty(store2, "$state", {
     get: () => pinia.state.value[$id],
     set: (state) => {
       $patch(($state) => {
@@ -4146,8 +4190,8 @@ function createSetupStore($id, setup2, options = {}, pinia, hot, isOptionsStore)
   });
   pinia._p.forEach((extender) => {
     {
-      assign(store, scope.run(() => extender({
-        store,
+      assign(store2, scope.run(() => extender({
+        store: store2,
         app: pinia._a,
         pinia,
         options: optionsForPlugin
@@ -4155,11 +4199,11 @@ function createSetupStore($id, setup2, options = {}, pinia, hot, isOptionsStore)
     }
   });
   if (initialState && isOptionsStore && options.hydrate) {
-    options.hydrate(store.$state, initialState);
+    options.hydrate(store2.$state, initialState);
   }
   isListening = true;
   isSyncListening = true;
-  return store;
+  return store2;
 }
 function defineStore(idOrOptions, setup2, setupOptions) {
   let id;
@@ -4185,11 +4229,24 @@ function defineStore(idOrOptions, setup2, setupOptions) {
         createOptionsStore(id, options, pinia);
       }
     }
-    const store = pinia._s.get(id);
-    return store;
+    const store2 = pinia._s.get(id);
+    return store2;
   }
   useStore.$id = id;
   return useStore;
+}
+function storeToRefs(store2) {
+  {
+    store2 = toRaw(store2);
+    const refs = {};
+    for (const key in store2) {
+      const value = store2[key];
+      if (isRef(value) || isReactive(value)) {
+        refs[key] = toRef(store2, key);
+      }
+    }
+    return refs;
+  }
 }
 const node_modules__64pinia_nuxt_dist_runtime_plugin_vue3_mjs_A0OWXRrUgq = defineNuxtPlugin((nuxtApp) => {
   const pinia = createPinia();
@@ -4220,7 +4277,7 @@ const _sfc_main$1 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.ff4e3d94.mjs').then((r) => r.default || r));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.4dc419de.mjs').then((r) => r.default || r));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -4652,10 +4709,456 @@ const Component = defineComponent({
     };
   }
 });
+function sizeController() {
+  const sizeUserSetting = useCookie("size");
+  if (!sizeUserSetting.value)
+    sizeUserSetting.value = "16px";
+  const getUserSize = () => sizeUserSetting.value;
+  const sizeSetting = useState("size.setting", () => getUserSize());
+  watch(sizeSetting, (val) => {
+    sizeUserSetting.value = val;
+    document.documentElement.style.fontSize = sizeSetting.value;
+  });
+  const init = () => {
+    sizeSetting.value = getUserSize();
+    if (sizeSetting.value)
+      document.documentElement.style.fontSize = sizeSetting.value;
+  };
+  return {
+    sizeSetting,
+    init
+  };
+}
+const storage = {
+  suffix: "_deadtime",
+  get(key) {
+    return store.get(key);
+  },
+  info() {
+    const d = {};
+    store.each((value, key) => {
+      d[key] = value;
+    });
+    return d;
+  },
+  set(key, value, expires) {
+    store.set(key, value);
+    if (expires) {
+      store.set(
+        `${key}${this.suffix}`,
+        Date.parse(String(new Date())) + expires * 1e3
+      );
+    }
+  },
+  isExpired(key) {
+    return (this.getExpiration(key) || 0) - Date.parse(String(new Date())) <= 2e3;
+  },
+  getExpiration(key) {
+    return this.get(key + this.suffix);
+  },
+  remove(key) {
+    store.remove(key);
+    this.removeExpiration(key);
+  },
+  removeExpiration(key) {
+    store.remove(key + this.suffix);
+  },
+  clearAll() {
+    store.clearAll();
+  }
+};
+const fetchConfig = {
+  baseURL: "/api"
+};
+function useGetFetchOptions(options = {}) {
+  var _a2, _b2, _c2, _d2, _e2;
+  options.baseURL = (_a2 = options.baseURL) != null ? _a2 : fetchConfig.baseURL;
+  options.headers = (_b2 = options.headers) != null ? _b2 : {};
+  options.initialCache = (_c2 = options.initialCache) != null ? _c2 : false;
+  options.lazy = (_d2 = options.lazy) != null ? _d2 : false;
+  options.async = (_e2 = options.async) != null ? _e2 : false;
+  options.body = { ...options.body, server: true };
+  if (options.multipart) {
+    options.headers = {
+      ...options.headers,
+      "Accept": "*/*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+      "Access-Control-Allow-Headers": "origin,X-Requested-With,content-type,accept",
+      "Access-Control-Allow-Credentials": "true"
+    };
+    delete options.headers["Content-Type"];
+  }
+  const { user } = useBaseStore();
+  const { token: tokenStore } = storeToRefs(user);
+  const token = tokenStore.value || storage.get("token");
+  if (token)
+    options.headers.Authorization = token;
+  else
+    delete options.headers.Authorization;
+  return options;
+}
+async function useHttpFetch(url, options = {}) {
+  options = useGetFetchOptions(options);
+  const {
+    error,
+    code: code2,
+    message = "",
+    data = null
+  } = await $fetch(fetchConfig.baseURL + url, { ...options });
+  if (error && code2 === 1005) {
+    const router = useRouter();
+    router.push("/");
+  }
+  return {
+    code: code2,
+    error,
+    message,
+    data
+  };
+}
+function useHttpFetchPost(url, options = {}) {
+  options.method = "POST";
+  return useHttpFetch(url, options);
+}
+const useUserStore = defineStore("user", () => {
+  const token = ref("");
+  function setToken(data) {
+    token.value = data.token;
+    storage.set("token", data.token, data.expire);
+    storage.set("refreshToken", data.refreshToken, data.refreshExpire);
+  }
+  const isLogin = ref(false);
+  async function refreshToken(token2) {
+    try {
+      const { data, error } = await useHttpFetchPost("/auth/refresh", {
+        body: { refreshToken: token2 }
+      });
+      if (!error) {
+        setToken(data);
+        await get();
+        set2(data);
+      }
+    } catch (e) {
+      logout();
+    }
+  }
+  const info = ref(null);
+  async function get() {
+    const { code: code2, error, data } = await useHttpFetchPost("/user/person");
+    if (error && code2 === 1005) {
+      const storeRefreshToken = storage.get("refreshToken");
+      await refreshToken(storeRefreshToken);
+    } else {
+      set2(data);
+    }
+    return data;
+  }
+  function set2(value) {
+    isLogin.value = true;
+    info.value = value;
+    storage.set("userInfo", value);
+  }
+  async function update(form) {
+    const $alert = useState("alert");
+    const updatePick = (({ firstName, lastName, birthday, gender, intro }) => ({
+      firstName,
+      lastName,
+      birthday,
+      gender,
+      intro
+    }))(form);
+    if (JSON.stringify(form) === JSON.stringify(updatePick)) {
+      return $alert.value = {
+        type: "info",
+        text: "\u672A\u4FEE\u6539\u500B\u4EBA\u8CC7\u6599",
+        center: true
+      };
+    }
+    const $loading = useState("loading");
+    $loading.value = true;
+    const { error, message } = await useHttpFetchPost("/user/update", {
+      body: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        birthday: form.birthday,
+        gender: form.gender,
+        intro: form.intro
+      }
+    });
+    $loading.value = false;
+    if (error)
+      return $alert.value = { type: "error", text: message, center: true };
+    updateField({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      birthday: form.birthday,
+      gender: form.gender,
+      intro: form.intro
+    });
+    $alert.value = { type: "success", text: "\u500B\u4EBA\u8CC7\u6599\u5DF2\u66F4\u65B0", center: true };
+  }
+  function updateField(obj) {
+    for (const key in obj)
+      info.value[key] = obj[key];
+    storage.set("userInfo", info.value);
+  }
+  async function login(loginForm) {
+    const { data, error, message } = await useHttpFetchPost(
+      "/auth/login",
+      {
+        body: {
+          phone: loginForm.phone,
+          password: loginForm.password
+        }
+      }
+    );
+    const $alert = useState("alert");
+    const $auth = useState("showAuth", () => false);
+    if (error && message) {
+      $alert.value = { type: "error", text: message, center: true };
+    } else {
+      $auth.value = false;
+      await setToken(data);
+      await get();
+      $alert.value = { type: "success", title: "\u767B\u5165\u6210\u529F" };
+      if (loginForm.rememberMe)
+        storage.set("loginData", loginForm);
+      else
+        storage.remove("loginData");
+    }
+  }
+  async function register(registerForm) {
+    const { error, message, data } = await useHttpFetchPost("/auth/register", {
+      body: {
+        firstName: registerForm.firstName,
+        lastName: registerForm.lastName,
+        birthday: registerForm.birthday,
+        phone: registerForm.phone,
+        password: registerForm.password,
+        gender: registerForm.gender,
+        passwordConfirm: registerForm.passwordConfirm,
+        verifyCode: registerForm.verifyCode
+      }
+    });
+    const $alert = useState("alert");
+    const $auth = useState("showAuth", () => false);
+    if (error && message) {
+      $alert.value = { type: "error", text: message, center: true };
+    } else {
+      $auth.value = false;
+      await setToken(data);
+      await get();
+      $alert.value = { type: "success", title: "\u767B\u5165\u6210\u529F" };
+      if (data.rememberMe)
+        storage.set("loginData", data);
+      else
+        storage.remove("loginData");
+    }
+    if (error) {
+      const $alert2 = useState("alert");
+      $alert2.value = {
+        type: "error",
+        title: "\u9A57\u8B49\u932F\u8AA4",
+        text: message,
+        center: true
+      };
+    }
+    return { error, message, data };
+  }
+  async function forgot(forgotForm) {
+    const { error, message, data } = await useHttpFetchPost("/auth/forgot", {
+      body: {
+        phone: forgotForm.phone,
+        password: forgotForm.password,
+        passwordConfirm: forgotForm.passwordConfirm,
+        verifyCode: forgotForm.verifyCode
+      }
+    });
+    const $alert = useState("alert");
+    const $auth = useState("showAuth", () => false);
+    if (error && message) {
+      $alert.value = { type: "error", text: message, center: true };
+    } else {
+      $auth.value = false;
+      await setToken(data);
+      await get();
+      $alert.value = { type: "success", title: "\u4FEE\u6539\u6210\u529F\uFF0C\u5DF2\u767B\u5165" };
+      if (data.rememberMe)
+        storage.set("loginData", forgotForm);
+      else
+        storage.remove("loginData");
+    }
+    if (error) {
+      const $alert2 = useState("alert");
+      $alert2.value = {
+        type: "error",
+        title: "\u9A57\u8B49\u932F\u8AA4",
+        text: message,
+        center: true
+      };
+    }
+    return { error, message, data };
+  }
+  async function logout() {
+    const $alert = useState("alert");
+    await useHttpFetchPost("/user/logout");
+    $alert.value = {
+      type: "success",
+      title: "\u767B\u51FA\u6210\u529F"
+    };
+    clear();
+  }
+  async function clear() {
+    return await new Promise((resolve) => {
+      var _a2;
+      storage.remove("userInfo");
+      storage.remove("token");
+      const isLoginState = useState("isLogin");
+      isLoginState.value = false;
+      isLogin.value = false;
+      info.value = null;
+      token.value = "";
+      const route = useRoute();
+      const router = useRouter();
+      const middleware = (_a2 = route.meta.middleware) != null ? _a2 : [];
+      if (middleware && middleware.includes("auth"))
+        router.push("/");
+      resolve("");
+    });
+  }
+  return {
+    token,
+    info,
+    isLogin,
+    get,
+    set: set2,
+    update,
+    updateField,
+    login,
+    register,
+    forgot,
+    logout,
+    clear,
+    setToken,
+    refreshToken
+  };
+});
+function getTodayExpired() {
+  const current = new Date();
+  const full = 24 * 60 * 60;
+  const hours = current.getHours();
+  const minutes = current.getMinutes();
+  const seconds = current.getSeconds();
+  const total = hours * 60 + minutes * 60 + seconds;
+  return full - total;
+}
+const useTipStore = defineStore("tip", () => {
+  const info = ref(null);
+  const storageName = "tip";
+  function detect() {
+    const todayTip = storage.get(storageName);
+    return !todayTip || storage.isExpired(storageName);
+  }
+  async function get() {
+    if (!detect())
+      return;
+    try {
+      const tip = await useHttpFetchPost("/tip/today");
+      const { data, error } = tip;
+      if (!error) {
+        const $show = useState("tip.show", () => false);
+        const $tip = useState("tip.data");
+        $show.value = true;
+        $tip.value = {
+          id: data.id,
+          title: data.title,
+          content: data.content,
+          publishDate: data.publishDate
+        };
+        set2(data);
+        return data;
+      }
+    } catch (e) {
+    }
+  }
+  function set2(value) {
+    info.value = value;
+    storage.set(storageName, 1, getTodayExpired());
+  }
+  function clear() {
+    storage.remove("today_tip");
+    info.value = {};
+  }
+  return {
+    info,
+    get,
+    set: set2,
+    clear
+  };
+});
+function useBaseStore() {
+  const user = useUserStore();
+  const tip = useTipStore();
+  return {
+    user,
+    tip
+  };
+}
+async function userController() {
+  const isLogin = useState("isLogin", () => false);
+  const route = useRoute();
+  const router = useRouter();
+  isLogin.value = false;
+  const token = storage.get("token");
+  if (token) {
+    const { user, tip } = useBaseStore();
+    const { token: userToken } = storeToRefs(user);
+    userToken.value = token;
+    const userInfo = await user.get();
+    isLogin.value = true;
+    tip.get();
+    return {
+      token,
+      info: userInfo
+    };
+  }
+  const $alert = useState("alert");
+  if (route.meta.middleware && route.meta.middleware.includes("auth") && !isLogin.value) {
+    setTimeout(() => {
+      $alert.value = {
+        type: "info",
+        title: "\u8ACB\u91CD\u65B0\u767B\u5165",
+        action: () => {
+          router.push("/");
+        }
+      };
+    }, 500);
+  }
+  return { token };
+}
+function InitApp() {
+  const app = {
+    name: "Bonding Tech.",
+    author: {
+      name: "\u9375\u7D50\u79D1\u6280",
+      link: "https://bondingtech.co"
+    }
+  };
+  useState("app", () => app);
+  const size = sizeController();
+  const user = userController();
+  return {
+    app,
+    size,
+    user
+  };
+}
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "app",
   __ssrInlineRender: true,
   setup(__props) {
+    InitApp();
     const locale = useState("locale.i18n");
     return (_ctx, _push, _parent, _attrs) => {
       const _component_Html = Html;
@@ -4721,7 +5224,7 @@ _sfc_main.setup = (props, ctx) => {
   return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
 };
 if (!globalThis.$fetch) {
-  globalThis.$fetch = $fetch.create({
+  globalThis.$fetch = $fetch$1.create({
     baseURL: baseURL()
   });
 }
