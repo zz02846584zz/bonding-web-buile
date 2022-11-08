@@ -1,31 +1,57 @@
-import { toRef, isRef, getCurrentInstance, inject, defineAsyncComponent, version, useSSRContext, defineComponent, computed, createVNode, resolveDynamicComponent, unref, mergeProps, withCtx, toDisplayString, createTextVNode, ref, provide, h as h$1, Fragment as Fragment$1, onMounted, onUnmounted, watch, watchEffect, nextTick, toRaw, isReactive, Suspense, Transition, reactive, createElementBlock, openBlock, createBlock, createCommentVNode, withDirectives, vShow, resolveComponent, renderSlot, renderList, cloneVNode, shallowRef, createApp, onServerPrefetch, effectScope, markRaw, onErrorCaptured, createElementVNode, toRefs } from 'vue';
+import { getCurrentInstance, ref, onServerPrefetch, toRef, isRef, reactive, defineAsyncComponent, defineComponent, h, inject, computed, unref, Text, resolveComponent, useSSRContext, watch, useSlots, mergeProps, withCtx, renderSlot, createTextVNode, toDisplayString as toDisplayString$1, createVNode, resolveDynamicComponent, onUnmounted, shallowRef, withAsyncContext, toRefs, cloneVNode, Fragment as Fragment$1, provide, onMounted, watchEffect, openBlock, createBlock, createCommentVNode, Suspense, nextTick, Transition, createApp, effectScope, markRaw, onErrorCaptured, createElementBlock, isReactive, toRaw, createElementVNode } from 'vue';
 import { $fetch as $fetch$1 } from 'ohmyfetch';
 import { createHooks } from 'hookable';
 import { getContext, executeAsync } from 'unctx';
 import destr from 'destr';
-import { hasProtocol, isEqual, parseURL, joinURL } from 'ufo';
-import { createError as createError$1, sendRedirect, appendHeader } from 'h3';
+import { withoutTrailingSlash, withTrailingSlash, hasProtocol, withBase, withLeadingSlash, joinURL, isEqual as isEqual$1, parseURL } from 'ufo';
+import { a as useRuntimeConfig$1, c as appendHeader, d as createError$1, s as sendRedirect } from '../nitro/node-server.mjs';
 import { defuFn, defu } from 'defu';
-import { RouterView, useRoute as useRoute$1, createMemoryHistory, createRouter } from 'vue-router';
-import { ssrRenderVNode, ssrInterpolate, ssrRenderComponent, ssrRenderAttrs, ssrRenderSlot, ssrRenderList, ssrRenderAttr, ssrRenderClass, ssrIncludeBooleanAttr, ssrRenderTeleport, ssrRenderSuspense } from 'vue/server-renderer';
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Pagination } from 'swiper';
-import store from 'store';
-import { ref as ref$1 } from '@vue/runtime-core';
-import { parse, serialize } from 'cookie-es';
-import { isEqual as isEqual$1 } from 'ohash';
-import { a as useRuntimeConfig$1 } from '../nitro/node-server.mjs';
+import { useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter } from 'vue-router';
+import { pascalCase } from 'scule';
+import { find, html } from 'property-information';
+import htmlTags from 'html-tags';
+import { ssrRenderComponent, ssrRenderSlot, ssrInterpolate, ssrRenderAttrs, ssrRenderVNode, ssrRenderClass, ssrRenderDynamicModel, ssrRenderAttr, ssrIncludeBooleanAttr, ssrRenderSuspense } from 'vue/server-renderer';
+import { hash, isEqual } from 'ohash';
+import { parse as parse$1, serialize } from 'cookie-es';
+import { CompileErrorCodes, createCompileError } from '@intlify/message-compiler';
 import 'node-fetch-native/polyfill';
 import 'http';
 import 'https';
 import 'unenv/runtime/fetch/index';
-import 'scule';
 import 'unstorage';
-import 'radix3';
-import 'node:fs';
-import 'node:url';
+import 'unstorage/drivers/overlay';
+import 'unstorage/drivers/memory';
+import 'fs';
 import 'pathe';
-import 'axios';
+import 'url';
+import 'unified';
+import 'mdast-util-to-string';
+import 'micromark/lib/preprocess.js';
+import 'micromark/lib/postprocess.js';
+import 'unist-util-stringify-position';
+import 'micromark-util-character';
+import 'micromark-util-chunked';
+import 'micromark-util-resolve-all';
+import 'remark-emoji';
+import 'rehype-slug';
+import 'remark-squeeze-paragraphs';
+import 'rehype-external-links';
+import 'remark-gfm';
+import 'rehype-sort-attribute-values';
+import 'rehype-sort-attributes';
+import 'rehype-raw';
+import 'remark-mdc';
+import 'remark-parse';
+import 'remark-rehype';
+import 'mdast-util-to-hast';
+import 'detab';
+import 'unist-builder';
+import 'mdurl';
+import 'unist-util-position';
+import 'slugify';
+import 'unist-util-visit';
+import 'shiki-es';
+import 'unenv/runtime/npm/consola';
 
 const appConfig = useRuntimeConfig$1().app;
 const baseURL = () => appConfig.baseURL;
@@ -321,6 +347,14 @@ const useRoute = () => {
   return useNuxtApp()._route;
 };
 const defineNuxtRouteMiddleware = (middleware) => middleware;
+const addRouteMiddleware = (name, middleware, options = {}) => {
+  const nuxtApp = useNuxtApp();
+  if (options.global || typeof name === "function") {
+    nuxtApp._middleware.global.push(typeof name === "function" ? name : middleware);
+  } else {
+    nuxtApp._middleware.named[name] = middleware;
+  }
+};
 const navigateTo = (to, options) => {
   if (!to) {
     to = "/";
@@ -351,61 +385,6 @@ const navigateTo = (to, options) => {
   }
   return (options == null ? void 0 : options.replace) ? router.replace(to) : router.push(to);
 };
-function useFetch(request, arg1, arg2) {
-  const [opts = {}, autoKey] = typeof arg1 === "string" ? [{}, arg1] : [arg1, arg2];
-  const _key = opts.key || autoKey;
-  if (!_key || typeof _key !== "string") {
-    throw new TypeError("[nuxt] [useFetch] key must be a string: " + _key);
-  }
-  if (!request) {
-    throw new Error("[nuxt] [useFetch] request is missing.");
-  }
-  const key = "$f" + _key;
-  const _request = computed(() => {
-    let r2 = request;
-    if (typeof r2 === "function") {
-      r2 = r2();
-    }
-    return unref(r2);
-  });
-  const {
-    server,
-    lazy,
-    default: defaultFn,
-    transform,
-    pick: pick2,
-    watch: watch2,
-    initialCache,
-    immediate,
-    ...fetchOptions
-  } = opts;
-  const _fetchOptions = reactive({
-    ...fetchOptions,
-    cache: typeof opts.cache === "boolean" ? void 0 : opts.cache
-  });
-  const _asyncDataOptions = {
-    server,
-    lazy,
-    default: defaultFn,
-    transform,
-    pick: pick2,
-    initialCache,
-    immediate,
-    watch: [
-      _fetchOptions,
-      _request,
-      ...watch2 || []
-    ]
-  };
-  let controller;
-  const asyncData = useAsyncData(key, () => {
-    var _a;
-    (_a = controller == null ? void 0 : controller.abort) == null ? void 0 : _a.call(controller);
-    controller = typeof AbortController !== "undefined" ? new AbortController() : {};
-    return $fetch(_request.value, { signal: controller.signal, ..._fetchOptions });
-  }, _asyncDataOptions);
-  return asyncData;
-}
 function useRequestEvent(nuxtApp = useNuxtApp()) {
   var _a;
   return (_a = nuxtApp.ssrContext) == null ? void 0 : _a.event;
@@ -423,7 +402,7 @@ function useCookie(name, _opts) {
   {
     const nuxtApp = useNuxtApp();
     const writeFinalCookieValue = () => {
-      if (!isEqual$1(cookie.value, cookies[name])) {
+      if (!isEqual(cookie.value, cookies[name])) {
         writeServerCookie(useRequestEvent(nuxtApp), name, cookie.value, opts);
       }
     };
@@ -438,7 +417,7 @@ function useCookie(name, _opts) {
 function readRawCookies(opts = {}) {
   var _a;
   {
-    return parse(((_a = useRequestEvent()) == null ? void 0 : _a.req.headers.cookie) || "", opts);
+    return parse$1(((_a = useRequestEvent()) == null ? void 0 : _a.req.headers.cookie) || "", opts);
   }
 }
 function serializeCookie(name, value, opts = {}) {
@@ -552,7 +531,7 @@ function defineNuxtLink(options) {
       return () => {
         var _a, _b, _c;
         if (!isExternal.value) {
-          return h$1(
+          return h(
             resolveComponent("RouterLink"),
             {
               ref: void 0,
@@ -585,12 +564,17 @@ function defineNuxtLink(options) {
             isExactActive: false
           });
         }
-        return h$1("a", { ref: el, href, rel, target }, (_c = slots.default) == null ? void 0 : _c.call(slots));
+        return h("a", { ref: el, href, rel, target }, (_c = slots.default) == null ? void 0 : _c.call(slots));
       };
     }
   });
 }
 const __nuxt_component_0$2 = defineNuxtLink({ componentName: "NuxtLink" });
+const nuxtLink = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  defineNuxtLink,
+  default: __nuxt_component_0$2
+}, Symbol.toStringTag, { value: "Module" }));
 const cfg0 = defineAppConfig({
   name: "Nuxt 3 Awesome Starter",
   author: {
@@ -613,23 +597,53 @@ function useHead(meta2) {
 function useMeta(meta2) {
   return useHead(meta2);
 }
-const components = {
-  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.03425d4e.mjs').then((c2) => c2.default || c2)),
-  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.4ddcc8fa.mjs').then((c2) => c2.default || c2)),
-  Message: defineAsyncComponent(() => import('./_nuxt/Message.1aac4f90.mjs').then((c2) => c2.default || c2))
+const components$1 = {
+  Tab: defineAsyncComponent(() => import('./_nuxt/Tab.3c3a53bf.mjs').then((c2) => c2.default || c2)),
+  Tabs: defineAsyncComponent(() => import('./_nuxt/Tabs.2c0c652a.mjs').then((c2) => c2.default || c2)),
+  ContentDoc: defineAsyncComponent(() => Promise.resolve().then(() => ContentDoc).then((c2) => c2.default || c2)),
+  ContentList: defineAsyncComponent(() => Promise.resolve().then(() => ContentList).then((c2) => c2.default || c2)),
+  ContentNavigation: defineAsyncComponent(() => import('./_nuxt/ContentNavigation.4cd65f34.mjs').then((c2) => c2.default || c2)),
+  ContentQuery: defineAsyncComponent(() => Promise.resolve().then(() => ContentQuery).then((c2) => c2.default || c2)),
+  ContentRenderer: defineAsyncComponent(() => Promise.resolve().then(() => ContentRenderer).then((c2) => c2.default || c2)),
+  ContentRendererMarkdown: defineAsyncComponent(() => Promise.resolve().then(() => ContentRendererMarkdown).then((c2) => c2.default || c2)),
+  ContentSlot: defineAsyncComponent(() => import('./_nuxt/ContentSlot.26d99e29.mjs').then((c2) => c2.default || c2)),
+  DocumentDrivenEmpty: defineAsyncComponent(() => Promise.resolve().then(() => DocumentDrivenEmpty).then((c2) => c2.default || c2)),
+  DocumentDrivenNotFound: defineAsyncComponent(() => Promise.resolve().then(() => DocumentDrivenNotFound).then((c2) => c2.default || c2)),
+  Markdown: defineAsyncComponent(() => import('./_nuxt/Markdown.9d97f708.mjs').then((c2) => c2.default || c2)),
+  ProseA: defineAsyncComponent(() => import('./_nuxt/ProseA.55c5d851.mjs').then((c2) => c2.default || c2)),
+  ProseBlockquote: defineAsyncComponent(() => import('./_nuxt/ProseBlockquote.099e0955.mjs').then((c2) => c2.default || c2)),
+  ProseCode: defineAsyncComponent(() => import('./_nuxt/ProseCode.4d2049cc.mjs').then((c2) => c2.default || c2)),
+  ProseCodeInline: defineAsyncComponent(() => import('./_nuxt/ProseCodeInline.84216761.mjs').then((c2) => c2.default || c2)),
+  ProseEm: defineAsyncComponent(() => import('./_nuxt/ProseEm.896114ed.mjs').then((c2) => c2.default || c2)),
+  ProseH1: defineAsyncComponent(() => import('./_nuxt/ProseH1.f530d684.mjs').then((c2) => c2.default || c2)),
+  ProseH2: defineAsyncComponent(() => import('./_nuxt/ProseH2.56cc58bc.mjs').then((c2) => c2.default || c2)),
+  ProseH3: defineAsyncComponent(() => import('./_nuxt/ProseH3.3fe4588e.mjs').then((c2) => c2.default || c2)),
+  ProseH4: defineAsyncComponent(() => import('./_nuxt/ProseH4.97e1d168.mjs').then((c2) => c2.default || c2)),
+  ProseH5: defineAsyncComponent(() => import('./_nuxt/ProseH5.a86c70fe.mjs').then((c2) => c2.default || c2)),
+  ProseH6: defineAsyncComponent(() => import('./_nuxt/ProseH6.2866f431.mjs').then((c2) => c2.default || c2)),
+  ProseHr: defineAsyncComponent(() => import('./_nuxt/ProseHr.0f77fefa.mjs').then((c2) => c2.default || c2)),
+  ProseImg: defineAsyncComponent(() => import('./_nuxt/ProseImg.0976bf8e.mjs').then((c2) => c2.default || c2)),
+  ProseLi: defineAsyncComponent(() => import('./_nuxt/ProseLi.3cfe432f.mjs').then((c2) => c2.default || c2)),
+  ProseOl: defineAsyncComponent(() => import('./_nuxt/ProseOl.5f4ee03a.mjs').then((c2) => c2.default || c2)),
+  ProseP: defineAsyncComponent(() => import('./_nuxt/ProseP.24408bcc.mjs').then((c2) => c2.default || c2)),
+  ProseStrong: defineAsyncComponent(() => import('./_nuxt/ProseStrong.ea1fff55.mjs').then((c2) => c2.default || c2)),
+  ProseTable: defineAsyncComponent(() => import('./_nuxt/ProseTable.06724dc2.mjs').then((c2) => c2.default || c2)),
+  ProseTbody: defineAsyncComponent(() => import('./_nuxt/ProseTbody.1f9b0c52.mjs').then((c2) => c2.default || c2)),
+  ProseTd: defineAsyncComponent(() => import('./_nuxt/ProseTd.304fe031.mjs').then((c2) => c2.default || c2)),
+  ProseTh: defineAsyncComponent(() => import('./_nuxt/ProseTh.9b5d8c20.mjs').then((c2) => c2.default || c2)),
+  ProseThead: defineAsyncComponent(() => import('./_nuxt/ProseThead.608755e5.mjs').then((c2) => c2.default || c2)),
+  ProseTr: defineAsyncComponent(() => import('./_nuxt/ProseTr.ad3ad0fe.mjs').then((c2) => c2.default || c2)),
+  ProseUl: defineAsyncComponent(() => import('./_nuxt/ProseUl.8cd4b7ff.mjs').then((c2) => c2.default || c2))
 };
 const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
-  for (const name in components) {
-    nuxtApp.vueApp.component(name, components[name]);
-    nuxtApp.vueApp.component("Lazy" + name, components[name]);
+  for (const name in components$1) {
+    nuxtApp.vueApp.component(name, components$1[name]);
+    nuxtApp.vueApp.component("Lazy" + name, components$1[name]);
   }
 });
 const isVue2 = false;
-function resolveUnref(r2) {
-  return typeof r2 === "function" ? r2() : unref(r2);
-}
-function identity(arg) {
-  return arg;
+function resolveUnref(r) {
+  return typeof r === "function" ? r() : unref(r);
 }
 var PROVIDE_KEY = "usehead";
 var HEAD_COUNT_KEY = "head:count";
@@ -728,7 +742,7 @@ var sortTags = (aTag, bTag) => {
 };
 var tagDedupeKey = (tag) => {
   const { props, tag: tagName, options } = tag;
-  if (["base", "title", "titleTemplate", "bodyAttrs", "htmlAttrs"].includes(tagName))
+  if (tagName === "base" || tagName === "title" || tagName === "titleTemplate")
     return tagName;
   if (tagName === "link" && props.rel === "canonical")
     return "canonical";
@@ -805,7 +819,7 @@ var resolveTag = (name, input, e2) => {
   return tag;
 };
 var headInputToTags = (e2) => {
-  return Object.entries(e2.input).filter(([, v2]) => typeof v2 !== "undefined").map(([key, value]) => {
+  return Object.entries(e2.input).filter(([, v]) => typeof v !== "undefined").map(([key, value]) => {
     return (Array.isArray(value) ? value : [value]).map((props) => {
       switch (key) {
         case "title":
@@ -830,7 +844,7 @@ var headInputToTags = (e2) => {
           return false;
       }
     });
-  }).flat().filter((v2) => !!v2);
+  }).flat().filter((v) => !!v);
 };
 var renderTitleTemplate = (template, title) => {
   if (template == null)
@@ -850,7 +864,7 @@ var resolveHeadEntriesToTags = (entries) => {
       deduping[tagDedupeKey(tag)] = tag;
     });
   });
-  let resolvedTags = Object.values(deduping).sort((a2, b2) => a2.runtime.position - b2.runtime.position).sort(sortTags);
+  let resolvedTags = Object.values(deduping).sort((a, b) => a.runtime.position - b.runtime.position).sort(sortTags);
   const titleTemplateIdx = resolvedTags.findIndex((i) => i.tag === "titleTemplate");
   const titleIdx = resolvedTags.findIndex((i) => i.tag === "title");
   if (titleIdx !== -1 && titleTemplateIdx !== -1) {
@@ -916,9 +930,9 @@ var setAttrs = (el, attrs) => {
 var createElement = (tag, document2) => {
   var _a;
   const $el = document2.createElement(tag.tag);
-  Object.entries(tag.props).forEach(([k2, v2]) => {
-    if (v2 !== false) {
-      $el.setAttribute(k2, v2 === true ? "" : String(v2));
+  Object.entries(tag.props).forEach(([k2, v]) => {
+    if (v !== false) {
+      $el.setAttribute(k2, v === true ? "" : String(v));
     }
   });
   if (tag.children) {
@@ -1041,7 +1055,6 @@ var updateDOM = async (head, previousTags, document2) => {
   previousTags.clear();
   Object.keys(tags).forEach((i) => previousTags.add(i));
 };
-version.startsWith("2.");
 var createHead = (initHeadObject) => {
   let entries = [];
   let entryId = 0;
@@ -1131,7 +1144,7 @@ const appHead = { "meta": [{ "name": "viewport", "content": "width=device-width,
 const appLayoutTransition = { "name": "layout", "mode": "out-in" };
 const appPageTransition = { "name": "page", "mode": "out-in" };
 const appKeepalive = false;
-const node_modules_nuxt_dist_head_runtime_lib_vueuse_head_plugin_mjs_D7WGfuP1A0 = defineNuxtPlugin((nuxtApp) => {
+const node_modules__pnpm_nuxt3_643_0_0_rc_13_27772354_a0a59e2_3qgq5m7bqj7palvvc4uezrk4iq_node_modules_nuxt3_dist_head_runtime_lib_vueuse_head_plugin_mjs_mIOVEwpfTX = defineNuxtPlugin((nuxtApp) => {
   const head = createHead();
   head.addEntry(appHead, { resolved: true });
   nuxtApp.vueApp.use(head);
@@ -1166,9 +1179,562 @@ const metaMixin = {
     useHead(source);
   }
 };
-const node_modules_nuxt_dist_head_runtime_mixin_plugin_mjs_prWV5EzJWI = defineNuxtPlugin((nuxtApp) => {
+const node_modules__pnpm_nuxt3_643_0_0_rc_13_27772354_a0a59e2_3qgq5m7bqj7palvvc4uezrk4iq_node_modules_nuxt3_dist_head_runtime_mixin_plugin_mjs_PlNrR5uuVf = defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.mixin(metaMixin);
 });
+const Fragment = defineComponent({
+  setup(_props, { slots }) {
+    return () => {
+      var _a;
+      return (_a = slots.default) == null ? void 0 : _a.call(slots);
+    };
+  }
+});
+const _wrapIf = (component, props, slots) => {
+  return { default: () => props ? h(component, props === true ? {} : props, slots) : h(Fragment, {}, slots) };
+};
+const layouts = {
+  dashboard: () => import('./_nuxt/dashboard.a3983d29.mjs').then((m2) => m2.default || m2),
+  page: () => import('./_nuxt/page.9ca9700a.mjs').then((m2) => m2.default || m2)
+};
+const LayoutLoader = defineComponent({
+  props: {
+    name: String,
+    ...{}
+  },
+  async setup(props, context) {
+    const LayoutComponent = await layouts[props.name]().then((r) => r.default || r);
+    return () => {
+      return h(LayoutComponent, {}, context.slots);
+    };
+  }
+});
+const __nuxt_component_0$1 = defineComponent({
+  props: {
+    name: {
+      type: [String, Boolean, Object],
+      default: null
+    }
+  },
+  setup(props, context) {
+    const injectedRoute = inject("_route");
+    const route = injectedRoute === useRoute() ? useRoute$1() : injectedRoute;
+    const layout2 = computed(() => {
+      var _a, _b;
+      return (_b = (_a = unref(props.name)) != null ? _a : route.meta.layout) != null ? _b : "default";
+    });
+    return () => {
+      var _a;
+      const hasLayout = layout2.value && layout2.value in layouts;
+      const transitionProps = (_a = route.meta.layoutTransition) != null ? _a : appLayoutTransition;
+      return _wrapIf(Transition, hasLayout && transitionProps, {
+        default: () => _wrapIf(LayoutLoader, hasLayout && { key: layout2.value, name: layout2.value, hasTransition: !!transitionProps }, context.slots).default()
+      }).default();
+    };
+  }
+});
+const layout = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_0$1
+}, Symbol.toStringTag, { value: "Module" }));
+const DEFAULT_SLOT = "default";
+const rxOn = /^@|^v-on:/;
+const rxBind = /^:|^v-bind:/;
+const rxModel = /^v-model/;
+const nativeInputs = ["select", "textarea", "input"];
+const _sfc_main$r = defineComponent({
+  name: "ContentRendererMarkdown",
+  props: {
+    value: {
+      type: Object,
+      required: true
+    },
+    excerpt: {
+      type: Boolean,
+      default: false
+    },
+    tag: {
+      type: String,
+      default: "div"
+    },
+    components: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  async setup(props) {
+    var _a;
+    const { content: { tags = {} } } = useRuntimeConfig().public;
+    await resolveContentComponents(props.value.body, {
+      tags: {
+        ...tags,
+        ...((_a = props.value) == null ? void 0 : _a._components) || {},
+        ...props.components
+      }
+    });
+    return { tags };
+  },
+  render(ctx) {
+    var _a;
+    const { tags, tag, value, components: components2 } = ctx;
+    if (!value) {
+      return null;
+    }
+    let body = value.body || value;
+    if (ctx.excerpt && value.excerpt) {
+      body = value.excerpt;
+    }
+    const meta2 = {
+      ...value,
+      tags: {
+        ...tags,
+        ...(value == null ? void 0 : value._components) || {},
+        ...components2
+      }
+    };
+    let component = meta2.component || tag;
+    if (typeof meta2.component === "object") {
+      component = meta2.component.name;
+    }
+    component = resolveVueComponent(component);
+    const children = (body.children || []).map((child) => renderNode(child, h, meta2));
+    return h(
+      component,
+      {
+        ...(_a = meta2.component) == null ? void 0 : _a.props,
+        ...this.$attrs
+      },
+      {
+        default: createSlotFunction(children)
+      }
+    );
+  }
+});
+function renderNode(node, h2, documentMeta, parentScope = {}) {
+  var _a;
+  if (node.type === "text") {
+    return h2(Text, node.value);
+  }
+  const originalTag = node.tag;
+  const renderTag = typeof ((_a = node.props) == null ? void 0 : _a.__ignoreMap) === "undefined" && documentMeta.tags[originalTag] || originalTag;
+  if (node.tag === "binding") {
+    return renderBinding(node, h2, documentMeta, parentScope);
+  }
+  const component = resolveVueComponent(renderTag);
+  if (typeof component === "object") {
+    component.tag = originalTag;
+  }
+  const props = propsToData(node, documentMeta);
+  return h2(
+    component,
+    props,
+    renderSlots(node, h2, documentMeta, { ...parentScope, ...props })
+  );
+}
+function renderBinding(node, h2, documentMeta, parentScope = {}) {
+  var _a;
+  const data = {
+    ...parentScope,
+    $route: () => useRoute(),
+    $document: documentMeta,
+    $doc: documentMeta
+  };
+  const splitter = /\.|\[(\d+)\]/;
+  const keys = (_a = node.props) == null ? void 0 : _a.value.trim().split(splitter).filter(Boolean);
+  const value = keys.reduce((data2, key) => {
+    if (key in data2) {
+      if (typeof data2[key] === "function") {
+        return data2[key]();
+      } else {
+        return data2[key];
+      }
+    }
+    return {};
+  }, data);
+  return h2(Text, value);
+}
+function renderSlots(node, h2, documentMeta, parentProps) {
+  const children = node.children || [];
+  const slots = children.reduce((data, node2) => {
+    if (!isTemplate(node2)) {
+      data[DEFAULT_SLOT].push(renderNode(node2, h2, documentMeta, parentProps));
+      return data;
+    }
+    if (isDefaultTemplate(node2)) {
+      data[DEFAULT_SLOT].push(...(node2.children || []).map((child) => renderNode(child, h2, documentMeta, parentProps)));
+      return data;
+    }
+    const slotName = getSlotName(node2);
+    data[slotName] = (node2.children || []).map((child) => renderNode(child, h2, documentMeta, parentProps));
+    return data;
+  }, {
+    [DEFAULT_SLOT]: []
+  });
+  const slotEntries = Object.entries(slots).map(([name, vDom]) => [name, createSlotFunction(vDom)]);
+  return Object.fromEntries(slotEntries);
+}
+function propsToData(node, documentMeta) {
+  const { tag = "", props = {} } = node;
+  return Object.keys(props).reduce(function(data, key) {
+    if (key === "__ignoreMap") {
+      return data;
+    }
+    const value = props[key];
+    if (rxModel.test(key) && !nativeInputs.includes(tag)) {
+      return propsToDataRxModel(key, value, data, documentMeta);
+    }
+    if (key === "v-bind") {
+      return propsToDataVBind(key, value, data, documentMeta);
+    }
+    if (rxOn.test(key)) {
+      return propsToDataRxOn(key, value, data, documentMeta);
+    }
+    if (rxBind.test(key)) {
+      return propsToDataRxBind(key, value, data, documentMeta);
+    }
+    const { attribute } = find(html, key);
+    if (Array.isArray(value) && value.every((v) => typeof v === "string")) {
+      data[attribute] = value.join(" ");
+      return data;
+    }
+    data[attribute] = value;
+    return data;
+  }, {});
+}
+function propsToDataRxModel(key, value, data, documentMeta) {
+  const number2 = (d2) => +d2;
+  const trim = (d2) => d2.trim();
+  const noop2 = (d2) => d2;
+  const mods = key.replace(rxModel, "").split(".").filter((d2) => d2).reduce((d2, k2) => {
+    d2[k2] = true;
+    return d2;
+  }, {});
+  const field = "value";
+  const event = mods.lazy ? "change" : "input";
+  const processor = mods.number ? number2 : mods.trim ? trim : noop2;
+  data[field] = evalInContext(value, documentMeta);
+  data.on = data.on || {};
+  data.on[event] = (e2) => documentMeta[value] = processor(e2);
+  return data;
+}
+function propsToDataVBind(_key, value, data, documentMeta) {
+  const val = evalInContext(value, documentMeta);
+  data = Object.assign(data, val);
+  return data;
+}
+function propsToDataRxOn(key, value, data, documentMeta) {
+  key = key.replace(rxOn, "");
+  data.on = data.on || {};
+  data.on[key] = () => evalInContext(value, documentMeta);
+  return data;
+}
+function propsToDataRxBind(key, value, data, documentMeta) {
+  key = key.replace(rxBind, "");
+  data[key] = evalInContext(value, documentMeta);
+  return data;
+}
+const resolveVueComponent = (component) => {
+  if (!htmlTags.includes(component)) {
+    const componentFn = resolveComponent(pascalCase(component), false);
+    if (typeof componentFn === "object") {
+      return componentFn;
+    }
+  }
+  return component;
+};
+function evalInContext(code2, context) {
+  const result = code2.split(".").reduce((o2, k2) => typeof o2 === "object" ? o2[k2] : void 0, context);
+  return typeof result === "undefined" ? destr(code2) : result;
+}
+function getSlotName(node) {
+  let name = "";
+  for (const propName of Object.keys(node.props || {})) {
+    if (!propName.startsWith("#") && !propName.startsWith("v-slot:")) {
+      continue;
+    }
+    name = propName.split(/[:#]/, 2)[1];
+    break;
+  }
+  return name || DEFAULT_SLOT;
+}
+function createSlotFunction(nodes) {
+  return nodes.length ? () => mergeTextNodes(nodes) : void 0;
+}
+function isDefaultTemplate(node) {
+  return isTemplate(node) && getSlotName(node) === DEFAULT_SLOT;
+}
+function isTemplate(node) {
+  return node.tag === "template";
+}
+function mergeTextNodes(nodes) {
+  const mergedNodes = [];
+  for (const node of nodes) {
+    const previousNode = mergedNodes[mergedNodes.length - 1];
+    if (node.type === Text && (previousNode == null ? void 0 : previousNode.type) === Text) {
+      previousNode.children = previousNode.children + node.children;
+    } else {
+      mergedNodes.push(node);
+    }
+  }
+  return mergedNodes;
+}
+async function resolveContentComponents(body, meta2) {
+  const components2 = Array.from(new Set(loadComponents(body, meta2)));
+  await Promise.all(components2.map(async (c2) => {
+    const resolvedComponent = resolveComponent(c2);
+    if ((resolvedComponent == null ? void 0 : resolvedComponent.__asyncLoader) && !resolvedComponent.__asyncResolved) {
+      await resolvedComponent.__asyncLoader();
+    }
+  }));
+  function loadComponents(node, documentMeta) {
+    var _a;
+    if (node.type === "text" || node.tag === "binding") {
+      return [];
+    }
+    const renderTag = typeof ((_a = node.props) == null ? void 0 : _a.__ignoreMap) === "undefined" && documentMeta.tags[node.tag] || node.tag;
+    const components22 = [];
+    if (node.type !== "root" && !htmlTags.includes(renderTag)) {
+      components22.push(renderTag);
+    }
+    for (const child of node.children || []) {
+      components22.push(...loadComponents(child, documentMeta));
+    }
+    return components22;
+  }
+}
+const _sfc_setup$r = _sfc_main$r.setup;
+_sfc_main$r.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/ContentRendererMarkdown.vue");
+  return _sfc_setup$r ? _sfc_setup$r(props, ctx) : void 0;
+};
+const ContentRendererMarkdown = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$r
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$q = defineComponent({
+  name: "ContentRenderer",
+  props: {
+    value: {
+      type: Object,
+      required: false,
+      default: () => ({})
+    },
+    excerpt: {
+      type: Boolean,
+      default: false
+    },
+    tag: {
+      type: String,
+      default: "div"
+    }
+  },
+  setup(props) {
+    watch(
+      () => props.excerpt,
+      (newExcerpt) => {
+        var _a, _b, _c;
+        if (newExcerpt && !((_a = props.value) == null ? void 0 : _a.excerpt)) {
+          console.warn(`No excerpt found for document content/${(_b = props == null ? void 0 : props.value) == null ? void 0 : _b._path}.${(_c = props == null ? void 0 : props.value) == null ? void 0 : _c._extension}!`);
+          console.warn("Make sure to use <!--more--> in your content if you want to use excerpt feature.");
+        }
+      },
+      {
+        immediate: true
+      }
+    );
+  },
+  render(ctx) {
+    var _a, _b;
+    const slots = useSlots();
+    const { value, excerpt, tag } = ctx;
+    if (!value && (slots == null ? void 0 : slots.empty)) {
+      return slots.empty({ value, excerpt, tag, ...this.$attrs });
+    }
+    if (slots == null ? void 0 : slots.default) {
+      return slots.default({ value, excerpt, tag, ...this.$attrs });
+    }
+    if (value && (value == null ? void 0 : value._type) === "markdown" && ((_b = (_a = value == null ? void 0 : value.body) == null ? void 0 : _a.children) == null ? void 0 : _b.length)) {
+      return h(
+        _sfc_main$r,
+        {
+          value,
+          excerpt,
+          tag,
+          ...this.$attrs
+        }
+      );
+    }
+    return h(
+      "pre",
+      null,
+      JSON.stringify({ message: "You should use slots with <ContentRenderer>", value, excerpt, tag }, null, 2)
+    );
+  }
+});
+const _sfc_setup$q = _sfc_main$q.setup;
+_sfc_main$q.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/ContentRenderer.vue");
+  return _sfc_setup$q ? _sfc_setup$q(props, ctx) : void 0;
+};
+const ContentRenderer = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$q
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$p = defineComponent({
+  name: "DocumentDrivenEmpty",
+  props: {
+    value: {
+      type: Object,
+      required: true
+    }
+  },
+  render({ value }) {
+    return h("div", void 0, [
+      h("p", "Document is empty"),
+      h("p", `Add content to it by opening ${value._source}/${value._file} file.`)
+    ]);
+  }
+});
+const _sfc_setup$p = _sfc_main$p.setup;
+_sfc_main$p.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/DocumentDrivenEmpty.vue");
+  return _sfc_setup$p ? _sfc_setup$p(props, ctx) : void 0;
+};
+const DocumentDrivenEmpty = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$p
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$o = defineComponent({
+  name: "DocumentDrivenNotFound",
+  render() {
+    return h("div", "Document not found");
+  }
+});
+const _sfc_setup$o = _sfc_main$o.setup;
+_sfc_main$o.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/DocumentDrivenNotFound.vue");
+  return _sfc_setup$o ? _sfc_setup$o(props, ctx) : void 0;
+};
+const DocumentDrivenNotFound = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$o
+}, Symbol.toStringTag, { value: "Module" }));
+const useContentState = () => {
+  const pages = useState("dd-pages", () => ({}));
+  const surrounds = useState("dd-surrounds", () => ({}));
+  const navigation = useState("dd-navigation");
+  const globals = useState("dd-globals", () => ({}));
+  return {
+    pages,
+    surrounds,
+    navigation,
+    globals
+  };
+};
+const useContent = () => {
+  const { navigation, pages, surrounds, globals } = useContentState();
+  const _path = computed(() => withoutTrailingSlash(useRoute().path));
+  const page2 = computed(() => pages.value[_path.value]);
+  const surround = computed(() => surrounds.value[_path.value]);
+  const toc = computed(() => {
+    var _a, _b;
+    return (_b = (_a = page2 == null ? void 0 : page2.value) == null ? void 0 : _a.body) == null ? void 0 : _b.toc;
+  });
+  const type = computed(() => {
+    var _a;
+    return (_a = page2.value) == null ? void 0 : _a.type;
+  });
+  const excerpt = computed(() => {
+    var _a;
+    return (_a = page2.value) == null ? void 0 : _a.excerpt;
+  });
+  const layout2 = computed(() => {
+    var _a;
+    return (_a = page2.value) == null ? void 0 : _a.layout;
+  });
+  const next = computed(() => {
+    var _a;
+    return (_a = surround.value) == null ? void 0 : _a[1];
+  });
+  const prev = computed(() => {
+    var _a;
+    return (_a = surround.value) == null ? void 0 : _a[0];
+  });
+  return {
+    globals,
+    navigation,
+    surround,
+    page: page2,
+    excerpt,
+    toc,
+    type,
+    layout: layout2,
+    next,
+    prev
+  };
+};
+const useContentHead = (_content, to = useRoute()) => {
+  const content = unref(_content);
+  const refreshHead = (data = content) => {
+    if (!to.path || !data) {
+      return;
+    }
+    const head = Object.assign({}, (data == null ? void 0 : data.head) || {});
+    const title = head.title || (data == null ? void 0 : data.title);
+    if (title) {
+      head.title = title;
+    }
+    head.meta = [...head.meta || []];
+    const description = (head == null ? void 0 : head.description) || (data == null ? void 0 : data.description);
+    if (description && head.meta.filter((m2) => m2.name === "description").length === 0) {
+      head.meta.push({
+        name: "description",
+        content: description
+      });
+    }
+    const image = (head == null ? void 0 : head.image) || (data == null ? void 0 : data.image);
+    if (image && head.meta.filter((m2) => m2.property === "og:image").length === 0) {
+      if (typeof image === "string") {
+        head.meta.push({
+          property: "og:image",
+          content: image
+        });
+      }
+      if (typeof image === "object") {
+        const imageKeys = [
+          "src",
+          "secure_url",
+          "type",
+          "width",
+          "height",
+          "alt"
+        ];
+        for (const key of imageKeys) {
+          if (key === "src" && image.src) {
+            head.meta.push({
+              property: "og:image",
+              content: image[key]
+            });
+          } else if (image[key]) {
+            head.meta.push({
+              property: `og:image:${key}`,
+              content: image[key]
+            });
+          }
+        }
+      }
+    }
+    {
+      useHead(head);
+    }
+  };
+  watch(() => unref(_content), refreshHead, { immediate: true });
+};
+const meta$9 = void 0;
 const _export_sfc = (sfc, props) => {
   const target = sfc.__vccOpts || sfc;
   for (const [key, val] of props) {
@@ -1176,20 +1742,24 @@ const _export_sfc = (sfc, props) => {
   }
   return target;
 };
-const _sfc_main$D = {};
-function _sfc_ssrRender$6(_ctx, _push, _parent, _attrs) {
+const _sfc_main$n = {};
+function _sfc_ssrRender$7(_ctx, _push, _parent, _attrs) {
   _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex-1 relative py-8" }, _attrs))}>`);
   ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
   _push(`</div>`);
 }
-const _sfc_setup$D = _sfc_main$D.setup;
-_sfc_main$D.setup = (props, ctx) => {
+const _sfc_setup$n = _sfc_main$n.setup;
+_sfc_main$n.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Wrapper.vue");
-  return _sfc_setup$D ? _sfc_setup$D(props, ctx) : void 0;
+  return _sfc_setup$n ? _sfc_setup$n(props, ctx) : void 0;
 };
-const __nuxt_component_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$D, [["ssrRender", _sfc_ssrRender$6]]);
-const _sfc_main$C = /* @__PURE__ */ defineComponent({
+const __nuxt_component_0 = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["ssrRender", _sfc_ssrRender$7]]);
+const Wrapper = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_0
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$m = /* @__PURE__ */ defineComponent({
   __name: "Button",
   __ssrInlineRender: true,
   props: {
@@ -1252,7 +1822,7 @@ const _sfc_main$C = /* @__PURE__ */ defineComponent({
             } else {
               return [
                 renderSlot(_ctx.$slots, "default", {}, () => [
-                  createTextVNode(toDisplayString(__props.text), 1)
+                  createTextVNode(toDisplayString$1(__props.text), 1)
                 ])
               ];
             }
@@ -1272,13 +1842,17 @@ const _sfc_main$C = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const _sfc_setup$C = _sfc_main$C.setup;
-_sfc_main$C.setup = (props, ctx) => {
+const _sfc_setup$m = _sfc_main$m.setup;
+_sfc_main$m.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Button.vue");
-  return _sfc_setup$C ? _sfc_setup$C(props, ctx) : void 0;
+  return _sfc_setup$m ? _sfc_setup$m(props, ctx) : void 0;
 };
-const _sfc_main$B = /* @__PURE__ */ defineComponent({
+const Button = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$m
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$l = /* @__PURE__ */ defineComponent({
   __name: "Error",
   __ssrInlineRender: true,
   props: {
@@ -1293,7 +1867,7 @@ const _sfc_main$B = /* @__PURE__ */ defineComponent({
   },
   setup(__props) {
     const props = __props;
-    const PageWrapper = __nuxt_component_0$1;
+    const PageWrapper = __nuxt_component_0;
     const errorsMap = {
       "400": "Bad Request",
       "401": "Unauthorized",
@@ -1301,14 +1875,14 @@ const _sfc_main$B = /* @__PURE__ */ defineComponent({
       "404": "Not Found"
     };
     const error = computed(() => {
-      const { code } = props;
+      const { code: code2 } = props;
       return {
-        code,
-        message: errorsMap[code.toString()] || "Unknown Error"
+        code: code2,
+        message: errorsMap[code2.toString()] || "Unknown Error"
       };
     });
     return (_ctx, _push, _parent, _attrs) => {
-      const _component_Button = _sfc_main$C;
+      const _component_Button = _sfc_main$m;
       ssrRenderVNode(_push, createVNode(resolveDynamicComponent(props.wrap ? unref(PageWrapper) : "div"), mergeProps({
         class: props.wrap ? "flex flex-col items-center justify-center" : ""
       }, _attrs), {
@@ -1323,8 +1897,8 @@ const _sfc_main$B = /* @__PURE__ */ defineComponent({
           } else {
             return [
               createVNode("h1", { class: "text-center mb-6 leading-3" }, [
-                createVNode("span", { class: "font-bold text-8xl block" }, toDisplayString(unref(error).code), 1),
-                createVNode("span", { class: "block italic" }, toDisplayString(unref(error).message), 1)
+                createVNode("span", { class: "font-bold text-8xl block" }, toDisplayString$1(unref(error).code), 1),
+                createVNode("span", { class: "block italic" }, toDisplayString$1(unref(error).message), 1)
               ]),
               createVNode(_component_Button, {
                 text: "Home",
@@ -1339,574 +1913,3696 @@ const _sfc_main$B = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const _sfc_setup$B = _sfc_main$B.setup;
-_sfc_main$B.setup = (props, ctx) => {
+const _sfc_setup$l = _sfc_main$l.setup;
+_sfc_main$l.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Error.vue");
-  return _sfc_setup$B ? _sfc_setup$B(props, ctx) : void 0;
+  return _sfc_setup$l ? _sfc_setup$l(props, ctx) : void 0;
 };
-const meta$f = void 0;
-const _sfc_main$A = {};
-function _sfc_ssrRender$5(_ctx, _push, _parent, _attrs) {
-  _push(`<div${ssrRenderAttrs(mergeProps({ class: "relative flex-1" }, _attrs))}>`);
-  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-  _push(`</div>`);
+const Error$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$l
+}, Symbol.toStringTag, { value: "Module" }));
+/*!
+  * shared v9.2.2
+  * (c) 2022 kazuya kawaguchi
+  * Released under the MIT License.
+  */
+const inBrowser = false;
+const hasSymbol = typeof Symbol === "function" && typeof Symbol.toStringTag === "symbol";
+const makeSymbol = (name) => hasSymbol ? Symbol(name) : name;
+const generateFormatCacheKey = (locale, key, source) => friendlyJSONstringify({ l: locale, k: key, s: source });
+const friendlyJSONstringify = (json) => JSON.stringify(json).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029").replace(/\u0027/g, "\\u0027");
+const isNumber = (val) => typeof val === "number" && isFinite(val);
+const isDate = (val) => toTypeString(val) === "[object Date]";
+const isRegExp = (val) => toTypeString(val) === "[object RegExp]";
+const isEmptyObject = (val) => isPlainObject$1(val) && Object.keys(val).length === 0;
+function warn(msg, err) {
+  if (typeof console !== "undefined") {
+    console.warn(`[intlify] ` + msg);
+    if (err) {
+      console.warn(err.stack);
+    }
+  }
 }
-const _sfc_setup$A = _sfc_main$A.setup;
-_sfc_main$A.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Wrapper.vue");
-  return _sfc_setup$A ? _sfc_setup$A(props, ctx) : void 0;
+const assign$1 = Object.assign;
+let _globalThis;
+const getGlobalThis = () => {
+  return _globalThis || (_globalThis = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof global !== "undefined" ? global : {});
 };
-const __nuxt_component_0 = /* @__PURE__ */ _export_sfc(_sfc_main$A, [["ssrRender", _sfc_ssrRender$5]]);
-const _sfc_main$z = {};
-function _sfc_ssrRender$4(_ctx, _push, _parent, _attrs) {
-  _push(`<div${ssrRenderAttrs(mergeProps({ class: "py-4" }, _attrs))}>`);
-  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-  _push(`</div>`);
+function escapeHtml(rawText) {
+  return rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
-const _sfc_setup$z = _sfc_main$z.setup;
-_sfc_main$z.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Body.vue");
-  return _sfc_setup$z ? _sfc_setup$z(props, ctx) : void 0;
-};
-const __nuxt_component_4$2 = /* @__PURE__ */ _export_sfc(_sfc_main$z, [["ssrRender", _sfc_ssrRender$4]]);
-const _sfc_main$y = {};
-function _sfc_ssrRender$3(_ctx, _push, _parent, _attrs) {
-  _push(`<div${ssrRenderAttrs(mergeProps({ class: "lg:px-8 px-4 mb-4 last-mb-0 overflow-hidden" }, _attrs))}>`);
-  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-  _push(`</div>`);
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwn(obj, key) {
+  return hasOwnProperty.call(obj, key);
 }
-const _sfc_setup$y = _sfc_main$y.setup;
-_sfc_main$y.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Section/index.vue");
-  return _sfc_setup$y ? _sfc_setup$y(props, ctx) : void 0;
+const isArray = Array.isArray;
+const isFunction = (val) => typeof val === "function";
+const isString = (val) => typeof val === "string";
+const isBoolean = (val) => typeof val === "boolean";
+const isObject = (val) => val !== null && typeof val === "object";
+const objectToString = Object.prototype.toString;
+const toTypeString = (value) => objectToString.call(value);
+const isPlainObject$1 = (val) => toTypeString(val) === "[object Object]";
+const toDisplayString = (val) => {
+  return val == null ? "" : isArray(val) || isPlainObject$1(val) && val.toString === objectToString ? JSON.stringify(val, null, 2) : String(val);
 };
-const __nuxt_component_5$2 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["ssrRender", _sfc_ssrRender$3]]);
-const _hoisted_1$r = {
-  viewBox: "0 0 12 12",
-  width: "1.2em",
-  height: "1.2em"
+/*!
+  * devtools-if v9.2.2
+  * (c) 2022 kazuya kawaguchi
+  * Released under the MIT License.
+  */
+const IntlifyDevToolsHooks = {
+  I18nInit: "i18n:init",
+  FunctionTranslate: "function:translate"
 };
-const _hoisted_2$r = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M10.5 6a.75.75 0 0 0-.75-.75H3.81l1.97-1.97a.75.75 0 0 0-1.06-1.06L1.47 5.47a.75.75 0 0 0 0 1.06l3.25 3.25a.75.75 0 0 0 1.06-1.06L3.81 6.75h5.94A.75.75 0 0 0 10.5 6Z"
-}, null, -1);
-const _hoisted_3$r = [
-  _hoisted_2$r
+/*!
+  * core-base v9.2.2
+  * (c) 2022 kazuya kawaguchi
+  * Released under the MIT License.
+  */
+const pathStateMachine = [];
+pathStateMachine[0] = {
+  ["w"]: [0],
+  ["i"]: [3, 0],
+  ["["]: [4],
+  ["o"]: [7]
+};
+pathStateMachine[1] = {
+  ["w"]: [1],
+  ["."]: [2],
+  ["["]: [4],
+  ["o"]: [7]
+};
+pathStateMachine[2] = {
+  ["w"]: [2],
+  ["i"]: [3, 0],
+  ["0"]: [3, 0]
+};
+pathStateMachine[3] = {
+  ["i"]: [3, 0],
+  ["0"]: [3, 0],
+  ["w"]: [1, 1],
+  ["."]: [2, 1],
+  ["["]: [4, 1],
+  ["o"]: [7, 1]
+};
+pathStateMachine[4] = {
+  ["'"]: [5, 0],
+  ['"']: [6, 0],
+  ["["]: [
+    4,
+    2
+  ],
+  ["]"]: [1, 3],
+  ["o"]: 8,
+  ["l"]: [4, 0]
+};
+pathStateMachine[5] = {
+  ["'"]: [4, 0],
+  ["o"]: 8,
+  ["l"]: [5, 0]
+};
+pathStateMachine[6] = {
+  ['"']: [4, 0],
+  ["o"]: 8,
+  ["l"]: [6, 0]
+};
+const literalValueRE = /^\s?(?:true|false|-?[\d.]+|'[^']*'|"[^"]*")\s?$/;
+function isLiteral(exp) {
+  return literalValueRE.test(exp);
+}
+function stripQuotes(str) {
+  const a = str.charCodeAt(0);
+  const b = str.charCodeAt(str.length - 1);
+  return a === b && (a === 34 || a === 39) ? str.slice(1, -1) : str;
+}
+function getPathCharType(ch) {
+  if (ch === void 0 || ch === null) {
+    return "o";
+  }
+  const code2 = ch.charCodeAt(0);
+  switch (code2) {
+    case 91:
+    case 93:
+    case 46:
+    case 34:
+    case 39:
+      return ch;
+    case 95:
+    case 36:
+    case 45:
+      return "i";
+    case 9:
+    case 10:
+    case 13:
+    case 160:
+    case 65279:
+    case 8232:
+    case 8233:
+      return "w";
+  }
+  return "i";
+}
+function formatSubPath(path) {
+  const trimmed = path.trim();
+  if (path.charAt(0) === "0" && isNaN(parseInt(path))) {
+    return false;
+  }
+  return isLiteral(trimmed) ? stripQuotes(trimmed) : "*" + trimmed;
+}
+function parse(path) {
+  const keys = [];
+  let index2 = -1;
+  let mode = 0;
+  let subPathDepth = 0;
+  let c2;
+  let key;
+  let newChar;
+  let type;
+  let transition;
+  let action;
+  let typeMap;
+  const actions = [];
+  actions[0] = () => {
+    if (key === void 0) {
+      key = newChar;
+    } else {
+      key += newChar;
+    }
+  };
+  actions[1] = () => {
+    if (key !== void 0) {
+      keys.push(key);
+      key = void 0;
+    }
+  };
+  actions[2] = () => {
+    actions[0]();
+    subPathDepth++;
+  };
+  actions[3] = () => {
+    if (subPathDepth > 0) {
+      subPathDepth--;
+      mode = 4;
+      actions[0]();
+    } else {
+      subPathDepth = 0;
+      if (key === void 0) {
+        return false;
+      }
+      key = formatSubPath(key);
+      if (key === false) {
+        return false;
+      } else {
+        actions[1]();
+      }
+    }
+  };
+  function maybeUnescapeQuote() {
+    const nextChar = path[index2 + 1];
+    if (mode === 5 && nextChar === "'" || mode === 6 && nextChar === '"') {
+      index2++;
+      newChar = "\\" + nextChar;
+      actions[0]();
+      return true;
+    }
+  }
+  while (mode !== null) {
+    index2++;
+    c2 = path[index2];
+    if (c2 === "\\" && maybeUnescapeQuote()) {
+      continue;
+    }
+    type = getPathCharType(c2);
+    typeMap = pathStateMachine[mode];
+    transition = typeMap[type] || typeMap["l"] || 8;
+    if (transition === 8) {
+      return;
+    }
+    mode = transition[0];
+    if (transition[1] !== void 0) {
+      action = actions[transition[1]];
+      if (action) {
+        newChar = c2;
+        if (action() === false) {
+          return;
+        }
+      }
+    }
+    if (mode === 7) {
+      return keys;
+    }
+  }
+}
+const cache = /* @__PURE__ */ new Map();
+function resolveWithKeyValue(obj, path) {
+  return isObject(obj) ? obj[path] : null;
+}
+function resolveValue(obj, path) {
+  if (!isObject(obj)) {
+    return null;
+  }
+  let hit = cache.get(path);
+  if (!hit) {
+    hit = parse(path);
+    if (hit) {
+      cache.set(path, hit);
+    }
+  }
+  if (!hit) {
+    return null;
+  }
+  const len = hit.length;
+  let last = obj;
+  let i = 0;
+  while (i < len) {
+    const val = last[hit[i]];
+    if (val === void 0) {
+      return null;
+    }
+    last = val;
+    i++;
+  }
+  return last;
+}
+const DEFAULT_MODIFIER = (str) => str;
+const DEFAULT_MESSAGE = (ctx) => "";
+const DEFAULT_MESSAGE_DATA_TYPE = "text";
+const DEFAULT_NORMALIZE = (values) => values.length === 0 ? "" : values.join("");
+const DEFAULT_INTERPOLATE = toDisplayString;
+function pluralDefault(choice, choicesLength) {
+  choice = Math.abs(choice);
+  if (choicesLength === 2) {
+    return choice ? choice > 1 ? 1 : 0 : 1;
+  }
+  return choice ? Math.min(choice, 2) : 0;
+}
+function getPluralIndex(options) {
+  const index2 = isNumber(options.pluralIndex) ? options.pluralIndex : -1;
+  return options.named && (isNumber(options.named.count) || isNumber(options.named.n)) ? isNumber(options.named.count) ? options.named.count : isNumber(options.named.n) ? options.named.n : index2 : index2;
+}
+function normalizeNamed(pluralIndex, props) {
+  if (!props.count) {
+    props.count = pluralIndex;
+  }
+  if (!props.n) {
+    props.n = pluralIndex;
+  }
+}
+function createMessageContext(options = {}) {
+  const locale = options.locale;
+  const pluralIndex = getPluralIndex(options);
+  const pluralRule = isObject(options.pluralRules) && isString(locale) && isFunction(options.pluralRules[locale]) ? options.pluralRules[locale] : pluralDefault;
+  const orgPluralRule = isObject(options.pluralRules) && isString(locale) && isFunction(options.pluralRules[locale]) ? pluralDefault : void 0;
+  const plural = (messages2) => {
+    return messages2[pluralRule(pluralIndex, messages2.length, orgPluralRule)];
+  };
+  const _list = options.list || [];
+  const list = (index2) => _list[index2];
+  const _named = options.named || {};
+  isNumber(options.pluralIndex) && normalizeNamed(pluralIndex, _named);
+  const named = (key) => _named[key];
+  function message(key) {
+    const msg = isFunction(options.messages) ? options.messages(key) : isObject(options.messages) ? options.messages[key] : false;
+    return !msg ? options.parent ? options.parent.message(key) : DEFAULT_MESSAGE : msg;
+  }
+  const _modifier = (name) => options.modifiers ? options.modifiers[name] : DEFAULT_MODIFIER;
+  const normalize = isPlainObject$1(options.processor) && isFunction(options.processor.normalize) ? options.processor.normalize : DEFAULT_NORMALIZE;
+  const interpolate = isPlainObject$1(options.processor) && isFunction(options.processor.interpolate) ? options.processor.interpolate : DEFAULT_INTERPOLATE;
+  const type = isPlainObject$1(options.processor) && isString(options.processor.type) ? options.processor.type : DEFAULT_MESSAGE_DATA_TYPE;
+  const linked = (key, ...args) => {
+    const [arg1, arg2] = args;
+    let type2 = "text";
+    let modifier = "";
+    if (args.length === 1) {
+      if (isObject(arg1)) {
+        modifier = arg1.modifier || modifier;
+        type2 = arg1.type || type2;
+      } else if (isString(arg1)) {
+        modifier = arg1 || modifier;
+      }
+    } else if (args.length === 2) {
+      if (isString(arg1)) {
+        modifier = arg1 || modifier;
+      }
+      if (isString(arg2)) {
+        type2 = arg2 || type2;
+      }
+    }
+    let msg = message(key)(ctx);
+    if (type2 === "vnode" && isArray(msg) && modifier) {
+      msg = msg[0];
+    }
+    return modifier ? _modifier(modifier)(msg, type2) : msg;
+  };
+  const ctx = {
+    ["list"]: list,
+    ["named"]: named,
+    ["plural"]: plural,
+    ["linked"]: linked,
+    ["message"]: message,
+    ["type"]: type,
+    ["interpolate"]: interpolate,
+    ["normalize"]: normalize
+  };
+  return ctx;
+}
+let devtools = null;
+function setDevToolsHook(hook) {
+  devtools = hook;
+}
+function initI18nDevTools(i18n, version, meta2) {
+  devtools && devtools.emit(IntlifyDevToolsHooks.I18nInit, {
+    timestamp: Date.now(),
+    i18n,
+    version,
+    meta: meta2
+  });
+}
+const translateDevTools = /* @__PURE__ */ createDevToolsHook(IntlifyDevToolsHooks.FunctionTranslate);
+function createDevToolsHook(hook) {
+  return (payloads) => devtools && devtools.emit(hook, payloads);
+}
+function fallbackWithSimple(ctx, fallback, start) {
+  return [.../* @__PURE__ */ new Set([
+    start,
+    ...isArray(fallback) ? fallback : isObject(fallback) ? Object.keys(fallback) : isString(fallback) ? [fallback] : [start]
+  ])];
+}
+function fallbackWithLocaleChain(ctx, fallback, start) {
+  const startLocale = isString(start) ? start : DEFAULT_LOCALE;
+  const context = ctx;
+  if (!context.__localeChainCache) {
+    context.__localeChainCache = /* @__PURE__ */ new Map();
+  }
+  let chain = context.__localeChainCache.get(startLocale);
+  if (!chain) {
+    chain = [];
+    let block = [start];
+    while (isArray(block)) {
+      block = appendBlockToChain(chain, block, fallback);
+    }
+    const defaults = isArray(fallback) || !isPlainObject$1(fallback) ? fallback : fallback["default"] ? fallback["default"] : null;
+    block = isString(defaults) ? [defaults] : defaults;
+    if (isArray(block)) {
+      appendBlockToChain(chain, block, false);
+    }
+    context.__localeChainCache.set(startLocale, chain);
+  }
+  return chain;
+}
+function appendBlockToChain(chain, block, blocks) {
+  let follow = true;
+  for (let i = 0; i < block.length && isBoolean(follow); i++) {
+    const locale = block[i];
+    if (isString(locale)) {
+      follow = appendLocaleToChain(chain, block[i], blocks);
+    }
+  }
+  return follow;
+}
+function appendLocaleToChain(chain, locale, blocks) {
+  let follow;
+  const tokens = locale.split("-");
+  do {
+    const target = tokens.join("-");
+    follow = appendItemToChain(chain, target, blocks);
+    tokens.splice(-1, 1);
+  } while (tokens.length && follow === true);
+  return follow;
+}
+function appendItemToChain(chain, target, blocks) {
+  let follow = false;
+  if (!chain.includes(target)) {
+    follow = true;
+    if (target) {
+      follow = target[target.length - 1] !== "!";
+      const locale = target.replace(/!/g, "");
+      chain.push(locale);
+      if ((isArray(blocks) || isPlainObject$1(blocks)) && blocks[locale]) {
+        follow = blocks[locale];
+      }
+    }
+  }
+  return follow;
+}
+const VERSION$1 = "9.2.2";
+const NOT_REOSLVED = -1;
+const DEFAULT_LOCALE = "en-US";
+const MISSING_RESOLVE_VALUE = "";
+const capitalize = (str) => `${str.charAt(0).toLocaleUpperCase()}${str.substr(1)}`;
+function getDefaultLinkedModifiers() {
+  return {
+    upper: (val, type) => {
+      return type === "text" && isString(val) ? val.toUpperCase() : type === "vnode" && isObject(val) && "__v_isVNode" in val ? val.children.toUpperCase() : val;
+    },
+    lower: (val, type) => {
+      return type === "text" && isString(val) ? val.toLowerCase() : type === "vnode" && isObject(val) && "__v_isVNode" in val ? val.children.toLowerCase() : val;
+    },
+    capitalize: (val, type) => {
+      return type === "text" && isString(val) ? capitalize(val) : type === "vnode" && isObject(val) && "__v_isVNode" in val ? capitalize(val.children) : val;
+    }
+  };
+}
+let _compiler;
+let _resolver;
+function registerMessageResolver(resolver) {
+  _resolver = resolver;
+}
+let _fallbacker;
+function registerLocaleFallbacker(fallbacker) {
+  _fallbacker = fallbacker;
+}
+let _additionalMeta = null;
+const setAdditionalMeta = (meta2) => {
+  _additionalMeta = meta2;
+};
+const getAdditionalMeta = () => _additionalMeta;
+let _fallbackContext = null;
+const setFallbackContext = (context) => {
+  _fallbackContext = context;
+};
+const getFallbackContext = () => _fallbackContext;
+let _cid = 0;
+function createCoreContext(options = {}) {
+  const version = isString(options.version) ? options.version : VERSION$1;
+  const locale = isString(options.locale) ? options.locale : DEFAULT_LOCALE;
+  const fallbackLocale = isArray(options.fallbackLocale) || isPlainObject$1(options.fallbackLocale) || isString(options.fallbackLocale) || options.fallbackLocale === false ? options.fallbackLocale : locale;
+  const messages2 = isPlainObject$1(options.messages) ? options.messages : { [locale]: {} };
+  const datetimeFormats = isPlainObject$1(options.datetimeFormats) ? options.datetimeFormats : { [locale]: {} };
+  const numberFormats = isPlainObject$1(options.numberFormats) ? options.numberFormats : { [locale]: {} };
+  const modifiers = assign$1({}, options.modifiers || {}, getDefaultLinkedModifiers());
+  const pluralRules = options.pluralRules || {};
+  const missing = isFunction(options.missing) ? options.missing : null;
+  const missingWarn = isBoolean(options.missingWarn) || isRegExp(options.missingWarn) ? options.missingWarn : true;
+  const fallbackWarn = isBoolean(options.fallbackWarn) || isRegExp(options.fallbackWarn) ? options.fallbackWarn : true;
+  const fallbackFormat = !!options.fallbackFormat;
+  const unresolving = !!options.unresolving;
+  const postTranslation = isFunction(options.postTranslation) ? options.postTranslation : null;
+  const processor = isPlainObject$1(options.processor) ? options.processor : null;
+  const warnHtmlMessage = isBoolean(options.warnHtmlMessage) ? options.warnHtmlMessage : true;
+  const escapeParameter = !!options.escapeParameter;
+  const messageCompiler = isFunction(options.messageCompiler) ? options.messageCompiler : _compiler;
+  const messageResolver = isFunction(options.messageResolver) ? options.messageResolver : _resolver || resolveWithKeyValue;
+  const localeFallbacker = isFunction(options.localeFallbacker) ? options.localeFallbacker : _fallbacker || fallbackWithSimple;
+  const fallbackContext = isObject(options.fallbackContext) ? options.fallbackContext : void 0;
+  const onWarn = isFunction(options.onWarn) ? options.onWarn : warn;
+  const internalOptions = options;
+  const __datetimeFormatters = isObject(internalOptions.__datetimeFormatters) ? internalOptions.__datetimeFormatters : /* @__PURE__ */ new Map();
+  const __numberFormatters = isObject(internalOptions.__numberFormatters) ? internalOptions.__numberFormatters : /* @__PURE__ */ new Map();
+  const __meta = isObject(internalOptions.__meta) ? internalOptions.__meta : {};
+  _cid++;
+  const context = {
+    version,
+    cid: _cid,
+    locale,
+    fallbackLocale,
+    messages: messages2,
+    modifiers,
+    pluralRules,
+    missing,
+    missingWarn,
+    fallbackWarn,
+    fallbackFormat,
+    unresolving,
+    postTranslation,
+    processor,
+    warnHtmlMessage,
+    escapeParameter,
+    messageCompiler,
+    messageResolver,
+    localeFallbacker,
+    fallbackContext,
+    onWarn,
+    __meta
+  };
+  {
+    context.datetimeFormats = datetimeFormats;
+    context.numberFormats = numberFormats;
+    context.__datetimeFormatters = __datetimeFormatters;
+    context.__numberFormatters = __numberFormatters;
+  }
+  if (__INTLIFY_PROD_DEVTOOLS__) {
+    initI18nDevTools(context, version, __meta);
+  }
+  return context;
+}
+function handleMissing(context, key, locale, missingWarn, type) {
+  const { missing, onWarn } = context;
+  if (missing !== null) {
+    const ret = missing(context, locale, key, type);
+    return isString(ret) ? ret : key;
+  } else {
+    return key;
+  }
+}
+function updateFallbackLocale(ctx, locale, fallback) {
+  const context = ctx;
+  context.__localeChainCache = /* @__PURE__ */ new Map();
+  ctx.localeFallbacker(ctx, fallback, locale);
+}
+let code$2 = CompileErrorCodes.__EXTEND_POINT__;
+const inc$2 = () => ++code$2;
+const CoreErrorCodes = {
+  INVALID_ARGUMENT: code$2,
+  INVALID_DATE_ARGUMENT: inc$2(),
+  INVALID_ISO_DATE_ARGUMENT: inc$2(),
+  __EXTEND_POINT__: inc$2()
+};
+function createCoreError(code2) {
+  return createCompileError(code2, null, void 0);
+}
+const NOOP_MESSAGE_FUNCTION = () => "";
+const isMessageFunction = (val) => isFunction(val);
+function translate(context, ...args) {
+  const { fallbackFormat, postTranslation, unresolving, messageCompiler, fallbackLocale, messages: messages2 } = context;
+  const [key, options] = parseTranslateArgs(...args);
+  const missingWarn = isBoolean(options.missingWarn) ? options.missingWarn : context.missingWarn;
+  const fallbackWarn = isBoolean(options.fallbackWarn) ? options.fallbackWarn : context.fallbackWarn;
+  const escapeParameter = isBoolean(options.escapeParameter) ? options.escapeParameter : context.escapeParameter;
+  const resolvedMessage = !!options.resolvedMessage;
+  const defaultMsgOrKey = isString(options.default) || isBoolean(options.default) ? !isBoolean(options.default) ? options.default : !messageCompiler ? () => key : key : fallbackFormat ? !messageCompiler ? () => key : key : "";
+  const enableDefaultMsg = fallbackFormat || defaultMsgOrKey !== "";
+  const locale = isString(options.locale) ? options.locale : context.locale;
+  escapeParameter && escapeParams(options);
+  let [formatScope, targetLocale, message] = !resolvedMessage ? resolveMessageFormat(context, key, locale, fallbackLocale, fallbackWarn, missingWarn) : [
+    key,
+    locale,
+    messages2[locale] || {}
+  ];
+  let format2 = formatScope;
+  let cacheBaseKey = key;
+  if (!resolvedMessage && !(isString(format2) || isMessageFunction(format2))) {
+    if (enableDefaultMsg) {
+      format2 = defaultMsgOrKey;
+      cacheBaseKey = format2;
+    }
+  }
+  if (!resolvedMessage && (!(isString(format2) || isMessageFunction(format2)) || !isString(targetLocale))) {
+    return unresolving ? NOT_REOSLVED : key;
+  }
+  let occurred = false;
+  const errorDetector = () => {
+    occurred = true;
+  };
+  const msg = !isMessageFunction(format2) ? compileMessageFormat(context, key, targetLocale, format2, cacheBaseKey, errorDetector) : format2;
+  if (occurred) {
+    return format2;
+  }
+  const ctxOptions = getMessageContextOptions(context, targetLocale, message, options);
+  const msgContext = createMessageContext(ctxOptions);
+  const messaged = evaluateMessage(context, msg, msgContext);
+  const ret = postTranslation ? postTranslation(messaged, key) : messaged;
+  if (__INTLIFY_PROD_DEVTOOLS__) {
+    const payloads = {
+      timestamp: Date.now(),
+      key: isString(key) ? key : isMessageFunction(format2) ? format2.key : "",
+      locale: targetLocale || (isMessageFunction(format2) ? format2.locale : ""),
+      format: isString(format2) ? format2 : isMessageFunction(format2) ? format2.source : "",
+      message: ret
+    };
+    payloads.meta = assign$1({}, context.__meta, getAdditionalMeta() || {});
+    translateDevTools(payloads);
+  }
+  return ret;
+}
+function escapeParams(options) {
+  if (isArray(options.list)) {
+    options.list = options.list.map((item) => isString(item) ? escapeHtml(item) : item);
+  } else if (isObject(options.named)) {
+    Object.keys(options.named).forEach((key) => {
+      if (isString(options.named[key])) {
+        options.named[key] = escapeHtml(options.named[key]);
+      }
+    });
+  }
+}
+function resolveMessageFormat(context, key, locale, fallbackLocale, fallbackWarn, missingWarn) {
+  const { messages: messages2, onWarn, messageResolver: resolveValue2, localeFallbacker } = context;
+  const locales = localeFallbacker(context, fallbackLocale, locale);
+  let message = {};
+  let targetLocale;
+  let format2 = null;
+  const type = "translate";
+  for (let i = 0; i < locales.length; i++) {
+    targetLocale = locales[i];
+    message = messages2[targetLocale] || {};
+    if ((format2 = resolveValue2(message, key)) === null) {
+      format2 = message[key];
+    }
+    if (isString(format2) || isFunction(format2))
+      break;
+    const missingRet = handleMissing(
+      context,
+      key,
+      targetLocale,
+      missingWarn,
+      type
+    );
+    if (missingRet !== key) {
+      format2 = missingRet;
+    }
+  }
+  return [format2, targetLocale, message];
+}
+function compileMessageFormat(context, key, targetLocale, format2, cacheBaseKey, errorDetector) {
+  const { messageCompiler, warnHtmlMessage } = context;
+  if (isMessageFunction(format2)) {
+    const msg2 = format2;
+    msg2.locale = msg2.locale || targetLocale;
+    msg2.key = msg2.key || key;
+    return msg2;
+  }
+  if (messageCompiler == null) {
+    const msg2 = () => format2;
+    msg2.locale = targetLocale;
+    msg2.key = key;
+    return msg2;
+  }
+  const msg = messageCompiler(format2, getCompileOptions(context, targetLocale, cacheBaseKey, format2, warnHtmlMessage, errorDetector));
+  msg.locale = targetLocale;
+  msg.key = key;
+  msg.source = format2;
+  return msg;
+}
+function evaluateMessage(context, msg, msgCtx) {
+  const messaged = msg(msgCtx);
+  return messaged;
+}
+function parseTranslateArgs(...args) {
+  const [arg1, arg2, arg3] = args;
+  const options = {};
+  if (!isString(arg1) && !isNumber(arg1) && !isMessageFunction(arg1)) {
+    throw createCoreError(CoreErrorCodes.INVALID_ARGUMENT);
+  }
+  const key = isNumber(arg1) ? String(arg1) : isMessageFunction(arg1) ? arg1 : arg1;
+  if (isNumber(arg2)) {
+    options.plural = arg2;
+  } else if (isString(arg2)) {
+    options.default = arg2;
+  } else if (isPlainObject$1(arg2) && !isEmptyObject(arg2)) {
+    options.named = arg2;
+  } else if (isArray(arg2)) {
+    options.list = arg2;
+  }
+  if (isNumber(arg3)) {
+    options.plural = arg3;
+  } else if (isString(arg3)) {
+    options.default = arg3;
+  } else if (isPlainObject$1(arg3)) {
+    assign$1(options, arg3);
+  }
+  return [key, options];
+}
+function getCompileOptions(context, locale, key, source, warnHtmlMessage, errorDetector) {
+  return {
+    warnHtmlMessage,
+    onError: (err) => {
+      errorDetector && errorDetector(err);
+      {
+        throw err;
+      }
+    },
+    onCacheKey: (source2) => generateFormatCacheKey(locale, key, source2)
+  };
+}
+function getMessageContextOptions(context, locale, message, options) {
+  const { modifiers, pluralRules, messageResolver: resolveValue2, fallbackLocale, fallbackWarn, missingWarn, fallbackContext } = context;
+  const resolveMessage = (key) => {
+    let val = resolveValue2(message, key);
+    if (val == null && fallbackContext) {
+      const [, , message2] = resolveMessageFormat(fallbackContext, key, locale, fallbackLocale, fallbackWarn, missingWarn);
+      val = resolveValue2(message2, key);
+    }
+    if (isString(val)) {
+      let occurred = false;
+      const errorDetector = () => {
+        occurred = true;
+      };
+      const msg = compileMessageFormat(context, key, locale, val, key, errorDetector);
+      return !occurred ? msg : NOOP_MESSAGE_FUNCTION;
+    } else if (isMessageFunction(val)) {
+      return val;
+    } else {
+      return NOOP_MESSAGE_FUNCTION;
+    }
+  };
+  const ctxOptions = {
+    locale,
+    modifiers,
+    pluralRules,
+    messages: resolveMessage
+  };
+  if (context.processor) {
+    ctxOptions.processor = context.processor;
+  }
+  if (options.list) {
+    ctxOptions.list = options.list;
+  }
+  if (options.named) {
+    ctxOptions.named = options.named;
+  }
+  if (isNumber(options.plural)) {
+    ctxOptions.pluralIndex = options.plural;
+  }
+  return ctxOptions;
+}
+function datetime(context, ...args) {
+  const { datetimeFormats, unresolving, fallbackLocale, onWarn, localeFallbacker } = context;
+  const { __datetimeFormatters } = context;
+  const [key, value, options, overrides] = parseDateTimeArgs(...args);
+  const missingWarn = isBoolean(options.missingWarn) ? options.missingWarn : context.missingWarn;
+  isBoolean(options.fallbackWarn) ? options.fallbackWarn : context.fallbackWarn;
+  const part = !!options.part;
+  const locale = isString(options.locale) ? options.locale : context.locale;
+  const locales = localeFallbacker(
+    context,
+    fallbackLocale,
+    locale
+  );
+  if (!isString(key) || key === "") {
+    return new Intl.DateTimeFormat(locale, overrides).format(value);
+  }
+  let datetimeFormat = {};
+  let targetLocale;
+  let format2 = null;
+  const type = "datetime format";
+  for (let i = 0; i < locales.length; i++) {
+    targetLocale = locales[i];
+    datetimeFormat = datetimeFormats[targetLocale] || {};
+    format2 = datetimeFormat[key];
+    if (isPlainObject$1(format2))
+      break;
+    handleMissing(context, key, targetLocale, missingWarn, type);
+  }
+  if (!isPlainObject$1(format2) || !isString(targetLocale)) {
+    return unresolving ? NOT_REOSLVED : key;
+  }
+  let id = `${targetLocale}__${key}`;
+  if (!isEmptyObject(overrides)) {
+    id = `${id}__${JSON.stringify(overrides)}`;
+  }
+  let formatter = __datetimeFormatters.get(id);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(targetLocale, assign$1({}, format2, overrides));
+    __datetimeFormatters.set(id, formatter);
+  }
+  return !part ? formatter.format(value) : formatter.formatToParts(value);
+}
+const DATETIME_FORMAT_OPTIONS_KEYS = [
+  "localeMatcher",
+  "weekday",
+  "era",
+  "year",
+  "month",
+  "day",
+  "hour",
+  "minute",
+  "second",
+  "timeZoneName",
+  "formatMatcher",
+  "hour12",
+  "timeZone",
+  "dateStyle",
+  "timeStyle",
+  "calendar",
+  "dayPeriod",
+  "numberingSystem",
+  "hourCycle",
+  "fractionalSecondDigits"
 ];
-function render$r(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$r, _hoisted_3$r);
+function parseDateTimeArgs(...args) {
+  const [arg1, arg2, arg3, arg4] = args;
+  const options = {};
+  let overrides = {};
+  let value;
+  if (isString(arg1)) {
+    const matches = arg1.match(/(\d{4}-\d{2}-\d{2})(T|\s)?(.*)/);
+    if (!matches) {
+      throw createCoreError(CoreErrorCodes.INVALID_ISO_DATE_ARGUMENT);
+    }
+    const dateTime = matches[3] ? matches[3].trim().startsWith("T") ? `${matches[1].trim()}${matches[3].trim()}` : `${matches[1].trim()}T${matches[3].trim()}` : matches[1].trim();
+    value = new Date(dateTime);
+    try {
+      value.toISOString();
+    } catch (e2) {
+      throw createCoreError(CoreErrorCodes.INVALID_ISO_DATE_ARGUMENT);
+    }
+  } else if (isDate(arg1)) {
+    if (isNaN(arg1.getTime())) {
+      throw createCoreError(CoreErrorCodes.INVALID_DATE_ARGUMENT);
+    }
+    value = arg1;
+  } else if (isNumber(arg1)) {
+    value = arg1;
+  } else {
+    throw createCoreError(CoreErrorCodes.INVALID_ARGUMENT);
+  }
+  if (isString(arg2)) {
+    options.key = arg2;
+  } else if (isPlainObject$1(arg2)) {
+    Object.keys(arg2).forEach((key) => {
+      if (DATETIME_FORMAT_OPTIONS_KEYS.includes(key)) {
+        overrides[key] = arg2[key];
+      } else {
+        options[key] = arg2[key];
+      }
+    });
+  }
+  if (isString(arg3)) {
+    options.locale = arg3;
+  } else if (isPlainObject$1(arg3)) {
+    overrides = arg3;
+  }
+  if (isPlainObject$1(arg4)) {
+    overrides = arg4;
+  }
+  return [options.key || "", value, options, overrides];
 }
-const __unplugin_components_0$7 = { name: "fluent-arrow-left12-filled", render: render$r };
-const _sfc_main$x = /* @__PURE__ */ defineComponent({
+function clearDateTimeFormat(ctx, locale, format2) {
+  const context = ctx;
+  for (const key in format2) {
+    const id = `${locale}__${key}`;
+    if (!context.__datetimeFormatters.has(id)) {
+      continue;
+    }
+    context.__datetimeFormatters.delete(id);
+  }
+}
+function number(context, ...args) {
+  const { numberFormats, unresolving, fallbackLocale, onWarn, localeFallbacker } = context;
+  const { __numberFormatters } = context;
+  const [key, value, options, overrides] = parseNumberArgs(...args);
+  const missingWarn = isBoolean(options.missingWarn) ? options.missingWarn : context.missingWarn;
+  isBoolean(options.fallbackWarn) ? options.fallbackWarn : context.fallbackWarn;
+  const part = !!options.part;
+  const locale = isString(options.locale) ? options.locale : context.locale;
+  const locales = localeFallbacker(
+    context,
+    fallbackLocale,
+    locale
+  );
+  if (!isString(key) || key === "") {
+    return new Intl.NumberFormat(locale, overrides).format(value);
+  }
+  let numberFormat = {};
+  let targetLocale;
+  let format2 = null;
+  const type = "number format";
+  for (let i = 0; i < locales.length; i++) {
+    targetLocale = locales[i];
+    numberFormat = numberFormats[targetLocale] || {};
+    format2 = numberFormat[key];
+    if (isPlainObject$1(format2))
+      break;
+    handleMissing(context, key, targetLocale, missingWarn, type);
+  }
+  if (!isPlainObject$1(format2) || !isString(targetLocale)) {
+    return unresolving ? NOT_REOSLVED : key;
+  }
+  let id = `${targetLocale}__${key}`;
+  if (!isEmptyObject(overrides)) {
+    id = `${id}__${JSON.stringify(overrides)}`;
+  }
+  let formatter = __numberFormatters.get(id);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(targetLocale, assign$1({}, format2, overrides));
+    __numberFormatters.set(id, formatter);
+  }
+  return !part ? formatter.format(value) : formatter.formatToParts(value);
+}
+const NUMBER_FORMAT_OPTIONS_KEYS = [
+  "localeMatcher",
+  "style",
+  "currency",
+  "currencyDisplay",
+  "currencySign",
+  "useGrouping",
+  "minimumIntegerDigits",
+  "minimumFractionDigits",
+  "maximumFractionDigits",
+  "minimumSignificantDigits",
+  "maximumSignificantDigits",
+  "compactDisplay",
+  "notation",
+  "signDisplay",
+  "unit",
+  "unitDisplay",
+  "roundingMode",
+  "roundingPriority",
+  "roundingIncrement",
+  "trailingZeroDisplay"
+];
+function parseNumberArgs(...args) {
+  const [arg1, arg2, arg3, arg4] = args;
+  const options = {};
+  let overrides = {};
+  if (!isNumber(arg1)) {
+    throw createCoreError(CoreErrorCodes.INVALID_ARGUMENT);
+  }
+  const value = arg1;
+  if (isString(arg2)) {
+    options.key = arg2;
+  } else if (isPlainObject$1(arg2)) {
+    Object.keys(arg2).forEach((key) => {
+      if (NUMBER_FORMAT_OPTIONS_KEYS.includes(key)) {
+        overrides[key] = arg2[key];
+      } else {
+        options[key] = arg2[key];
+      }
+    });
+  }
+  if (isString(arg3)) {
+    options.locale = arg3;
+  } else if (isPlainObject$1(arg3)) {
+    overrides = arg3;
+  }
+  if (isPlainObject$1(arg4)) {
+    overrides = arg4;
+  }
+  return [options.key || "", value, options, overrides];
+}
+function clearNumberFormat(ctx, locale, format2) {
+  const context = ctx;
+  for (const key in format2) {
+    const id = `${locale}__${key}`;
+    if (!context.__numberFormatters.has(id)) {
+      continue;
+    }
+    context.__numberFormatters.delete(id);
+  }
+}
+{
+  if (typeof __INTLIFY_PROD_DEVTOOLS__ !== "boolean") {
+    getGlobalThis().__INTLIFY_PROD_DEVTOOLS__ = false;
+  }
+}
+/*!
+  * vue-i18n v9.2.2
+  * (c) 2022 kazuya kawaguchi
+  * Released under the MIT License.
+  */
+const VERSION = "9.2.2";
+function initFeatureFlags() {
+  if (typeof __INTLIFY_PROD_DEVTOOLS__ !== "boolean") {
+    getGlobalThis().__INTLIFY_PROD_DEVTOOLS__ = false;
+  }
+}
+let code = CompileErrorCodes.__EXTEND_POINT__;
+const inc = () => ++code;
+const I18nErrorCodes = {
+  UNEXPECTED_RETURN_TYPE: code,
+  INVALID_ARGUMENT: inc(),
+  MUST_BE_CALL_SETUP_TOP: inc(),
+  NOT_INSLALLED: inc(),
+  NOT_AVAILABLE_IN_LEGACY_MODE: inc(),
+  REQUIRED_VALUE: inc(),
+  INVALID_VALUE: inc(),
+  CANNOT_SETUP_VUE_DEVTOOLS_PLUGIN: inc(),
+  NOT_INSLALLED_WITH_PROVIDE: inc(),
+  UNEXPECTED_ERROR: inc(),
+  NOT_COMPATIBLE_LEGACY_VUE_I18N: inc(),
+  BRIDGE_SUPPORT_VUE_2_ONLY: inc(),
+  MUST_DEFINE_I18N_OPTION_IN_ALLOW_COMPOSITION: inc(),
+  NOT_AVAILABLE_COMPOSITION_IN_LEGACY: inc(),
+  __EXTEND_POINT__: inc()
+};
+function createI18nError(code2, ...args) {
+  return createCompileError(code2, null, void 0);
+}
+const TransrateVNodeSymbol = /* @__PURE__ */ makeSymbol("__transrateVNode");
+const DatetimePartsSymbol = /* @__PURE__ */ makeSymbol("__datetimeParts");
+const NumberPartsSymbol = /* @__PURE__ */ makeSymbol("__numberParts");
+const SetPluralRulesSymbol = makeSymbol("__setPluralRules");
+const InejctWithOption = /* @__PURE__ */ makeSymbol("__injectWithOption");
+function handleFlatJson(obj) {
+  if (!isObject(obj)) {
+    return obj;
+  }
+  for (const key in obj) {
+    if (!hasOwn(obj, key)) {
+      continue;
+    }
+    if (!key.includes(".")) {
+      if (isObject(obj[key])) {
+        handleFlatJson(obj[key]);
+      }
+    } else {
+      const subKeys = key.split(".");
+      const lastIndex = subKeys.length - 1;
+      let currentObj = obj;
+      for (let i = 0; i < lastIndex; i++) {
+        if (!(subKeys[i] in currentObj)) {
+          currentObj[subKeys[i]] = {};
+        }
+        currentObj = currentObj[subKeys[i]];
+      }
+      currentObj[subKeys[lastIndex]] = obj[key];
+      delete obj[key];
+      if (isObject(currentObj[subKeys[lastIndex]])) {
+        handleFlatJson(currentObj[subKeys[lastIndex]]);
+      }
+    }
+  }
+  return obj;
+}
+function getLocaleMessages(locale, options) {
+  const { messages: messages2, __i18n, messageResolver, flatJson } = options;
+  const ret = isPlainObject$1(messages2) ? messages2 : isArray(__i18n) ? {} : { [locale]: {} };
+  if (isArray(__i18n)) {
+    __i18n.forEach((custom) => {
+      if ("locale" in custom && "resource" in custom) {
+        const { locale: locale2, resource } = custom;
+        if (locale2) {
+          ret[locale2] = ret[locale2] || {};
+          deepCopy(resource, ret[locale2]);
+        } else {
+          deepCopy(resource, ret);
+        }
+      } else {
+        isString(custom) && deepCopy(JSON.parse(custom), ret);
+      }
+    });
+  }
+  if (messageResolver == null && flatJson) {
+    for (const key in ret) {
+      if (hasOwn(ret, key)) {
+        handleFlatJson(ret[key]);
+      }
+    }
+  }
+  return ret;
+}
+const isNotObjectOrIsArray = (val) => !isObject(val) || isArray(val);
+function deepCopy(src, des) {
+  if (isNotObjectOrIsArray(src) || isNotObjectOrIsArray(des)) {
+    throw createI18nError(I18nErrorCodes.INVALID_VALUE);
+  }
+  for (const key in src) {
+    if (hasOwn(src, key)) {
+      if (isNotObjectOrIsArray(src[key]) || isNotObjectOrIsArray(des[key])) {
+        des[key] = src[key];
+      } else {
+        deepCopy(src[key], des[key]);
+      }
+    }
+  }
+}
+function getComponentOptions(instance) {
+  return instance.type;
+}
+function adjustI18nResources(global2, options, componentOptions) {
+  let messages2 = isObject(options.messages) ? options.messages : {};
+  if ("__i18nGlobal" in componentOptions) {
+    messages2 = getLocaleMessages(globalThis.locale.value, {
+      messages: messages2,
+      __i18n: componentOptions.__i18nGlobal
+    });
+  }
+  const locales = Object.keys(messages2);
+  if (locales.length) {
+    locales.forEach((locale) => {
+      global2.mergeLocaleMessage(locale, messages2[locale]);
+    });
+  }
+  {
+    if (isObject(options.datetimeFormats)) {
+      const locales2 = Object.keys(options.datetimeFormats);
+      if (locales2.length) {
+        locales2.forEach((locale) => {
+          global2.mergeDateTimeFormat(locale, options.datetimeFormats[locale]);
+        });
+      }
+    }
+    if (isObject(options.numberFormats)) {
+      const locales2 = Object.keys(options.numberFormats);
+      if (locales2.length) {
+        locales2.forEach((locale) => {
+          global2.mergeNumberFormat(locale, options.numberFormats[locale]);
+        });
+      }
+    }
+  }
+}
+function createTextNode(key) {
+  return createVNode(Text, null, key, 0);
+}
+const DEVTOOLS_META = "__INTLIFY_META__";
+let composerID = 0;
+function defineCoreMissingHandler(missing) {
+  return (ctx, locale, key, type) => {
+    return missing(locale, key, getCurrentInstance() || void 0, type);
+  };
+}
+const getMetaInfo = () => {
+  const instance = getCurrentInstance();
+  let meta2 = null;
+  return instance && (meta2 = getComponentOptions(instance)[DEVTOOLS_META]) ? { [DEVTOOLS_META]: meta2 } : null;
+};
+function createComposer(options = {}, VueI18nLegacy) {
+  const { __root } = options;
+  const _isGlobal = __root === void 0;
+  let _inheritLocale = isBoolean(options.inheritLocale) ? options.inheritLocale : true;
+  const _locale = ref(
+    __root && _inheritLocale ? __root.locale.value : isString(options.locale) ? options.locale : DEFAULT_LOCALE
+  );
+  const _fallbackLocale = ref(
+    __root && _inheritLocale ? __root.fallbackLocale.value : isString(options.fallbackLocale) || isArray(options.fallbackLocale) || isPlainObject$1(options.fallbackLocale) || options.fallbackLocale === false ? options.fallbackLocale : _locale.value
+  );
+  const _messages = ref(getLocaleMessages(_locale.value, options));
+  const _datetimeFormats = ref(isPlainObject$1(options.datetimeFormats) ? options.datetimeFormats : { [_locale.value]: {} });
+  const _numberFormats = ref(isPlainObject$1(options.numberFormats) ? options.numberFormats : { [_locale.value]: {} });
+  let _missingWarn = __root ? __root.missingWarn : isBoolean(options.missingWarn) || isRegExp(options.missingWarn) ? options.missingWarn : true;
+  let _fallbackWarn = __root ? __root.fallbackWarn : isBoolean(options.fallbackWarn) || isRegExp(options.fallbackWarn) ? options.fallbackWarn : true;
+  let _fallbackRoot = __root ? __root.fallbackRoot : isBoolean(options.fallbackRoot) ? options.fallbackRoot : true;
+  let _fallbackFormat = !!options.fallbackFormat;
+  let _missing = isFunction(options.missing) ? options.missing : null;
+  let _runtimeMissing = isFunction(options.missing) ? defineCoreMissingHandler(options.missing) : null;
+  let _postTranslation = isFunction(options.postTranslation) ? options.postTranslation : null;
+  let _warnHtmlMessage = __root ? __root.warnHtmlMessage : isBoolean(options.warnHtmlMessage) ? options.warnHtmlMessage : true;
+  let _escapeParameter = !!options.escapeParameter;
+  const _modifiers = __root ? __root.modifiers : isPlainObject$1(options.modifiers) ? options.modifiers : {};
+  let _pluralRules = options.pluralRules || __root && __root.pluralRules;
+  let _context;
+  const getCoreContext = () => {
+    _isGlobal && setFallbackContext(null);
+    const ctxOptions = {
+      version: VERSION,
+      locale: _locale.value,
+      fallbackLocale: _fallbackLocale.value,
+      messages: _messages.value,
+      modifiers: _modifiers,
+      pluralRules: _pluralRules,
+      missing: _runtimeMissing === null ? void 0 : _runtimeMissing,
+      missingWarn: _missingWarn,
+      fallbackWarn: _fallbackWarn,
+      fallbackFormat: _fallbackFormat,
+      unresolving: true,
+      postTranslation: _postTranslation === null ? void 0 : _postTranslation,
+      warnHtmlMessage: _warnHtmlMessage,
+      escapeParameter: _escapeParameter,
+      messageResolver: options.messageResolver,
+      __meta: { framework: "vue" }
+    };
+    {
+      ctxOptions.datetimeFormats = _datetimeFormats.value;
+      ctxOptions.numberFormats = _numberFormats.value;
+      ctxOptions.__datetimeFormatters = isPlainObject$1(_context) ? _context.__datetimeFormatters : void 0;
+      ctxOptions.__numberFormatters = isPlainObject$1(_context) ? _context.__numberFormatters : void 0;
+    }
+    const ctx = createCoreContext(ctxOptions);
+    _isGlobal && setFallbackContext(ctx);
+    return ctx;
+  };
+  _context = getCoreContext();
+  updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+  function trackReactivityValues() {
+    return [
+      _locale.value,
+      _fallbackLocale.value,
+      _messages.value,
+      _datetimeFormats.value,
+      _numberFormats.value
+    ];
+  }
+  const locale = computed({
+    get: () => _locale.value,
+    set: (val) => {
+      _locale.value = val;
+      _context.locale = _locale.value;
+    }
+  });
+  const fallbackLocale = computed({
+    get: () => _fallbackLocale.value,
+    set: (val) => {
+      _fallbackLocale.value = val;
+      _context.fallbackLocale = _fallbackLocale.value;
+      updateFallbackLocale(_context, _locale.value, val);
+    }
+  });
+  const messages2 = computed(() => _messages.value);
+  const datetimeFormats = /* @__PURE__ */ computed(() => _datetimeFormats.value);
+  const numberFormats = /* @__PURE__ */ computed(() => _numberFormats.value);
+  function getPostTranslationHandler() {
+    return isFunction(_postTranslation) ? _postTranslation : null;
+  }
+  function setPostTranslationHandler(handler) {
+    _postTranslation = handler;
+    _context.postTranslation = handler;
+  }
+  function getMissingHandler() {
+    return _missing;
+  }
+  function setMissingHandler(handler) {
+    if (handler !== null) {
+      _runtimeMissing = defineCoreMissingHandler(handler);
+    }
+    _missing = handler;
+    _context.missing = _runtimeMissing;
+  }
+  const wrapWithDeps = (fn, argumentParser, warnType, fallbackSuccess, fallbackFail, successCondition) => {
+    trackReactivityValues();
+    let ret;
+    if (__INTLIFY_PROD_DEVTOOLS__) {
+      try {
+        setAdditionalMeta(getMetaInfo());
+        if (!_isGlobal) {
+          _context.fallbackContext = __root ? getFallbackContext() : void 0;
+        }
+        ret = fn(_context);
+      } finally {
+        setAdditionalMeta(null);
+        if (!_isGlobal) {
+          _context.fallbackContext = void 0;
+        }
+      }
+    } else {
+      ret = fn(_context);
+    }
+    if (isNumber(ret) && ret === NOT_REOSLVED) {
+      const [key, arg2] = argumentParser();
+      return __root && _fallbackRoot ? fallbackSuccess(__root) : fallbackFail(key);
+    } else if (successCondition(ret)) {
+      return ret;
+    } else {
+      throw createI18nError(I18nErrorCodes.UNEXPECTED_RETURN_TYPE);
+    }
+  };
+  function t2(...args) {
+    return wrapWithDeps((context) => Reflect.apply(translate, null, [context, ...args]), () => parseTranslateArgs(...args), "translate", (root) => Reflect.apply(root.t, root, [...args]), (key) => key, (val) => isString(val));
+  }
+  function rt(...args) {
+    const [arg1, arg2, arg3] = args;
+    if (arg3 && !isObject(arg3)) {
+      throw createI18nError(I18nErrorCodes.INVALID_ARGUMENT);
+    }
+    return t2(...[arg1, arg2, assign$1({ resolvedMessage: true }, arg3 || {})]);
+  }
+  function d2(...args) {
+    return wrapWithDeps((context) => Reflect.apply(datetime, null, [context, ...args]), () => parseDateTimeArgs(...args), "datetime format", (root) => Reflect.apply(root.d, root, [...args]), () => MISSING_RESOLVE_VALUE, (val) => isString(val));
+  }
+  function n2(...args) {
+    return wrapWithDeps((context) => Reflect.apply(number, null, [context, ...args]), () => parseNumberArgs(...args), "number format", (root) => Reflect.apply(root.n, root, [...args]), () => MISSING_RESOLVE_VALUE, (val) => isString(val));
+  }
+  function normalize(values) {
+    return values.map((val) => isString(val) || isNumber(val) || isBoolean(val) ? createTextNode(String(val)) : val);
+  }
+  const interpolate = (val) => val;
+  const processor = {
+    normalize,
+    interpolate,
+    type: "vnode"
+  };
+  function transrateVNode(...args) {
+    return wrapWithDeps(
+      (context) => {
+        let ret;
+        const _context2 = context;
+        try {
+          _context2.processor = processor;
+          ret = Reflect.apply(translate, null, [_context2, ...args]);
+        } finally {
+          _context2.processor = null;
+        }
+        return ret;
+      },
+      () => parseTranslateArgs(...args),
+      "translate",
+      (root) => root[TransrateVNodeSymbol](...args),
+      (key) => [createTextNode(key)],
+      (val) => isArray(val)
+    );
+  }
+  function numberParts(...args) {
+    return wrapWithDeps(
+      (context) => Reflect.apply(number, null, [context, ...args]),
+      () => parseNumberArgs(...args),
+      "number format",
+      (root) => root[NumberPartsSymbol](...args),
+      () => [],
+      (val) => isString(val) || isArray(val)
+    );
+  }
+  function datetimeParts(...args) {
+    return wrapWithDeps(
+      (context) => Reflect.apply(datetime, null, [context, ...args]),
+      () => parseDateTimeArgs(...args),
+      "datetime format",
+      (root) => root[DatetimePartsSymbol](...args),
+      () => [],
+      (val) => isString(val) || isArray(val)
+    );
+  }
+  function setPluralRules(rules) {
+    _pluralRules = rules;
+    _context.pluralRules = _pluralRules;
+  }
+  function te(key, locale2) {
+    const targetLocale = isString(locale2) ? locale2 : _locale.value;
+    const message = getLocaleMessage(targetLocale);
+    return _context.messageResolver(message, key) !== null;
+  }
+  function resolveMessages(key) {
+    let messages3 = null;
+    const locales = fallbackWithLocaleChain(_context, _fallbackLocale.value, _locale.value);
+    for (let i = 0; i < locales.length; i++) {
+      const targetLocaleMessages = _messages.value[locales[i]] || {};
+      const messageValue = _context.messageResolver(targetLocaleMessages, key);
+      if (messageValue != null) {
+        messages3 = messageValue;
+        break;
+      }
+    }
+    return messages3;
+  }
+  function tm(key) {
+    const messages3 = resolveMessages(key);
+    return messages3 != null ? messages3 : __root ? __root.tm(key) || {} : {};
+  }
+  function getLocaleMessage(locale2) {
+    return _messages.value[locale2] || {};
+  }
+  function setLocaleMessage(locale2, message) {
+    _messages.value[locale2] = message;
+    _context.messages = _messages.value;
+  }
+  function mergeLocaleMessage(locale2, message) {
+    _messages.value[locale2] = _messages.value[locale2] || {};
+    deepCopy(message, _messages.value[locale2]);
+    _context.messages = _messages.value;
+  }
+  function getDateTimeFormat(locale2) {
+    return _datetimeFormats.value[locale2] || {};
+  }
+  function setDateTimeFormat(locale2, format2) {
+    _datetimeFormats.value[locale2] = format2;
+    _context.datetimeFormats = _datetimeFormats.value;
+    clearDateTimeFormat(_context, locale2, format2);
+  }
+  function mergeDateTimeFormat(locale2, format2) {
+    _datetimeFormats.value[locale2] = assign$1(_datetimeFormats.value[locale2] || {}, format2);
+    _context.datetimeFormats = _datetimeFormats.value;
+    clearDateTimeFormat(_context, locale2, format2);
+  }
+  function getNumberFormat(locale2) {
+    return _numberFormats.value[locale2] || {};
+  }
+  function setNumberFormat(locale2, format2) {
+    _numberFormats.value[locale2] = format2;
+    _context.numberFormats = _numberFormats.value;
+    clearNumberFormat(_context, locale2, format2);
+  }
+  function mergeNumberFormat(locale2, format2) {
+    _numberFormats.value[locale2] = assign$1(_numberFormats.value[locale2] || {}, format2);
+    _context.numberFormats = _numberFormats.value;
+    clearNumberFormat(_context, locale2, format2);
+  }
+  composerID++;
+  if (__root && inBrowser) {
+    watch(__root.locale, (val) => {
+      if (_inheritLocale) {
+        _locale.value = val;
+        _context.locale = val;
+        updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+      }
+    });
+    watch(__root.fallbackLocale, (val) => {
+      if (_inheritLocale) {
+        _fallbackLocale.value = val;
+        _context.fallbackLocale = val;
+        updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+      }
+    });
+  }
+  const composer = {
+    id: composerID,
+    locale,
+    fallbackLocale,
+    get inheritLocale() {
+      return _inheritLocale;
+    },
+    set inheritLocale(val) {
+      _inheritLocale = val;
+      if (val && __root) {
+        _locale.value = __root.locale.value;
+        _fallbackLocale.value = __root.fallbackLocale.value;
+        updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+      }
+    },
+    get availableLocales() {
+      return Object.keys(_messages.value).sort();
+    },
+    messages: messages2,
+    get modifiers() {
+      return _modifiers;
+    },
+    get pluralRules() {
+      return _pluralRules || {};
+    },
+    get isGlobal() {
+      return _isGlobal;
+    },
+    get missingWarn() {
+      return _missingWarn;
+    },
+    set missingWarn(val) {
+      _missingWarn = val;
+      _context.missingWarn = _missingWarn;
+    },
+    get fallbackWarn() {
+      return _fallbackWarn;
+    },
+    set fallbackWarn(val) {
+      _fallbackWarn = val;
+      _context.fallbackWarn = _fallbackWarn;
+    },
+    get fallbackRoot() {
+      return _fallbackRoot;
+    },
+    set fallbackRoot(val) {
+      _fallbackRoot = val;
+    },
+    get fallbackFormat() {
+      return _fallbackFormat;
+    },
+    set fallbackFormat(val) {
+      _fallbackFormat = val;
+      _context.fallbackFormat = _fallbackFormat;
+    },
+    get warnHtmlMessage() {
+      return _warnHtmlMessage;
+    },
+    set warnHtmlMessage(val) {
+      _warnHtmlMessage = val;
+      _context.warnHtmlMessage = val;
+    },
+    get escapeParameter() {
+      return _escapeParameter;
+    },
+    set escapeParameter(val) {
+      _escapeParameter = val;
+      _context.escapeParameter = val;
+    },
+    t: t2,
+    getLocaleMessage,
+    setLocaleMessage,
+    mergeLocaleMessage,
+    getPostTranslationHandler,
+    setPostTranslationHandler,
+    getMissingHandler,
+    setMissingHandler,
+    [SetPluralRulesSymbol]: setPluralRules
+  };
+  {
+    composer.datetimeFormats = datetimeFormats;
+    composer.numberFormats = numberFormats;
+    composer.rt = rt;
+    composer.te = te;
+    composer.tm = tm;
+    composer.d = d2;
+    composer.n = n2;
+    composer.getDateTimeFormat = getDateTimeFormat;
+    composer.setDateTimeFormat = setDateTimeFormat;
+    composer.mergeDateTimeFormat = mergeDateTimeFormat;
+    composer.getNumberFormat = getNumberFormat;
+    composer.setNumberFormat = setNumberFormat;
+    composer.mergeNumberFormat = mergeNumberFormat;
+    composer[InejctWithOption] = options.__injectWithOption;
+    composer[TransrateVNodeSymbol] = transrateVNode;
+    composer[DatetimePartsSymbol] = datetimeParts;
+    composer[NumberPartsSymbol] = numberParts;
+  }
+  return composer;
+}
+function convertComposerOptions(options) {
+  const locale = isString(options.locale) ? options.locale : DEFAULT_LOCALE;
+  const fallbackLocale = isString(options.fallbackLocale) || isArray(options.fallbackLocale) || isPlainObject$1(options.fallbackLocale) || options.fallbackLocale === false ? options.fallbackLocale : locale;
+  const missing = isFunction(options.missing) ? options.missing : void 0;
+  const missingWarn = isBoolean(options.silentTranslationWarn) || isRegExp(options.silentTranslationWarn) ? !options.silentTranslationWarn : true;
+  const fallbackWarn = isBoolean(options.silentFallbackWarn) || isRegExp(options.silentFallbackWarn) ? !options.silentFallbackWarn : true;
+  const fallbackRoot = isBoolean(options.fallbackRoot) ? options.fallbackRoot : true;
+  const fallbackFormat = !!options.formatFallbackMessages;
+  const modifiers = isPlainObject$1(options.modifiers) ? options.modifiers : {};
+  const pluralizationRules = options.pluralizationRules;
+  const postTranslation = isFunction(options.postTranslation) ? options.postTranslation : void 0;
+  const warnHtmlMessage = isString(options.warnHtmlInMessage) ? options.warnHtmlInMessage !== "off" : true;
+  const escapeParameter = !!options.escapeParameterHtml;
+  const inheritLocale = isBoolean(options.sync) ? options.sync : true;
+  let messages2 = options.messages;
+  if (isPlainObject$1(options.sharedMessages)) {
+    const sharedMessages = options.sharedMessages;
+    const locales = Object.keys(sharedMessages);
+    messages2 = locales.reduce((messages3, locale2) => {
+      const message = messages3[locale2] || (messages3[locale2] = {});
+      assign$1(message, sharedMessages[locale2]);
+      return messages3;
+    }, messages2 || {});
+  }
+  const { __i18n, __root, __injectWithOption } = options;
+  const datetimeFormats = options.datetimeFormats;
+  const numberFormats = options.numberFormats;
+  const flatJson = options.flatJson;
+  return {
+    locale,
+    fallbackLocale,
+    messages: messages2,
+    flatJson,
+    datetimeFormats,
+    numberFormats,
+    missing,
+    missingWarn,
+    fallbackWarn,
+    fallbackRoot,
+    fallbackFormat,
+    modifiers,
+    pluralRules: pluralizationRules,
+    postTranslation,
+    warnHtmlMessage,
+    escapeParameter,
+    messageResolver: options.messageResolver,
+    inheritLocale,
+    __i18n,
+    __root,
+    __injectWithOption
+  };
+}
+function createVueI18n(options = {}, VueI18nLegacy) {
+  {
+    const composer = createComposer(convertComposerOptions(options));
+    const vueI18n = {
+      id: composer.id,
+      get locale() {
+        return composer.locale.value;
+      },
+      set locale(val) {
+        composer.locale.value = val;
+      },
+      get fallbackLocale() {
+        return composer.fallbackLocale.value;
+      },
+      set fallbackLocale(val) {
+        composer.fallbackLocale.value = val;
+      },
+      get messages() {
+        return composer.messages.value;
+      },
+      get datetimeFormats() {
+        return composer.datetimeFormats.value;
+      },
+      get numberFormats() {
+        return composer.numberFormats.value;
+      },
+      get availableLocales() {
+        return composer.availableLocales;
+      },
+      get formatter() {
+        return {
+          interpolate() {
+            return [];
+          }
+        };
+      },
+      set formatter(val) {
+      },
+      get missing() {
+        return composer.getMissingHandler();
+      },
+      set missing(handler) {
+        composer.setMissingHandler(handler);
+      },
+      get silentTranslationWarn() {
+        return isBoolean(composer.missingWarn) ? !composer.missingWarn : composer.missingWarn;
+      },
+      set silentTranslationWarn(val) {
+        composer.missingWarn = isBoolean(val) ? !val : val;
+      },
+      get silentFallbackWarn() {
+        return isBoolean(composer.fallbackWarn) ? !composer.fallbackWarn : composer.fallbackWarn;
+      },
+      set silentFallbackWarn(val) {
+        composer.fallbackWarn = isBoolean(val) ? !val : val;
+      },
+      get modifiers() {
+        return composer.modifiers;
+      },
+      get formatFallbackMessages() {
+        return composer.fallbackFormat;
+      },
+      set formatFallbackMessages(val) {
+        composer.fallbackFormat = val;
+      },
+      get postTranslation() {
+        return composer.getPostTranslationHandler();
+      },
+      set postTranslation(handler) {
+        composer.setPostTranslationHandler(handler);
+      },
+      get sync() {
+        return composer.inheritLocale;
+      },
+      set sync(val) {
+        composer.inheritLocale = val;
+      },
+      get warnHtmlInMessage() {
+        return composer.warnHtmlMessage ? "warn" : "off";
+      },
+      set warnHtmlInMessage(val) {
+        composer.warnHtmlMessage = val !== "off";
+      },
+      get escapeParameterHtml() {
+        return composer.escapeParameter;
+      },
+      set escapeParameterHtml(val) {
+        composer.escapeParameter = val;
+      },
+      get preserveDirectiveContent() {
+        return true;
+      },
+      set preserveDirectiveContent(val) {
+      },
+      get pluralizationRules() {
+        return composer.pluralRules || {};
+      },
+      __composer: composer,
+      t(...args) {
+        const [arg1, arg2, arg3] = args;
+        const options2 = {};
+        let list = null;
+        let named = null;
+        if (!isString(arg1)) {
+          throw createI18nError(I18nErrorCodes.INVALID_ARGUMENT);
+        }
+        const key = arg1;
+        if (isString(arg2)) {
+          options2.locale = arg2;
+        } else if (isArray(arg2)) {
+          list = arg2;
+        } else if (isPlainObject$1(arg2)) {
+          named = arg2;
+        }
+        if (isArray(arg3)) {
+          list = arg3;
+        } else if (isPlainObject$1(arg3)) {
+          named = arg3;
+        }
+        return Reflect.apply(composer.t, composer, [
+          key,
+          list || named || {},
+          options2
+        ]);
+      },
+      rt(...args) {
+        return Reflect.apply(composer.rt, composer, [...args]);
+      },
+      tc(...args) {
+        const [arg1, arg2, arg3] = args;
+        const options2 = { plural: 1 };
+        let list = null;
+        let named = null;
+        if (!isString(arg1)) {
+          throw createI18nError(I18nErrorCodes.INVALID_ARGUMENT);
+        }
+        const key = arg1;
+        if (isString(arg2)) {
+          options2.locale = arg2;
+        } else if (isNumber(arg2)) {
+          options2.plural = arg2;
+        } else if (isArray(arg2)) {
+          list = arg2;
+        } else if (isPlainObject$1(arg2)) {
+          named = arg2;
+        }
+        if (isString(arg3)) {
+          options2.locale = arg3;
+        } else if (isArray(arg3)) {
+          list = arg3;
+        } else if (isPlainObject$1(arg3)) {
+          named = arg3;
+        }
+        return Reflect.apply(composer.t, composer, [
+          key,
+          list || named || {},
+          options2
+        ]);
+      },
+      te(key, locale) {
+        return composer.te(key, locale);
+      },
+      tm(key) {
+        return composer.tm(key);
+      },
+      getLocaleMessage(locale) {
+        return composer.getLocaleMessage(locale);
+      },
+      setLocaleMessage(locale, message) {
+        composer.setLocaleMessage(locale, message);
+      },
+      mergeLocaleMessage(locale, message) {
+        composer.mergeLocaleMessage(locale, message);
+      },
+      d(...args) {
+        return Reflect.apply(composer.d, composer, [...args]);
+      },
+      getDateTimeFormat(locale) {
+        return composer.getDateTimeFormat(locale);
+      },
+      setDateTimeFormat(locale, format2) {
+        composer.setDateTimeFormat(locale, format2);
+      },
+      mergeDateTimeFormat(locale, format2) {
+        composer.mergeDateTimeFormat(locale, format2);
+      },
+      n(...args) {
+        return Reflect.apply(composer.n, composer, [...args]);
+      },
+      getNumberFormat(locale) {
+        return composer.getNumberFormat(locale);
+      },
+      setNumberFormat(locale, format2) {
+        composer.setNumberFormat(locale, format2);
+      },
+      mergeNumberFormat(locale, format2) {
+        composer.mergeNumberFormat(locale, format2);
+      },
+      getChoiceIndex(choice, choicesLength) {
+        return -1;
+      },
+      __onComponentInstanceCreated(target) {
+        const { componentInstanceCreatedListener } = options;
+        if (componentInstanceCreatedListener) {
+          componentInstanceCreatedListener(target, vueI18n);
+        }
+      }
+    };
+    return vueI18n;
+  }
+}
+const baseFormatProps = {
+  tag: {
+    type: [String, Object]
+  },
+  locale: {
+    type: String
+  },
+  scope: {
+    type: String,
+    validator: (val) => val === "parent" || val === "global",
+    default: "parent"
+  },
+  i18n: {
+    type: Object
+  }
+};
+function getInterpolateArg({ slots }, keys) {
+  if (keys.length === 1 && keys[0] === "default") {
+    const ret = slots.default ? slots.default() : [];
+    return ret.reduce((slot, current) => {
+      return slot = [
+        ...slot,
+        ...isArray(current.children) ? current.children : [current]
+      ];
+    }, []);
+  } else {
+    return keys.reduce((arg, key) => {
+      const slot = slots[key];
+      if (slot) {
+        arg[key] = slot();
+      }
+      return arg;
+    }, {});
+  }
+}
+function getFragmentableTag(tag) {
+  return Fragment$1;
+}
+const Translation = {
+  name: "i18n-t",
+  props: assign$1({
+    keypath: {
+      type: String,
+      required: true
+    },
+    plural: {
+      type: [Number, String],
+      validator: (val) => isNumber(val) || !isNaN(val)
+    }
+  }, baseFormatProps),
+  setup(props, context) {
+    const { slots, attrs } = context;
+    const i18n = props.i18n || useI18n({
+      useScope: props.scope,
+      __useComponent: true
+    });
+    return () => {
+      const keys = Object.keys(slots).filter((key) => key !== "_");
+      const options = {};
+      if (props.locale) {
+        options.locale = props.locale;
+      }
+      if (props.plural !== void 0) {
+        options.plural = isString(props.plural) ? +props.plural : props.plural;
+      }
+      const arg = getInterpolateArg(context, keys);
+      const children = i18n[TransrateVNodeSymbol](props.keypath, arg, options);
+      const assignedAttrs = assign$1({}, attrs);
+      const tag = isString(props.tag) || isObject(props.tag) ? props.tag : getFragmentableTag();
+      return h(tag, assignedAttrs, children);
+    };
+  }
+};
+function isVNode(target) {
+  return isArray(target) && !isString(target[0]);
+}
+function renderFormatter(props, context, slotKeys, partFormatter) {
+  const { slots, attrs } = context;
+  return () => {
+    const options = { part: true };
+    let overrides = {};
+    if (props.locale) {
+      options.locale = props.locale;
+    }
+    if (isString(props.format)) {
+      options.key = props.format;
+    } else if (isObject(props.format)) {
+      if (isString(props.format.key)) {
+        options.key = props.format.key;
+      }
+      overrides = Object.keys(props.format).reduce((options2, prop) => {
+        return slotKeys.includes(prop) ? assign$1({}, options2, { [prop]: props.format[prop] }) : options2;
+      }, {});
+    }
+    const parts = partFormatter(...[props.value, options, overrides]);
+    let children = [options.key];
+    if (isArray(parts)) {
+      children = parts.map((part, index2) => {
+        const slot = slots[part.type];
+        const node = slot ? slot({ [part.type]: part.value, index: index2, parts }) : [part.value];
+        if (isVNode(node)) {
+          node[0].key = `${part.type}-${index2}`;
+        }
+        return node;
+      });
+    } else if (isString(parts)) {
+      children = [parts];
+    }
+    const assignedAttrs = assign$1({}, attrs);
+    const tag = isString(props.tag) || isObject(props.tag) ? props.tag : getFragmentableTag();
+    return h(tag, assignedAttrs, children);
+  };
+}
+const NumberFormat = {
+  name: "i18n-n",
+  props: assign$1({
+    value: {
+      type: Number,
+      required: true
+    },
+    format: {
+      type: [String, Object]
+    }
+  }, baseFormatProps),
+  setup(props, context) {
+    const i18n = props.i18n || useI18n({ useScope: "parent", __useComponent: true });
+    return renderFormatter(props, context, NUMBER_FORMAT_OPTIONS_KEYS, (...args) => i18n[NumberPartsSymbol](...args));
+  }
+};
+const DatetimeFormat = {
+  name: "i18n-d",
+  props: assign$1({
+    value: {
+      type: [Number, Date],
+      required: true
+    },
+    format: {
+      type: [String, Object]
+    }
+  }, baseFormatProps),
+  setup(props, context) {
+    const i18n = props.i18n || useI18n({ useScope: "parent", __useComponent: true });
+    return renderFormatter(props, context, DATETIME_FORMAT_OPTIONS_KEYS, (...args) => i18n[DatetimePartsSymbol](...args));
+  }
+};
+function getComposer$2(i18n, instance) {
+  const i18nInternal = i18n;
+  if (i18n.mode === "composition") {
+    return i18nInternal.__getInstance(instance) || i18n.global;
+  } else {
+    const vueI18n = i18nInternal.__getInstance(instance);
+    return vueI18n != null ? vueI18n.__composer : i18n.global.__composer;
+  }
+}
+function vTDirective(i18n) {
+  const _process = (binding) => {
+    const { instance, modifiers, value } = binding;
+    if (!instance || !instance.$) {
+      throw createI18nError(I18nErrorCodes.UNEXPECTED_ERROR);
+    }
+    const composer = getComposer$2(i18n, instance.$);
+    const parsedValue = parseValue(value);
+    return [
+      Reflect.apply(composer.t, composer, [...makeParams(parsedValue)]),
+      composer
+    ];
+  };
+  const register = (el, binding) => {
+    const [textContent, composer] = _process(binding);
+    el.__composer = composer;
+    el.textContent = textContent;
+  };
+  const unregister = (el) => {
+    if (el.__composer) {
+      el.__composer = void 0;
+      delete el.__composer;
+    }
+  };
+  const update = (el, { value }) => {
+    if (el.__composer) {
+      const composer = el.__composer;
+      const parsedValue = parseValue(value);
+      el.textContent = Reflect.apply(composer.t, composer, [
+        ...makeParams(parsedValue)
+      ]);
+    }
+  };
+  const getSSRProps = (binding) => {
+    const [textContent] = _process(binding);
+    return { textContent };
+  };
+  return {
+    created: register,
+    unmounted: unregister,
+    beforeUpdate: update,
+    getSSRProps
+  };
+}
+function parseValue(value) {
+  if (isString(value)) {
+    return { path: value };
+  } else if (isPlainObject$1(value)) {
+    if (!("path" in value)) {
+      throw createI18nError(I18nErrorCodes.REQUIRED_VALUE, "path");
+    }
+    return value;
+  } else {
+    throw createI18nError(I18nErrorCodes.INVALID_VALUE);
+  }
+}
+function makeParams(value) {
+  const { path, locale, args, choice, plural } = value;
+  const options = {};
+  const named = args || {};
+  if (isString(locale)) {
+    options.locale = locale;
+  }
+  if (isNumber(choice)) {
+    options.plural = choice;
+  }
+  if (isNumber(plural)) {
+    options.plural = plural;
+  }
+  return [path, named, options];
+}
+function apply$1(app2, i18n, ...options) {
+  const pluginOptions = isPlainObject$1(options[0]) ? options[0] : {};
+  const useI18nComponentName = !!pluginOptions.useI18nComponentName;
+  const globalInstall = isBoolean(pluginOptions.globalInstall) ? pluginOptions.globalInstall : true;
+  if (globalInstall) {
+    app2.component(!useI18nComponentName ? Translation.name : "i18n", Translation);
+    app2.component(NumberFormat.name, NumberFormat);
+    app2.component(DatetimeFormat.name, DatetimeFormat);
+  }
+  {
+    app2.directive("t", vTDirective(i18n));
+  }
+}
+function defineMixin(vuei18n, composer, i18n) {
+  return {
+    beforeCreate() {
+      const instance = getCurrentInstance();
+      if (!instance) {
+        throw createI18nError(I18nErrorCodes.UNEXPECTED_ERROR);
+      }
+      const options = this.$options;
+      if (options.i18n) {
+        const optionsI18n = options.i18n;
+        if (options.__i18n) {
+          optionsI18n.__i18n = options.__i18n;
+        }
+        optionsI18n.__root = composer;
+        if (this === this.$root) {
+          this.$i18n = mergeToRoot(vuei18n, optionsI18n);
+        } else {
+          optionsI18n.__injectWithOption = true;
+          this.$i18n = createVueI18n(optionsI18n);
+        }
+      } else if (options.__i18n) {
+        if (this === this.$root) {
+          this.$i18n = mergeToRoot(vuei18n, options);
+        } else {
+          this.$i18n = createVueI18n({
+            __i18n: options.__i18n,
+            __injectWithOption: true,
+            __root: composer
+          });
+        }
+      } else {
+        this.$i18n = vuei18n;
+      }
+      if (options.__i18nGlobal) {
+        adjustI18nResources(composer, options, options);
+      }
+      vuei18n.__onComponentInstanceCreated(this.$i18n);
+      i18n.__setInstance(instance, this.$i18n);
+      this.$t = (...args) => this.$i18n.t(...args);
+      this.$rt = (...args) => this.$i18n.rt(...args);
+      this.$tc = (...args) => this.$i18n.tc(...args);
+      this.$te = (key, locale) => this.$i18n.te(key, locale);
+      this.$d = (...args) => this.$i18n.d(...args);
+      this.$n = (...args) => this.$i18n.n(...args);
+      this.$tm = (key) => this.$i18n.tm(key);
+    },
+    mounted() {
+    },
+    unmounted() {
+      const instance = getCurrentInstance();
+      if (!instance) {
+        throw createI18nError(I18nErrorCodes.UNEXPECTED_ERROR);
+      }
+      delete this.$t;
+      delete this.$rt;
+      delete this.$tc;
+      delete this.$te;
+      delete this.$d;
+      delete this.$n;
+      delete this.$tm;
+      i18n.__deleteInstance(instance);
+      delete this.$i18n;
+    }
+  };
+}
+function mergeToRoot(root, options) {
+  root.locale = options.locale || root.locale;
+  root.fallbackLocale = options.fallbackLocale || root.fallbackLocale;
+  root.missing = options.missing || root.missing;
+  root.silentTranslationWarn = options.silentTranslationWarn || root.silentFallbackWarn;
+  root.silentFallbackWarn = options.silentFallbackWarn || root.silentFallbackWarn;
+  root.formatFallbackMessages = options.formatFallbackMessages || root.formatFallbackMessages;
+  root.postTranslation = options.postTranslation || root.postTranslation;
+  root.warnHtmlInMessage = options.warnHtmlInMessage || root.warnHtmlInMessage;
+  root.escapeParameterHtml = options.escapeParameterHtml || root.escapeParameterHtml;
+  root.sync = options.sync || root.sync;
+  root.__composer[SetPluralRulesSymbol](options.pluralizationRules || root.pluralizationRules);
+  const messages2 = getLocaleMessages(root.locale, {
+    messages: options.messages,
+    __i18n: options.__i18n
+  });
+  Object.keys(messages2).forEach((locale) => root.mergeLocaleMessage(locale, messages2[locale]));
+  if (options.datetimeFormats) {
+    Object.keys(options.datetimeFormats).forEach((locale) => root.mergeDateTimeFormat(locale, options.datetimeFormats[locale]));
+  }
+  if (options.numberFormats) {
+    Object.keys(options.numberFormats).forEach((locale) => root.mergeNumberFormat(locale, options.numberFormats[locale]));
+  }
+  return root;
+}
+const I18nInjectionKey = /* @__PURE__ */ makeSymbol("global-vue-i18n");
+function createI18n(options = {}, VueI18nLegacy) {
+  const __legacyMode = isBoolean(options.legacy) ? options.legacy : true;
+  const __globalInjection = isBoolean(options.globalInjection) ? options.globalInjection : true;
+  const __allowComposition = __legacyMode ? !!options.allowComposition : true;
+  const __instances = /* @__PURE__ */ new Map();
+  const [globalScope, __global] = createGlobal(options, __legacyMode);
+  const symbol = makeSymbol("");
+  function __getInstance(component) {
+    return __instances.get(component) || null;
+  }
+  function __setInstance(component, instance) {
+    __instances.set(component, instance);
+  }
+  function __deleteInstance(component) {
+    __instances.delete(component);
+  }
+  {
+    const i18n = {
+      get mode() {
+        return __legacyMode ? "legacy" : "composition";
+      },
+      get allowComposition() {
+        return __allowComposition;
+      },
+      async install(app2, ...options2) {
+        app2.__VUE_I18N_SYMBOL__ = symbol;
+        app2.provide(app2.__VUE_I18N_SYMBOL__, i18n);
+        if (!__legacyMode && __globalInjection) {
+          injectGlobalFields(app2, i18n.global);
+        }
+        {
+          apply$1(app2, i18n, ...options2);
+        }
+        if (__legacyMode) {
+          app2.mixin(defineMixin(__global, __global.__composer, i18n));
+        }
+        const unmountApp = app2.unmount;
+        app2.unmount = () => {
+          i18n.dispose();
+          unmountApp();
+        };
+      },
+      get global() {
+        return __global;
+      },
+      dispose() {
+        globalScope.stop();
+      },
+      __instances,
+      __getInstance,
+      __setInstance,
+      __deleteInstance
+    };
+    return i18n;
+  }
+}
+function useI18n(options = {}) {
+  const instance = getCurrentInstance();
+  if (instance == null) {
+    throw createI18nError(I18nErrorCodes.MUST_BE_CALL_SETUP_TOP);
+  }
+  if (!instance.isCE && instance.appContext.app != null && !instance.appContext.app.__VUE_I18N_SYMBOL__) {
+    throw createI18nError(I18nErrorCodes.NOT_INSLALLED);
+  }
+  const i18n = getI18nInstance(instance);
+  const global2 = getGlobalComposer(i18n);
+  const componentOptions = getComponentOptions(instance);
+  const scope = getScope(options, componentOptions);
+  {
+    if (i18n.mode === "legacy" && !options.__useComponent) {
+      if (!i18n.allowComposition) {
+        throw createI18nError(I18nErrorCodes.NOT_AVAILABLE_IN_LEGACY_MODE);
+      }
+      return useI18nForLegacy(instance, scope, global2, options);
+    }
+  }
+  if (scope === "global") {
+    adjustI18nResources(global2, options, componentOptions);
+    return global2;
+  }
+  if (scope === "parent") {
+    let composer2 = getComposer(i18n, instance, options.__useComponent);
+    if (composer2 == null) {
+      composer2 = global2;
+    }
+    return composer2;
+  }
+  const i18nInternal = i18n;
+  let composer = i18nInternal.__getInstance(instance);
+  if (composer == null) {
+    const composerOptions = assign$1({}, options);
+    if ("__i18n" in componentOptions) {
+      composerOptions.__i18n = componentOptions.__i18n;
+    }
+    if (global2) {
+      composerOptions.__root = global2;
+    }
+    composer = createComposer(composerOptions);
+    setupLifeCycle(i18nInternal, instance);
+    i18nInternal.__setInstance(instance, composer);
+  }
+  return composer;
+}
+function createGlobal(options, legacyMode, VueI18nLegacy) {
+  const scope = effectScope();
+  {
+    const obj = legacyMode ? scope.run(() => createVueI18n(options)) : scope.run(() => createComposer(options));
+    if (obj == null) {
+      throw createI18nError(I18nErrorCodes.UNEXPECTED_ERROR);
+    }
+    return [scope, obj];
+  }
+}
+function getI18nInstance(instance) {
+  {
+    const i18n = inject(!instance.isCE ? instance.appContext.app.__VUE_I18N_SYMBOL__ : I18nInjectionKey);
+    if (!i18n) {
+      throw createI18nError(!instance.isCE ? I18nErrorCodes.UNEXPECTED_ERROR : I18nErrorCodes.NOT_INSLALLED_WITH_PROVIDE);
+    }
+    return i18n;
+  }
+}
+function getScope(options, componentOptions) {
+  return isEmptyObject(options) ? "__i18n" in componentOptions ? "local" : "global" : !options.useScope ? "local" : options.useScope;
+}
+function getGlobalComposer(i18n) {
+  return i18n.mode === "composition" ? i18n.global : i18n.global.__composer;
+}
+function getComposer(i18n, target, useComponent = false) {
+  let composer = null;
+  const root = target.root;
+  let current = target.parent;
+  while (current != null) {
+    const i18nInternal = i18n;
+    if (i18n.mode === "composition") {
+      composer = i18nInternal.__getInstance(current);
+    } else {
+      {
+        const vueI18n = i18nInternal.__getInstance(current);
+        if (vueI18n != null) {
+          composer = vueI18n.__composer;
+          if (useComponent && composer && !composer[InejctWithOption]) {
+            composer = null;
+          }
+        }
+      }
+    }
+    if (composer != null) {
+      break;
+    }
+    if (root === current) {
+      break;
+    }
+    current = current.parent;
+  }
+  return composer;
+}
+function setupLifeCycle(i18n, target, composer) {
+  {
+    onUnmounted(() => {
+      i18n.__deleteInstance(target);
+    }, target);
+  }
+}
+function useI18nForLegacy(instance, scope, root, options = {}) {
+  const isLocale = scope === "local";
+  const _composer = shallowRef(null);
+  if (isLocale && instance.proxy && !(instance.proxy.$options.i18n || instance.proxy.$options.__i18n)) {
+    throw createI18nError(I18nErrorCodes.MUST_DEFINE_I18N_OPTION_IN_ALLOW_COMPOSITION);
+  }
+  const _inheritLocale = isBoolean(options.inheritLocale) ? options.inheritLocale : true;
+  const _locale = ref(
+    isLocale && _inheritLocale ? root.locale.value : isString(options.locale) ? options.locale : DEFAULT_LOCALE
+  );
+  const _fallbackLocale = ref(
+    isLocale && _inheritLocale ? root.fallbackLocale.value : isString(options.fallbackLocale) || isArray(options.fallbackLocale) || isPlainObject$1(options.fallbackLocale) || options.fallbackLocale === false ? options.fallbackLocale : _locale.value
+  );
+  const _messages = ref(getLocaleMessages(_locale.value, options));
+  const _datetimeFormats = ref(isPlainObject$1(options.datetimeFormats) ? options.datetimeFormats : { [_locale.value]: {} });
+  const _numberFormats = ref(isPlainObject$1(options.numberFormats) ? options.numberFormats : { [_locale.value]: {} });
+  const _missingWarn = isLocale ? root.missingWarn : isBoolean(options.missingWarn) || isRegExp(options.missingWarn) ? options.missingWarn : true;
+  const _fallbackWarn = isLocale ? root.fallbackWarn : isBoolean(options.fallbackWarn) || isRegExp(options.fallbackWarn) ? options.fallbackWarn : true;
+  const _fallbackRoot = isLocale ? root.fallbackRoot : isBoolean(options.fallbackRoot) ? options.fallbackRoot : true;
+  const _fallbackFormat = !!options.fallbackFormat;
+  const _missing = isFunction(options.missing) ? options.missing : null;
+  const _postTranslation = isFunction(options.postTranslation) ? options.postTranslation : null;
+  const _warnHtmlMessage = isLocale ? root.warnHtmlMessage : isBoolean(options.warnHtmlMessage) ? options.warnHtmlMessage : true;
+  const _escapeParameter = !!options.escapeParameter;
+  const _modifiers = isLocale ? root.modifiers : isPlainObject$1(options.modifiers) ? options.modifiers : {};
+  const _pluralRules = options.pluralRules || isLocale && root.pluralRules;
+  function trackReactivityValues() {
+    return [
+      _locale.value,
+      _fallbackLocale.value,
+      _messages.value,
+      _datetimeFormats.value,
+      _numberFormats.value
+    ];
+  }
+  const locale = computed({
+    get: () => {
+      return _composer.value ? _composer.value.locale.value : _locale.value;
+    },
+    set: (val) => {
+      if (_composer.value) {
+        _composer.value.locale.value = val;
+      }
+      _locale.value = val;
+    }
+  });
+  const fallbackLocale = computed({
+    get: () => {
+      return _composer.value ? _composer.value.fallbackLocale.value : _fallbackLocale.value;
+    },
+    set: (val) => {
+      if (_composer.value) {
+        _composer.value.fallbackLocale.value = val;
+      }
+      _fallbackLocale.value = val;
+    }
+  });
+  const messages2 = computed(() => {
+    if (_composer.value) {
+      return _composer.value.messages.value;
+    } else {
+      return _messages.value;
+    }
+  });
+  const datetimeFormats = computed(() => _datetimeFormats.value);
+  const numberFormats = computed(() => _numberFormats.value);
+  function getPostTranslationHandler() {
+    return _composer.value ? _composer.value.getPostTranslationHandler() : _postTranslation;
+  }
+  function setPostTranslationHandler(handler) {
+    if (_composer.value) {
+      _composer.value.setPostTranslationHandler(handler);
+    }
+  }
+  function getMissingHandler() {
+    return _composer.value ? _composer.value.getMissingHandler() : _missing;
+  }
+  function setMissingHandler(handler) {
+    if (_composer.value) {
+      _composer.value.setMissingHandler(handler);
+    }
+  }
+  function warpWithDeps(fn) {
+    trackReactivityValues();
+    return fn();
+  }
+  function t2(...args) {
+    return _composer.value ? warpWithDeps(() => Reflect.apply(_composer.value.t, null, [...args])) : warpWithDeps(() => "");
+  }
+  function rt(...args) {
+    return _composer.value ? Reflect.apply(_composer.value.rt, null, [...args]) : "";
+  }
+  function d2(...args) {
+    return _composer.value ? warpWithDeps(() => Reflect.apply(_composer.value.d, null, [...args])) : warpWithDeps(() => "");
+  }
+  function n2(...args) {
+    return _composer.value ? warpWithDeps(() => Reflect.apply(_composer.value.n, null, [...args])) : warpWithDeps(() => "");
+  }
+  function tm(key) {
+    return _composer.value ? _composer.value.tm(key) : {};
+  }
+  function te(key, locale2) {
+    return _composer.value ? _composer.value.te(key, locale2) : false;
+  }
+  function getLocaleMessage(locale2) {
+    return _composer.value ? _composer.value.getLocaleMessage(locale2) : {};
+  }
+  function setLocaleMessage(locale2, message) {
+    if (_composer.value) {
+      _composer.value.setLocaleMessage(locale2, message);
+      _messages.value[locale2] = message;
+    }
+  }
+  function mergeLocaleMessage(locale2, message) {
+    if (_composer.value) {
+      _composer.value.mergeLocaleMessage(locale2, message);
+    }
+  }
+  function getDateTimeFormat(locale2) {
+    return _composer.value ? _composer.value.getDateTimeFormat(locale2) : {};
+  }
+  function setDateTimeFormat(locale2, format2) {
+    if (_composer.value) {
+      _composer.value.setDateTimeFormat(locale2, format2);
+      _datetimeFormats.value[locale2] = format2;
+    }
+  }
+  function mergeDateTimeFormat(locale2, format2) {
+    if (_composer.value) {
+      _composer.value.mergeDateTimeFormat(locale2, format2);
+    }
+  }
+  function getNumberFormat(locale2) {
+    return _composer.value ? _composer.value.getNumberFormat(locale2) : {};
+  }
+  function setNumberFormat(locale2, format2) {
+    if (_composer.value) {
+      _composer.value.setNumberFormat(locale2, format2);
+      _numberFormats.value[locale2] = format2;
+    }
+  }
+  function mergeNumberFormat(locale2, format2) {
+    if (_composer.value) {
+      _composer.value.mergeNumberFormat(locale2, format2);
+    }
+  }
+  const wrapper = {
+    get id() {
+      return _composer.value ? _composer.value.id : -1;
+    },
+    locale,
+    fallbackLocale,
+    messages: messages2,
+    datetimeFormats,
+    numberFormats,
+    get inheritLocale() {
+      return _composer.value ? _composer.value.inheritLocale : _inheritLocale;
+    },
+    set inheritLocale(val) {
+      if (_composer.value) {
+        _composer.value.inheritLocale = val;
+      }
+    },
+    get availableLocales() {
+      return _composer.value ? _composer.value.availableLocales : Object.keys(_messages.value);
+    },
+    get modifiers() {
+      return _composer.value ? _composer.value.modifiers : _modifiers;
+    },
+    get pluralRules() {
+      return _composer.value ? _composer.value.pluralRules : _pluralRules;
+    },
+    get isGlobal() {
+      return _composer.value ? _composer.value.isGlobal : false;
+    },
+    get missingWarn() {
+      return _composer.value ? _composer.value.missingWarn : _missingWarn;
+    },
+    set missingWarn(val) {
+      if (_composer.value) {
+        _composer.value.missingWarn = val;
+      }
+    },
+    get fallbackWarn() {
+      return _composer.value ? _composer.value.fallbackWarn : _fallbackWarn;
+    },
+    set fallbackWarn(val) {
+      if (_composer.value) {
+        _composer.value.missingWarn = val;
+      }
+    },
+    get fallbackRoot() {
+      return _composer.value ? _composer.value.fallbackRoot : _fallbackRoot;
+    },
+    set fallbackRoot(val) {
+      if (_composer.value) {
+        _composer.value.fallbackRoot = val;
+      }
+    },
+    get fallbackFormat() {
+      return _composer.value ? _composer.value.fallbackFormat : _fallbackFormat;
+    },
+    set fallbackFormat(val) {
+      if (_composer.value) {
+        _composer.value.fallbackFormat = val;
+      }
+    },
+    get warnHtmlMessage() {
+      return _composer.value ? _composer.value.warnHtmlMessage : _warnHtmlMessage;
+    },
+    set warnHtmlMessage(val) {
+      if (_composer.value) {
+        _composer.value.warnHtmlMessage = val;
+      }
+    },
+    get escapeParameter() {
+      return _composer.value ? _composer.value.escapeParameter : _escapeParameter;
+    },
+    set escapeParameter(val) {
+      if (_composer.value) {
+        _composer.value.escapeParameter = val;
+      }
+    },
+    t: t2,
+    getPostTranslationHandler,
+    setPostTranslationHandler,
+    getMissingHandler,
+    setMissingHandler,
+    rt,
+    d: d2,
+    n: n2,
+    tm,
+    te,
+    getLocaleMessage,
+    setLocaleMessage,
+    mergeLocaleMessage,
+    getDateTimeFormat,
+    setDateTimeFormat,
+    mergeDateTimeFormat,
+    getNumberFormat,
+    setNumberFormat,
+    mergeNumberFormat
+  };
+  return wrapper;
+}
+const globalExportProps = [
+  "locale",
+  "fallbackLocale",
+  "availableLocales"
+];
+const globalExportMethods = ["t", "rt", "d", "n", "tm"];
+function injectGlobalFields(app2, composer) {
+  const i18n = /* @__PURE__ */ Object.create(null);
+  globalExportProps.forEach((prop) => {
+    const desc = Object.getOwnPropertyDescriptor(composer, prop);
+    if (!desc) {
+      throw createI18nError(I18nErrorCodes.UNEXPECTED_ERROR);
+    }
+    const wrap = isRef(desc.value) ? {
+      get() {
+        return desc.value.value;
+      },
+      set(val) {
+        desc.value.value = val;
+      }
+    } : {
+      get() {
+        return desc.get && desc.get();
+      }
+    };
+    Object.defineProperty(i18n, prop, wrap);
+  });
+  app2.config.globalProperties.$i18n = i18n;
+  globalExportMethods.forEach((method) => {
+    const desc = Object.getOwnPropertyDescriptor(composer, method);
+    if (!desc || !desc.value) {
+      throw createI18nError(I18nErrorCodes.UNEXPECTED_ERROR);
+    }
+    Object.defineProperty(app2.config.globalProperties, `$${method}`, desc);
+  });
+}
+registerMessageResolver(resolveValue);
+registerLocaleFallbacker(fallbackWithLocaleChain);
+{
+  initFeatureFlags();
+}
+if (__INTLIFY_PROD_DEVTOOLS__) {
+  const target = getGlobalThis();
+  target.__INTLIFY__ = true;
+  setDevToolsHook(target.__INTLIFY_DEVTOOLS_GLOBAL_HOOK__);
+}
+const meta$8 = {
+  layout: "page"
+};
+const _sfc_main$k = defineComponent({
+  layout: "dashboard"
+});
+function _sfc_ssrRender$6(_ctx, _push, _parent, _attrs, $props, $setup, $data, $options) {
+  _push(`<div${ssrRenderAttrs(mergeProps({ class: "lg:px-8 px-4 mb-6" }, _attrs))}>`);
+  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+  _push(`</div>`);
+}
+const _sfc_setup$k = _sfc_main$k.setup;
+_sfc_main$k.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Header.vue");
+  return _sfc_setup$k ? _sfc_setup$k(props, ctx) : void 0;
+};
+const __nuxt_component_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["ssrRender", _sfc_ssrRender$6]]);
+const Header = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_1$1
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$j = /* @__PURE__ */ defineComponent({
   __name: "Title",
   __ssrInlineRender: true,
   props: {
-    title: {
+    text: {
       type: String,
       default: ""
-    },
-    size: {
-      type: String,
-      default: "xl"
-    },
-    color: {
-      type: String,
-      default: ""
-    },
-    darkColor: {
-      type: String,
-      default: ""
-    },
-    tag: {
-      type: String,
-      default: "h2"
-    },
-    previous: {
-      type: Boolean,
-      default: false
     }
   },
   setup(__props) {
     return (_ctx, _push, _parent, _attrs) => {
-      const _component_IconFluent58arrow_left_12_filled = __unplugin_components_0$7;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex flex-wrap items-center justify-between py-3" }, _attrs))}><div class="flex items-center flex-1 space-x-1 lg:space-x-2">`);
-      if (__props.previous) {
-        _push(`<div class="flex items-center cursor-pointer">`);
-        _push(ssrRenderComponent(_component_IconFluent58arrow_left_12_filled, { class: "text-sm lg:text-base" }, null, _parent));
-        _push(`</div>`);
-      } else {
-        _push(`<!---->`);
-      }
-      ssrRenderVNode(_push, createVNode(resolveDynamicComponent(__props.tag), {
-        class: [`
-          text-${__props.size}
-          ${__props.color ? `text-${__props.color}` : ""}
-          ${__props.darkColor ? `dark:text-${__props.darkColor}` : ""}
-        `, "flex-1 font-bold ellipsis ellipsis-1"]
-      }, {
-        default: withCtx((_2, _push2, _parent2, _scopeId) => {
-          if (_push2) {
-            _push2(`${ssrInterpolate(__props.title)}`);
-          } else {
-            return [
-              createTextVNode(toDisplayString(__props.title), 1)
-            ];
-          }
-        }),
-        _: 1
-      }), _parent);
-      _push(`</div>`);
-      ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "text-4xl font-bold" }, _attrs))}>`);
+      ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+        _push(`${ssrInterpolate(__props.text)}`);
+      }, _push, _parent);
       _push(`</div>`);
     };
   }
 });
-const _sfc_setup$x = _sfc_main$x.setup;
-_sfc_main$x.setup = (props, ctx) => {
+const _sfc_setup$j = _sfc_main$j.setup;
+_sfc_main$j.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Title.vue");
-  return _sfc_setup$x ? _sfc_setup$x(props, ctx) : void 0;
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Title.vue");
+  return _sfc_setup$j ? _sfc_setup$j(props, ctx) : void 0;
 };
-const _sfc_main$w = {
-  components: {
-    Swiper,
-    SwiperSlide
-  },
-  props: {
-    list: {
-      type: Array,
-      default: () => []
+const Title$3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$j
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$i = {};
+function _sfc_ssrRender$5(_ctx, _push, _parent, _attrs) {
+  _push(`<div${ssrRenderAttrs(_attrs)}>`);
+  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+  _push(`</div>`);
+}
+const _sfc_setup$i = _sfc_main$i.setup;
+_sfc_main$i.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Body.vue");
+  return _sfc_setup$i ? _sfc_setup$i(props, ctx) : void 0;
+};
+const __nuxt_component_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["ssrRender", _sfc_ssrRender$5]]);
+const Body$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_3$1
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$h = {};
+function _sfc_ssrRender$4(_ctx, _push, _parent, _attrs) {
+  _push(`<section${ssrRenderAttrs(mergeProps({ class: "lg:px-8 px-4 mb-6" }, _attrs))}>`);
+  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+  _push(`</section>`);
+}
+const _sfc_setup$h = _sfc_main$h.setup;
+_sfc_main$h.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Section/index.vue");
+  return _sfc_setup$h ? _sfc_setup$h(props, ctx) : void 0;
+};
+const __nuxt_component_4$2 = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["ssrRender", _sfc_ssrRender$4]]);
+const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_4$2
+}, Symbol.toStringTag, { value: "Module" }));
+const meta$7 = {
+  layout: "page"
+};
+const meta$6 = {
+  layout: "dashboard"
+};
+const get = (obj, path) => path.split(".").reduce((acc, part) => acc && acc[part], obj);
+const _pick = (obj, condition) => Object.keys(obj).filter(condition).reduce((newObj, key) => Object.assign(newObj, { [key]: obj[key] }), {});
+const apply = (fn) => (data) => Array.isArray(data) ? data.map((item) => fn(item)) : fn(data);
+const detectProperties = (keys) => {
+  const prefixes = [];
+  const properties = [];
+  for (const key of keys) {
+    if (["$", "_"].includes(key)) {
+      prefixes.push(key);
+    } else {
+      properties.push(key);
     }
-  },
-  setup() {
-    return {
-      ArticleType: {
-        normal: "\u4E00\u822C\u65B0\u805E",
-        video: "\u5F71\u97F3\u65B0\u805E"
-      },
-      pagination: {
-        clickable: true
-      },
-      modules: [Pagination]
-    };
+  }
+  return { prefixes, properties };
+};
+const withoutKeys = (keys = []) => (obj) => {
+  if (keys.length === 0 || !obj) {
+    return obj;
+  }
+  const { prefixes, properties } = detectProperties(keys);
+  return _pick(obj, (key) => !properties.includes(key) && !prefixes.includes(key[0]));
+};
+const withKeys = (keys = []) => (obj) => {
+  if (keys.length === 0 || !obj) {
+    return obj;
+  }
+  const { prefixes, properties } = detectProperties(keys);
+  return _pick(obj, (key) => properties.includes(key) || prefixes.includes(key[0]));
+};
+const sortList = (data, params) => {
+  const comperable = new Intl.Collator(params.$locale, {
+    numeric: params.$numeric,
+    caseFirst: params.$caseFirst,
+    sensitivity: params.$sensitivity
+  });
+  const keys = Object.keys(params).filter((key) => !key.startsWith("$"));
+  for (const key of keys) {
+    data = data.sort((a, b) => {
+      const values = [get(a, key), get(b, key)].map((value) => {
+        if (value === null) {
+          return void 0;
+        }
+        if (value instanceof Date) {
+          return value.toISOString();
+        }
+        return value;
+      });
+      if (params[key] === -1) {
+        values.reverse();
+      }
+      return comperable.compare(values[0], values[1]);
+    });
+  }
+  return data;
+};
+const assertArray = (value, message = "Expected an array") => {
+  if (!Array.isArray(value)) {
+    throw new TypeError(message);
   }
 };
-function _sfc_ssrRender$2(_ctx, _push, _parent, _attrs, $props, $setup, $data, $options) {
-  const _component_Swiper = resolveComponent("Swiper");
-  const _component_SwiperSlide = resolveComponent("SwiperSlide");
-  const _component_nuxt_link = __nuxt_component_0$2;
-  if ($props.list.length) {
-    _push(ssrRenderComponent(_component_Swiper, mergeProps({
-      "space-between": 20,
-      pagination: $setup.pagination,
-      modules: $setup.modules,
-      class: "news-swiper pb-[1.7em]"
-    }, _attrs), {
-      default: withCtx((_2, _push2, _parent2, _scopeId) => {
-        if (_push2) {
-          _push2(`<!--[-->`);
-          ssrRenderList($props.list, (slide) => {
-            _push2(ssrRenderComponent(_component_SwiperSlide, {
-              key: slide.id,
-              class: "rounded-md overflow-hidden"
-            }, {
+const ensureArray = (value) => Array.isArray(value) ? value : value ? [value] : [];
+const arrayParams = ["sort", "where", "only", "without"];
+const createQuery = (fetcher, intitialParams) => {
+  const queryParams = {
+    ...intitialParams
+  };
+  for (const key of arrayParams) {
+    if (queryParams[key]) {
+      queryParams[key] = ensureArray(queryParams[key]);
+    }
+  }
+  const $set = (key, fn = (v) => v) => {
+    return (...values) => {
+      queryParams[key] = fn(...values);
+      return query;
+    };
+  };
+  const query = {
+    params: () => queryParams,
+    only: $set("only", ensureArray),
+    without: $set("without", ensureArray),
+    where: $set("where", (q) => [...ensureArray(queryParams.where), q]),
+    sort: $set("sort", (sort) => [...ensureArray(queryParams.sort), ...ensureArray(sort)]),
+    limit: $set("limit", (v) => parseInt(String(v), 10)),
+    skip: $set("skip", (v) => parseInt(String(v), 10)),
+    find: () => fetcher(query),
+    findOne: () => {
+      queryParams.first = true;
+      return fetcher(query);
+    },
+    findSurround: (surroundQuery, options) => {
+      queryParams.surround = { query: surroundQuery, ...options };
+      return fetcher(query);
+    },
+    locale: (_locale) => query.where({ _locale })
+  };
+  return query;
+};
+function jsonStringify(value) {
+  return JSON.stringify(value, regExpReplacer);
+}
+function regExpReplacer(_key, value) {
+  if (value instanceof RegExp) {
+    return `--REGEX ${value.toString()}`;
+  }
+  return value;
+}
+const TEXT_TAGS = ["p", "h1", "h2", "h3", "h4", "h5", "h6", "li"];
+function isTag(vnode, tag) {
+  if (vnode.type === tag) {
+    return true;
+  }
+  if (typeof vnode.type === "object" && vnode.type.tag === tag) {
+    return true;
+  }
+  if (vnode.tag === tag) {
+    return true;
+  }
+  return false;
+}
+function isText(vnode) {
+  return isTag(vnode, "text") || typeof vnode.children === "string";
+}
+function nodeChildren(node) {
+  if (Array.isArray(node.children) || typeof node.children === "string") {
+    return node.children;
+  }
+  if (typeof node.children.default === "function") {
+    return node.children.default();
+  }
+  return [];
+}
+function nodeTextContent(node) {
+  if (!node) {
+    return "";
+  }
+  if (Array.isArray(node)) {
+    return node.map(nodeTextContent).join("");
+  }
+  if (isText(node)) {
+    return node.children || node.value;
+  }
+  const children = nodeChildren(node);
+  if (Array.isArray(children)) {
+    return children.map(nodeTextContent).join("");
+  }
+  return "";
+}
+function unwrap(vnode, tags = ["p"]) {
+  if (Array.isArray(vnode)) {
+    return vnode.flatMap((node) => unwrap(node, tags));
+  }
+  let result = vnode;
+  if (tags.some((tag) => tag === "*" || isTag(vnode, tag))) {
+    result = nodeChildren(vnode) || vnode;
+    if (!Array.isArray(result) && TEXT_TAGS.some((tag) => isTag(vnode, tag))) {
+      result = [result];
+    }
+  }
+  return result;
+}
+function flatUnwrap(vnodes, tags = ["p"]) {
+  vnodes = Array.isArray(vnodes) ? vnodes : [vnodes];
+  if (!tags.length) {
+    return vnodes;
+  }
+  return vnodes.flatMap((vnode) => flatUnwrap(unwrap(vnode, [tags[0]]), tags.slice(1))).filter((vnode) => !(isText(vnode) && nodeTextContent(vnode).trim() === ""));
+}
+const withContentBase = (url) => withBase(url, "/api/" + useRuntimeConfig().public.content.base);
+const useUnwrap = () => ({
+  unwrap,
+  flatUnwrap
+});
+const addPrerenderPath = (path) => {
+  const event = useRequestEvent();
+  event.res.setHeader(
+    "x-nitro-prerender",
+    [
+      event.res.getHeader("x-nitro-prerender"),
+      path
+    ].filter(Boolean).join(",")
+  );
+};
+const shouldUseClientDB = () => {
+  useRuntimeConfig().content;
+  {
+    return false;
+  }
+};
+const createQueryFetch = (path) => async (query) => {
+  var _a;
+  if (path) {
+    if (query.params().first && (query.params().where || []).length === 0) {
+      query.where({ _path: withoutTrailingSlash(path) });
+    } else {
+      query.where({ _path: new RegExp(`^${path.replace(/[-[\]{}()*+.,^$\s/]/g, "\\$&")}`) });
+    }
+  }
+  if (!((_a = query.params().sort) == null ? void 0 : _a.length)) {
+    query.sort({ _file: 1, $numeric: true });
+  }
+  const params = query.params();
+  const apiPath = withContentBase(`/query/${hash(params)}.json`);
+  {
+    addPrerenderPath(apiPath);
+  }
+  if (shouldUseClientDB()) {
+    const db = await import('./_nuxt/client-db.27671087.mjs').then((m2) => m2.useContentDatabase());
+    return db.fetch(query);
+  }
+  const data = await $fetch(apiPath, {
+    method: "GET",
+    responseType: "json",
+    params: {
+      _params: jsonStringify(params),
+      previewToken: useCookie("previewToken").value
+    }
+  });
+  if (typeof data === "string" && data.startsWith("<!DOCTYPE html>")) {
+    throw new Error("Not found");
+  }
+  return data;
+};
+function queryContent(query, ...pathParts) {
+  if (typeof query === "string") {
+    return createQuery(createQueryFetch(withLeadingSlash(joinURL(query, ...pathParts))));
+  }
+  return createQuery(createQueryFetch(), query);
+}
+const _sfc_main$g = {
+  __name: "Renderer",
+  __ssrInlineRender: true,
+  props: {
+    path: {
+      type: String,
+      required: true
+    },
+    pageTitle: {
+      type: String,
+      default: ""
+    }
+  },
+  async setup(__props) {
+    let __temp, __restore;
+    const props = __props;
+    const { data } = ([__temp, __restore] = withAsyncContext(() => useAsyncData(
+      props.path,
+      () => queryContent(props.path).findOne(),
+      "$j3im94qGwg"
+    )), __temp = await __temp, __restore(), __temp);
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_PageWrapper = __nuxt_component_0;
+      const _component_PageHeader = __nuxt_component_1$1;
+      const _component_PageTitle = _sfc_main$j;
+      const _component_PageBody = __nuxt_component_3$1;
+      const _component_PageSection = __nuxt_component_4$2;
+      const _component_ContentRenderer = _sfc_main$q;
+      _push(ssrRenderComponent(_component_PageWrapper, _attrs, {
+        default: withCtx((_2, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(_component_PageHeader, null, {
               default: withCtx((_3, _push3, _parent3, _scopeId2) => {
-                var _a, _b;
                 if (_push3) {
-                  _push3(`<div class="absolute top-0 left-0 w-full h-full"${_scopeId2}><img${ssrRenderAttr("src", slide.thumbnail)} class="object-cover w-full h-full"${_scopeId2}></div><div class="flex flex-wrap content-end absolute bottom-0 left-0 w-full px-4 h-1/3 pb-5 lg:pb-7 lg:px-6 bg-gradient-to-b from-transparent via-gray-900/60 to-gray-900/95"${_scopeId2}><div class="flex items-center w-full pb-3 text-xs space-x-3 text-white"${_scopeId2}><div class="w-fit h-6 leading-6 px-2 rounded bg-green-500"${_scopeId2}>${ssrInterpolate($setup.ArticleType[slide.type])}</div><!--[-->`);
-                  ssrRenderList((_a = slide.categories) == null ? void 0 : _a.split(","), (item, index) => {
-                    _push3(`<div class="w-fit h-6 leading-6 px-2 rounded bg-blue-500"${_scopeId2}>${ssrInterpolate(item)}</div>`);
-                  });
-                  _push3(`<!--]--></div><h3 class="text-xl font-bold tracking-widest text-white text-shadow-lg"${_scopeId2}>${ssrInterpolate(slide.title)}</h3></div>`);
-                  _push3(ssrRenderComponent(_component_nuxt_link, {
-                    to: `/news/article/${slide.slug}`,
-                    class: "absolute top-0 left-0 w-full h-full"
+                  _push3(ssrRenderComponent(_component_PageTitle, {
+                    text: __props.pageTitle,
+                    class: "capitalize"
                   }, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode("div", { class: "absolute top-0 left-0 w-full h-full" }, [
-                      createVNode("img", {
-                        src: slide.thumbnail,
-                        class: "object-cover w-full h-full"
-                      }, null, 8, ["src"])
-                    ]),
-                    createVNode("div", { class: "flex flex-wrap content-end absolute bottom-0 left-0 w-full px-4 h-1/3 pb-5 lg:pb-7 lg:px-6 bg-gradient-to-b from-transparent via-gray-900/60 to-gray-900/95" }, [
-                      createVNode("div", { class: "flex items-center w-full pb-3 text-xs space-x-3 text-white" }, [
-                        createVNode("div", { class: "w-fit h-6 leading-6 px-2 rounded bg-green-500" }, toDisplayString($setup.ArticleType[slide.type]), 1),
-                        (openBlock(true), createBlock(Fragment$1, null, renderList((_b = slide.categories) == null ? void 0 : _b.split(","), (item, index) => {
-                          return openBlock(), createBlock("div", {
-                            key: index,
-                            class: "w-fit h-6 leading-6 px-2 rounded bg-blue-500"
-                          }, toDisplayString(item), 1);
-                        }), 128))
-                      ]),
-                      createVNode("h3", { class: "text-xl font-bold tracking-widest text-white text-shadow-lg" }, toDisplayString(slide.title), 1)
-                    ]),
-                    createVNode(_component_nuxt_link, {
-                      to: `/news/article/${slide.slug}`,
-                      class: "absolute top-0 left-0 w-full h-full"
-                    }, null, 8, ["to"])
+                    createVNode(_component_PageTitle, {
+                      text: __props.pageTitle,
+                      class: "capitalize"
+                    }, null, 8, ["text"])
                   ];
                 }
               }),
-              _: 2
+              _: 1
             }, _parent2, _scopeId));
-          });
-          _push2(`<!--]-->`);
-        } else {
-          return [
-            (openBlock(true), createBlock(Fragment$1, null, renderList($props.list, (slide) => {
-              return openBlock(), createBlock(_component_SwiperSlide, {
-                key: slide.id,
-                class: "rounded-md overflow-hidden"
-              }, {
-                default: withCtx(() => {
-                  var _a;
+            _push2(ssrRenderComponent(_component_PageBody, null, {
+              default: withCtx((_3, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(ssrRenderComponent(_component_PageSection, null, {
+                    default: withCtx((_4, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        _push4(ssrRenderComponent(_component_ContentRenderer, { value: unref(data) }, null, _parent4, _scopeId3));
+                      } else {
+                        return [
+                          createVNode(_component_ContentRenderer, { value: unref(data) }, null, 8, ["value"])
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                } else {
                   return [
-                    createVNode("div", { class: "absolute top-0 left-0 w-full h-full" }, [
-                      createVNode("img", {
-                        src: slide.thumbnail,
-                        class: "object-cover w-full h-full"
-                      }, null, 8, ["src"])
-                    ]),
-                    createVNode("div", { class: "flex flex-wrap content-end absolute bottom-0 left-0 w-full px-4 h-1/3 pb-5 lg:pb-7 lg:px-6 bg-gradient-to-b from-transparent via-gray-900/60 to-gray-900/95" }, [
-                      createVNode("div", { class: "flex items-center w-full pb-3 text-xs space-x-3 text-white" }, [
-                        createVNode("div", { class: "w-fit h-6 leading-6 px-2 rounded bg-green-500" }, toDisplayString($setup.ArticleType[slide.type]), 1),
-                        (openBlock(true), createBlock(Fragment$1, null, renderList((_a = slide.categories) == null ? void 0 : _a.split(","), (item, index) => {
-                          return openBlock(), createBlock("div", {
-                            key: index,
-                            class: "w-fit h-6 leading-6 px-2 rounded bg-blue-500"
-                          }, toDisplayString(item), 1);
-                        }), 128))
+                    createVNode(_component_PageSection, null, {
+                      default: withCtx(() => [
+                        createVNode(_component_ContentRenderer, { value: unref(data) }, null, 8, ["value"])
                       ]),
-                      createVNode("h3", { class: "text-xl font-bold tracking-widest text-white text-shadow-lg" }, toDisplayString(slide.title), 1)
-                    ]),
-                    createVNode(_component_nuxt_link, {
-                      to: `/news/article/${slide.slug}`,
-                      class: "absolute top-0 left-0 w-full h-full"
-                    }, null, 8, ["to"])
+                      _: 1
+                    })
                   ];
-                }),
-                _: 2
-              }, 1024);
-            }), 128))
-          ];
-        }
-      }),
-      _: 1
-    }, _parent));
-  } else {
-    _push(`<!---->`);
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(_component_PageHeader, null, {
+                default: withCtx(() => [
+                  createVNode(_component_PageTitle, {
+                    text: __props.pageTitle,
+                    class: "capitalize"
+                  }, null, 8, ["text"])
+                ]),
+                _: 1
+              }),
+              createVNode(_component_PageBody, null, {
+                default: withCtx(() => [
+                  createVNode(_component_PageSection, null, {
+                    default: withCtx(() => [
+                      createVNode(_component_ContentRenderer, { value: unref(data) }, null, 8, ["value"])
+                    ]),
+                    _: 1
+                  })
+                ]),
+                _: 1
+              })
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+    };
   }
-}
-const _sfc_setup$w = _sfc_main$w.setup;
-_sfc_main$w.setup = (props, ctx) => {
+};
+const _sfc_setup$g = _sfc_main$g.setup;
+_sfc_main$g.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Loop/Slider.vue");
-  return _sfc_setup$w ? _sfc_setup$w(props, ctx) : void 0;
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Content/Renderer.vue");
+  return _sfc_setup$g ? _sfc_setup$g(props, ctx) : void 0;
 };
-const __nuxt_component_4$1 = /* @__PURE__ */ _export_sfc(_sfc_main$w, [["ssrRender", _sfc_ssrRender$2]]);
-const _hoisted_1$q = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
+const Renderer = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$g
+}, Symbol.toStringTag, { value: "Module" }));
+const meta$5 = {
+  layout: "page"
 };
-const _hoisted_2$q = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M1.181 12C2.121 6.88 6.608 3 12 3c5.392 0 9.878 3.88 10.819 9c-.94 5.12-5.427 9-10.819 9c-5.392 0-9.878-3.88-10.819-9zM12 17a5 5 0 1 0 0-10a5 5 0 0 0 0 10zm0-2a3 3 0 1 1 0-6a3 3 0 0 1 0 6z"
-}, null, -1);
-const _hoisted_3$q = [
-  _hoisted_2$q
-];
-function render$q(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$q, _hoisted_3$q);
+const _sfc_main$f = {
+  data() {
+    return {
+      ready: false
+    };
+  },
+  async mounted() {
+    const THREE = await import('three').then((m2) => m2.default || m2);
+    const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js').then((m2) => m2.default || m2);
+    const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js').then((m2) => m2.default || m2);
+    let canvas = document.querySelector("canvas.webgl");
+    while (!canvas) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      canvas = document.querySelector("canvas.webgl");
+    }
+    const scene = new THREE.Scene();
+    let gem;
+    let light;
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.load("/assets/gem/gem.gltf", (gltf) => {
+      gem = gltf.scene.children[6];
+      gem.material.displacementScale = 0.15;
+      gem.material.emissiveIntensity = 0.4;
+      gem.material.refractionRatio = 1;
+      gem.rotation.z = 0;
+      scene.add(gem);
+      light = gltf.scene.children[0];
+      scene.add(light);
+      this.ready = true;
+    });
+    const ambientLight = new THREE.AmbientLight(16777215, 2);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(16777215, 3);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
+    const directionalLight2 = new THREE.DirectionalLight(16777215, 3);
+    directionalLight2.position.set(-1, -1, -1);
+    scene.add(directionalLight2);
+    const sizes = {
+      width: 500,
+      height: 500
+    };
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      sizes.width / sizes.height,
+      0.1,
+      100
+    );
+    camera.position.set(2, 2, 6);
+    scene.add(camera);
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableZoom = false;
+    controls.target.set(0, 0.75, 0);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.minPolarAngle = Math.PI / 2;
+    controls.maxPolarAngle = Math.PI / 2;
+    const renderer = new THREE.WebGLRenderer({
+      antialiasing: true,
+      canvas,
+      alpha: true
+    });
+    renderer.setClearColor(0, 0);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const clock = new THREE.Clock();
+    const tick = () => {
+      const elapsedTime = clock.getElapsedTime();
+      if (gem) {
+        gem.rotation.y = 1.1 * elapsedTime;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+      window.requestAnimationFrame(tick);
+    };
+    tick();
+  }
+};
+function _sfc_ssrRender$3(_ctx, _push, _parent, _attrs, $props, $setup, $data, $options) {
+  _push(`<canvas${ssrRenderAttrs(mergeProps({
+    class: "webgl",
+    style: { opacity: $data.ready ? 1 : 0 }
+  }, _attrs))} data-v-9fa2f2ec></canvas>`);
 }
-const __unplugin_components_1$4 = { name: "ri-eye-fill", render: render$q };
-const _hoisted_1$p = {
-  viewBox: "0 0 16 16",
-  width: "1.2em",
-  height: "1.2em"
+const _sfc_setup$f = _sfc_main$f.setup;
+_sfc_main$f.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Gem.vue");
+  return _sfc_setup$f ? _sfc_setup$f(props, ctx) : void 0;
 };
-const _hoisted_2$p = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M9.58 1.052c-.75-.209-1.336.35-1.545.871c-.24.6-.453 1.021-.706 1.524a44.75 44.75 0 0 0-.533 1.09c-.475 1.01-.948 1.656-1.293 2.045a4.063 4.063 0 0 1-.405.402a1.92 1.92 0 0 1-.101.081l-.016.012L3.109 8.18a2 2 0 0 0-.856 2.426l.52 1.384a2 2 0 0 0 1.273 1.205l5.356 1.682a2.5 2.5 0 0 0 3.148-1.68l1.364-4.647a2 2 0 0 0-1.92-2.563H10.61c.066-.227.133-.479.195-.74c.131-.562.243-1.203.232-1.738c-.009-.497-.06-1.019-.264-1.462c-.219-.475-.602-.832-1.192-.996ZM4.978 7.08l-.002.001Z"
-}, null, -1);
-const _hoisted_3$p = [
-  _hoisted_2$p
-];
-function render$p(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$p, _hoisted_3$p);
-}
-const __unplugin_components_0$6 = { name: "fluent-thumb-like16-filled", render: render$p };
-const _sfc_main$v = {
-  __name: "Hot",
-  __ssrInlineRender: true,
+const __nuxt_component_4$1 = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["ssrRender", _sfc_ssrRender$3], ["__scopeId", "data-v-9fa2f2ec"]]);
+const Gem = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_4$1
+}, Symbol.toStringTag, { value: "Module" }));
+const meta$4 = {
+  layout: "page"
+};
+const _sfc_main$e = defineComponent({
+  name: "ContentQuery",
   props: {
-    list: {
-      type: Array,
-      default: () => []
+    path: {
+      type: String,
+      required: false,
+      default: void 0
     },
-    infinite: {
-      type: Boolean,
-      default: false
+    only: {
+      type: Array,
+      required: false,
+      default: void 0
+    },
+    without: {
+      type: Array,
+      required: false,
+      default: void 0
+    },
+    where: {
+      type: Object,
+      required: false,
+      default: void 0
+    },
+    sort: {
+      type: Object,
+      required: false,
+      default: void 0
+    },
+    limit: {
+      type: Number,
+      required: false,
+      default: void 0
+    },
+    skip: {
+      type: Number,
+      required: false,
+      default: void 0
+    },
+    locale: {
+      type: String,
+      required: false,
+      default: void 0
+    },
+    find: {
+      type: String,
+      required: false,
+      default: void 0
     }
   },
-  setup(__props) {
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_nuxt_link = __nuxt_component_0$2;
-      const _component_IconFluent58thumb_like_16_filled = __unplugin_components_0$6;
-      const _component_IconRi58eye_fill = __unplugin_components_1$4;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "grid py-1 grid-rows-3 lg:gap-4 lg:grid-cols-2 2xl:block" }, _attrs))}><!--[-->`);
-      ssrRenderList(__props.list, (article, index) => {
-        _push(ssrRenderComponent(_component_nuxt_link, {
-          key: article.id,
-          to: `/news/article/${article.slug}`,
-          class: [
-            "flex border-gray-200 dark:border-gray-700 2xl:mb-4 lt-lg:px-1 last:mb-0 last:border-0 last:pb-0",
-            __props.list.length - 2 <= index ? "2xl:pb-4 2xl:border-b-1 lt-lg:mb-3 lt-lg:pb-3 lt-lg:border-b-1 last-pb-0 last-mb-0 last-border-b-0" : "border-b-1 pb-4 lg:pb-3 2xl:pb-4 lt-lg:mb-4"
-          ]
-        }, {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(`<div class="flex flex-wrap w-full"${_scopeId}><div class="relative w-20 h-18 mr-4"${_scopeId}><img${ssrRenderAttr("src", article.thumbnail)} class="absolute object-cover w-full h-full rounded-sm"${_scopeId}></div><div class="flex flex-col content-between flex-1"${_scopeId}><h3 class="text-base font-bold ellipsis"${_scopeId}>${ssrInterpolate(article.title)}</h3><div class="flex flex-wrap justify-between w-full pt-1 mt-auto text-xs text-gray-600 dark:text-gray-400"${_scopeId}><div class="flex justify-between w-full mb-1" itemprop="author"${_scopeId}><p${_scopeId}>${ssrInterpolate(article.author)}</p><p${_scopeId}>${ssrInterpolate(article.categories)}</p></div><div class="flex flex-wrap w-full"${_scopeId}><div class="mr-2 tracking-wider" itemprop="create-date"${_scopeId}>${ssrInterpolate(article.publishTime)}</div><div class="ml-auto flex items-center space-x-4"${_scopeId}><div class="flex items-center justify-end ml-auto space-x-1"${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_IconFluent58thumb_like_16_filled, { class: "text-green-400" }, null, _parent2, _scopeId));
-              _push2(`<span${_scopeId}>${ssrInterpolate(article.likes)}</span></div><div class="flex items-center ml-auto space-x-1"${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_IconRi58eye_fill, { class: "text-green-400" }, null, _parent2, _scopeId));
-              _push2(`<span${_scopeId}>${ssrInterpolate(article.views)}</span></div></div></div></div></div></div>`);
+  async setup(props) {
+    const {
+      path,
+      only,
+      without,
+      where,
+      sort,
+      limit,
+      skip,
+      locale,
+      find: find2
+    } = toRefs(props);
+    const isPartial = computed(() => {
+      var _a;
+      return (_a = path.value) == null ? void 0 : _a.includes("/_");
+    });
+    const { data, refresh } = await useAsyncData(
+      `content-query-${hash(props)}`,
+      () => {
+        let queryBuilder;
+        if (path.value) {
+          queryBuilder = queryContent(path.value);
+        } else {
+          queryBuilder = queryContent();
+        }
+        if (only.value) {
+          queryBuilder = queryBuilder.only(only.value);
+        }
+        if (without.value) {
+          queryBuilder = queryBuilder.without(without.value);
+        }
+        if (where.value) {
+          queryBuilder = queryBuilder.where(where.value);
+        }
+        if (sort.value) {
+          queryBuilder = queryBuilder.sort(sort.value);
+        }
+        if (limit.value) {
+          queryBuilder = queryBuilder.limit(limit.value);
+        }
+        if (skip.value) {
+          queryBuilder = queryBuilder.skip(skip.value);
+        }
+        if (locale.value) {
+          queryBuilder = queryBuilder.where({ _locale: locale.value });
+        }
+        if (find2.value === "one") {
+          return queryBuilder.findOne();
+        }
+        if (find2.value === "surround") {
+          if (!path.value) {
+            console.warn("[Content] Surround queries requires `path` prop to be set.");
+            console.warn("[Content] Query without `path` will return regular `find()` results.");
+            return queryBuilder.find();
+          }
+          return queryBuilder.findSurround(path);
+        }
+        return queryBuilder.find();
+      }
+    );
+    return {
+      isPartial,
+      data,
+      refresh
+    };
+  },
+  render(ctx) {
+    var _a;
+    const slots = useSlots();
+    const {
+      data,
+      refresh,
+      isPartial,
+      path,
+      only,
+      without,
+      where,
+      sort,
+      limit,
+      skip,
+      locale,
+      find: find2
+    } = ctx;
+    const props = {
+      path,
+      only,
+      without,
+      where,
+      sort,
+      limit,
+      skip,
+      locale,
+      find: find2
+    };
+    if (props.find === "one") {
+      if (!data && (slots == null ? void 0 : slots["not-found"])) {
+        return slots["not-found"]({ props, ...this.$attrs });
+      }
+      if ((data == null ? void 0 : data._type) === "markdown" && !((_a = data == null ? void 0 : data.body) == null ? void 0 : _a.children.length)) {
+        return slots.empty({ props, ...this.$attrs });
+      }
+    } else if (!data || !data.length) {
+      if (slots == null ? void 0 : slots["not-found"]) {
+        return slots["not-found"]({ props, ...this.$attrs });
+      }
+    }
+    if (slots == null ? void 0 : slots.default) {
+      return slots.default({ data, refresh, isPartial, props, ...this.$attrs });
+    }
+    const emptyNode = (slot, data2) => h("pre", null, JSON.stringify({ message: "You should use slots with <ContentQuery>!", slot, data: data2 }, null, 2));
+    return emptyNode("default", { data, props, isPartial });
+  }
+});
+const _sfc_setup$e = _sfc_main$e.setup;
+_sfc_main$e.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/ContentQuery.vue");
+  return _sfc_setup$e ? _sfc_setup$e(props, ctx) : void 0;
+};
+const ContentQuery = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$e
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$d = defineComponent({
+  name: "ContentDoc",
+  props: {
+    tag: {
+      type: String,
+      required: false,
+      default: "div"
+    },
+    excerpt: {
+      type: Boolean,
+      default: false
+    },
+    path: {
+      type: String,
+      required: false,
+      default: void 0
+    },
+    query: {
+      type: Object,
+      required: false,
+      default: void 0
+    },
+    head: {
+      type: Boolean,
+      required: false,
+      default: true
+    }
+  },
+  render(ctx) {
+    const slots = useSlots();
+    const { tag, excerpt, path, query, head } = ctx;
+    const contentQueryProps = {
+      ...query || {},
+      path: path || (query == null ? void 0 : query.path) || withTrailingSlash(useRoute().path),
+      find: "one"
+    };
+    const emptyNode = (slot, data) => h("pre", null, JSON.stringify({ message: "You should use slots with <ContentDoc>", slot, data }, null, 2));
+    return h(
+      _sfc_main$e,
+      contentQueryProps,
+      {
+        default: (slots == null ? void 0 : slots.default) ? ({ data, refresh, isPartial }) => {
+          var _a;
+          if (head) {
+            useContentHead(data);
+          }
+          return (_a = slots.default) == null ? void 0 : _a.call(slots, { doc: data, refresh, isPartial, excerpt, ...this.$attrs });
+        } : ({ data }) => {
+          if (head) {
+            useContentHead(data);
+          }
+          return h(
+            _sfc_main$q,
+            { value: data, excerpt, tag, ...this.$attrs },
+            { empty: (bindings) => (slots == null ? void 0 : slots.empty) ? slots.empty(bindings) : emptyNode("default", data) }
+          );
+        },
+        empty: (bindings) => {
+          var _a;
+          return ((_a = slots == null ? void 0 : slots.empty) == null ? void 0 : _a.call(slots, bindings)) || h("p", null, "Document is empty, overwrite this content with #empty slot in <ContentDoc>.");
+        },
+        "not-found": (bindings) => {
+          var _a;
+          return ((_a = slots == null ? void 0 : slots["not-found"]) == null ? void 0 : _a.call(slots, bindings)) || h("p", null, "Document not found, overwrite this content with #not-found slot in <ContentDoc>.");
+        }
+      }
+    );
+  }
+});
+const _sfc_setup$d = _sfc_main$d.setup;
+_sfc_main$d.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/ContentDoc.vue");
+  return _sfc_setup$d ? _sfc_setup$d(props, ctx) : void 0;
+};
+const ContentDoc = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$d
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$c = {};
+function _sfc_ssrRender$2(_ctx, _push, _parent, _attrs) {
+  const _component_ContentDoc = _sfc_main$d;
+  const _component_PageHeader = __nuxt_component_1$1;
+  const _component_PageTitle = _sfc_main$j;
+  const _component_PageBody = __nuxt_component_3$1;
+  const _component_PageSection = __nuxt_component_4$2;
+  const _component_ContentRenderer = _sfc_main$q;
+  const _component_Error = _sfc_main$l;
+  _push(ssrRenderComponent(_component_ContentDoc, _attrs, {
+    default: withCtx(({ doc }, _push2, _parent2, _scopeId) => {
+      if (_push2) {
+        _push2(ssrRenderComponent(_component_PageHeader, null, {
+          default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+            if (_push3) {
+              _push3(ssrRenderComponent(_component_PageTitle, {
+                text: doc.title
+              }, null, _parent3, _scopeId2));
             } else {
               return [
-                createVNode("div", { class: "flex flex-wrap w-full" }, [
-                  createVNode("div", { class: "relative w-20 h-18 mr-4" }, [
-                    createVNode("img", {
-                      src: article.thumbnail,
-                      class: "absolute object-cover w-full h-full rounded-sm"
-                    }, null, 8, ["src"])
-                  ]),
-                  createVNode("div", { class: "flex flex-col content-between flex-1" }, [
-                    createVNode("h3", { class: "text-base font-bold ellipsis" }, toDisplayString(article.title), 1),
-                    createVNode("div", { class: "flex flex-wrap justify-between w-full pt-1 mt-auto text-xs text-gray-600 dark:text-gray-400" }, [
-                      createVNode("div", {
-                        class: "flex justify-between w-full mb-1",
-                        itemprop: "author"
-                      }, [
-                        createVNode("p", null, toDisplayString(article.author), 1),
-                        createVNode("p", null, toDisplayString(article.categories), 1)
-                      ]),
-                      createVNode("div", { class: "flex flex-wrap w-full" }, [
-                        createVNode("div", {
-                          class: "mr-2 tracking-wider",
-                          itemprop: "create-date"
-                        }, toDisplayString(article.publishTime), 1),
-                        createVNode("div", { class: "ml-auto flex items-center space-x-4" }, [
-                          createVNode("div", { class: "flex items-center justify-end ml-auto space-x-1" }, [
-                            createVNode(_component_IconFluent58thumb_like_16_filled, { class: "text-green-400" }),
-                            createVNode("span", null, toDisplayString(article.likes), 1)
-                          ]),
-                          createVNode("div", { class: "flex items-center ml-auto space-x-1" }, [
-                            createVNode(_component_IconRi58eye_fill, { class: "text-green-400" }),
-                            createVNode("span", null, toDisplayString(article.views), 1)
-                          ])
-                        ])
-                      ])
-                    ])
-                  ])
-                ])
+                createVNode(_component_PageTitle, {
+                  text: doc.title
+                }, null, 8, ["text"])
               ];
             }
           }),
           _: 2
-        }, _parent));
-      });
-      _push(`<!--]--></div>`);
-    };
-  }
-};
-const _sfc_setup$v = _sfc_main$v.setup;
-_sfc_main$v.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Loop/Hot.vue");
-  return _sfc_setup$v ? _sfc_setup$v(props, ctx) : void 0;
-};
-const _sfc_main$u = {
-  __name: "RowLoading",
-  __ssrInlineRender: true,
-  props: {
-    row: {
-      type: Number,
-      default: 4
-    },
-    column: {
-      type: Number,
-      default: 2
-    },
-    gap: {
-      type: Number,
-      default: 2
-    }
-  },
-  setup(__props) {
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "grid grid-cols-2 gap-5 2xl:grid-cols-4 xl:grid-cols-3" }, _attrs))} data-v-445ccf6b><!--[-->`);
-      ssrRenderList(4, (n2) => {
-        _push(`<div class="${ssrRenderClass([[{ "xl:hidden 2xl:block": n2 > 3 }, { "hidden lg:block": n2 > 2 }], "relative"])}" data-v-445ccf6b><div class="h-0 mb-2 bg-gray-300 rounded dark:bg-gray-700 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 dark:from-gray-800 dark:via-gray-600 dark:to-gray-800 loading thumbnail" data-v-445ccf6b></div><div class="w-full h-12 mb-3 bg-gray-300 rounded dark:bg-gray-700 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 dark:from-gray-800 dark:via-gray-600 dark:to-gray-800 loading" data-v-445ccf6b></div><div class="flex justify-between" data-v-445ccf6b><div class="w-16 h-5 bg-gray-300 rounded dark:bg-gray-700 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 dark:from-gray-800 dark:via-gray-600 dark:to-gray-800 loading" data-v-445ccf6b></div><div class="w-16 h-5 bg-gray-300 rounded dark:bg-gray-700 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 dark:from-gray-800 dark:via-gray-600 dark:to-gray-800 loading" data-v-445ccf6b></div></div></div>`);
-      });
-      _push(`<!--]--></div>`);
-    };
-  }
-};
-const _sfc_setup$u = _sfc_main$u.setup;
-_sfc_main$u.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Loop/RowLoading.vue");
-  return _sfc_setup$u ? _sfc_setup$u(props, ctx) : void 0;
-};
-const __nuxt_component_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$u, [["__scopeId", "data-v-445ccf6b"]]);
-const _sfc_main$t = {
-  __name: "Row",
-  __ssrInlineRender: true,
-  props: {
-    list: {
-      type: Array,
-      default: () => []
-    },
-    infinite: {
-      type: Boolean,
-      default: false
-    },
-    loading: {
-      type: Boolean,
-      default: false
-    },
-    tag: {
-      type: String,
-      default: "h3"
-    },
-    row: {
-      type: Number,
-      default: 4
-    },
-    gap: {
-      type: Number,
-      default: 2
-    }
-  },
-  setup(__props) {
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_nuxt_link = __nuxt_component_0$2;
-      const _component_IconFluent58thumb_like_16_filled = __unplugin_components_0$6;
-      const _component_IconRi58eye_fill = __unplugin_components_1$4;
-      const _component_ArticleLoopRowLoading = __nuxt_component_1$2;
-      _push(`<!--[--><div class="grid grid-cols-2 gap-5 2xl:grid-cols-4 xl:grid-cols-3" data-v-26832a25><!--[-->`);
-      ssrRenderList(__props.list, (article) => {
-        _push(ssrRenderComponent(_component_nuxt_link, {
-          key: article.id,
-          to: `/news/article/${article.slug}`,
-          class: "relative"
-        }, {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(`<div class="relative h-0 mb-2 overflow-hidden rounded thumbnail" data-v-26832a25${_scopeId}><img${ssrRenderAttr("src", article.thumbnail)} class="absolute top-0 left-0 object-cover w-full h-full" data-v-26832a25${_scopeId}></div><div class="px-2" data-v-26832a25${_scopeId}>`);
-              ssrRenderVNode(_push2, createVNode(resolveDynamicComponent(__props.tag), { class: "text-base font-bold ellipsis" }, {
-                default: withCtx((_3, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`${ssrInterpolate(article.title)}`);
+        }, _parent2, _scopeId));
+        _push2(ssrRenderComponent(_component_PageBody, null, {
+          default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+            if (_push3) {
+              _push3(ssrRenderComponent(_component_PageSection, null, {
+                default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                  if (_push4) {
+                    _push4(ssrRenderComponent(_component_ContentRenderer, { value: doc }, null, _parent4, _scopeId3));
                   } else {
                     return [
-                      createTextVNode(toDisplayString(article.title), 1)
+                      createVNode(_component_ContentRenderer, { value: doc }, null, 8, ["value"])
                     ];
                   }
                 }),
                 _: 2
-              }), _parent2, _scopeId);
-              _push2(`<div class="flex flex-wrap justify-between w-full py-2 mt-auto text-xs text-gray-600 dark:text-gray-400" data-v-26832a25${_scopeId}><div class="flex justify-between w-full mb-1" itemprop="author" data-v-26832a25${_scopeId}><p data-v-26832a25${_scopeId}>${ssrInterpolate(article.author)}</p><p data-v-26832a25${_scopeId}>${ssrInterpolate(article.categories)}</p></div><div class="flex w-full" data-v-26832a25${_scopeId}><div class="mr-2 tracking-wider" itemprop="create-date" data-v-26832a25${_scopeId}>${ssrInterpolate(article.publishTime)}</div><div class="ml-auto flex items-center space-x-4" data-v-26832a25${_scopeId}><div class="flex items-center justify-end ml-auto space-x-1" data-v-26832a25${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_IconFluent58thumb_like_16_filled, { class: "text-green-400" }, null, _parent2, _scopeId));
-              _push2(`<span data-v-26832a25${_scopeId}>${ssrInterpolate(article.likes)}</span></div><div class="flex items-center ml-auto space-x-1" data-v-26832a25${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_IconRi58eye_fill, { class: "text-green-400" }, null, _parent2, _scopeId));
-              _push2(`<span data-v-26832a25${_scopeId}>${ssrInterpolate(article.views)}</span></div></div></div></div></div>`);
+              }, _parent3, _scopeId2));
             } else {
               return [
-                createVNode("div", { class: "relative h-0 mb-2 overflow-hidden rounded thumbnail" }, [
-                  createVNode("img", {
-                    src: article.thumbnail,
-                    class: "absolute top-0 left-0 object-cover w-full h-full"
-                  }, null, 8, ["src"])
-                ]),
-                createVNode("div", { class: "px-2" }, [
-                  (openBlock(), createBlock(resolveDynamicComponent(__props.tag), { class: "text-base font-bold ellipsis" }, {
-                    default: withCtx(() => [
-                      createTextVNode(toDisplayString(article.title), 1)
-                    ]),
-                    _: 2
-                  }, 1024)),
-                  createVNode("div", { class: "flex flex-wrap justify-between w-full py-2 mt-auto text-xs text-gray-600 dark:text-gray-400" }, [
-                    createVNode("div", {
-                      class: "flex justify-between w-full mb-1",
-                      itemprop: "author"
-                    }, [
-                      createVNode("p", null, toDisplayString(article.author), 1),
-                      createVNode("p", null, toDisplayString(article.categories), 1)
-                    ]),
-                    createVNode("div", { class: "flex w-full" }, [
-                      createVNode("div", {
-                        class: "mr-2 tracking-wider",
-                        itemprop: "create-date"
-                      }, toDisplayString(article.publishTime), 1),
-                      createVNode("div", { class: "ml-auto flex items-center space-x-4" }, [
-                        createVNode("div", { class: "flex items-center justify-end ml-auto space-x-1" }, [
-                          createVNode(_component_IconFluent58thumb_like_16_filled, { class: "text-green-400" }),
-                          createVNode("span", null, toDisplayString(article.likes), 1)
-                        ]),
-                        createVNode("div", { class: "flex items-center ml-auto space-x-1" }, [
-                          createVNode(_component_IconRi58eye_fill, { class: "text-green-400" }),
-                          createVNode("span", null, toDisplayString(article.views), 1)
-                        ])
-                      ])
-                    ])
-                  ])
-                ])
+                createVNode(_component_PageSection, null, {
+                  default: withCtx(() => [
+                    createVNode(_component_ContentRenderer, { value: doc }, null, 8, ["value"])
+                  ]),
+                  _: 2
+                }, 1024)
               ];
             }
           }),
           _: 2
-        }, _parent));
-      });
-      _push(`<!--]--></div>`);
-      if (__props.infinite && __props.loading) {
-        _push(ssrRenderComponent(_component_ArticleLoopRowLoading, { class: "mt-2" }, null, _parent));
+        }, _parent2, _scopeId));
       } else {
-        _push(`<!---->`);
+        return [
+          createVNode(_component_PageHeader, null, {
+            default: withCtx(() => [
+              createVNode(_component_PageTitle, {
+                text: doc.title
+              }, null, 8, ["text"])
+            ]),
+            _: 2
+          }, 1024),
+          createVNode(_component_PageBody, null, {
+            default: withCtx(() => [
+              createVNode(_component_PageSection, null, {
+                default: withCtx(() => [
+                  createVNode(_component_ContentRenderer, { value: doc }, null, 8, ["value"])
+                ]),
+                _: 2
+              }, 1024)
+            ]),
+            _: 2
+          }, 1024)
+        ];
       }
-      _push(`<!--]-->`);
+    }),
+    empty: withCtx((_2, _push2, _parent2, _scopeId) => {
+      if (_push2) {
+        _push2(`<h1${_scopeId}>Post in empty</h1>`);
+      } else {
+        return [
+          createVNode("h1", null, "Post in empty")
+        ];
+      }
+    }),
+    "not-found": withCtx((_2, _push2, _parent2, _scopeId) => {
+      if (_push2) {
+        _push2(ssrRenderComponent(_component_Error, {
+          code: 404,
+          wrap: ""
+        }, null, _parent2, _scopeId));
+      } else {
+        return [
+          createVNode(_component_Error, {
+            code: 404,
+            wrap: ""
+          })
+        ];
+      }
+    }),
+    _: 1
+  }, _parent));
+}
+const _sfc_setup$c = _sfc_main$c.setup;
+_sfc_main$c.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Content/Doc.vue");
+  return _sfc_setup$c ? _sfc_setup$c(props, ctx) : void 0;
+};
+const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["ssrRender", _sfc_ssrRender$2]]);
+const Doc = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_1
+}, Symbol.toStringTag, { value: "Module" }));
+const meta$3 = {
+  layout: "page"
+};
+const _sfc_main$b = defineComponent({
+  name: "ContentList",
+  props: {
+    path: {
+      type: String,
+      required: false,
+      default: void 0
+    },
+    query: {
+      type: Object,
+      required: false,
+      default: void 0
+    }
+  },
+  render(ctx) {
+    const slots = useSlots();
+    const { path, query } = ctx;
+    const contentQueryProps = {
+      ...query || {},
+      path: path || (query == null ? void 0 : query.path) || "/"
+    };
+    const emptyNode = (slot, data) => h("pre", null, JSON.stringify({ message: "You should use slots with <ContentList>", slot, data }, null, 2));
+    return h(
+      _sfc_main$e,
+      contentQueryProps,
+      {
+        default: (slots == null ? void 0 : slots.default) ? ({ data, refresh, isPartial }) => slots == null ? void 0 : slots.default({ list: data, refresh, isPartial, ...this.$attrs }) : ({ data }) => emptyNode("default", data),
+        empty: (bindings) => (slots == null ? void 0 : slots.empty) ? slots.empty(bindings) : ({ data }) => emptyNode("default", data),
+        "not-found": (bindings) => {
+          var _a;
+          return (slots == null ? void 0 : slots["not-found"]) ? (_a = slots == null ? void 0 : slots["not-found"]) == null ? void 0 : _a.call(slots, bindings) : ({ data }) => emptyNode("not-found", data);
+        }
+      }
+    );
+  }
+});
+const _sfc_setup$b = _sfc_main$b.setup;
+_sfc_main$b.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/components/ContentList.vue");
+  return _sfc_setup$b ? _sfc_setup$b(props, ctx) : void 0;
+};
+const ContentList = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$b
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$a = /* @__PURE__ */ defineComponent({
+  __name: "Anchor",
+  __ssrInlineRender: true,
+  props: {
+    text: {
+      type: String,
+      default: ""
+    },
+    to: {
+      type: [String, Object],
+      default: void 0
+    },
+    href: {
+      type: String,
+      default: ""
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const href = toRef(props, "href");
+    const to = toRef(props, "to");
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_NuxtLink = __nuxt_component_0$2;
+      if (unref(to)) {
+        _push(ssrRenderComponent(_component_NuxtLink, mergeProps({
+          tag: "a",
+          to: unref(to),
+          class: `transition-colors duration-300 dark:hover:text-white hover:text-gray-900 hover:underline`
+        }, _attrs), {
+          default: withCtx((_2, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+                _push2(`${ssrInterpolate(__props.text)}`);
+              }, _push2, _parent2, _scopeId);
+            } else {
+              return [
+                renderSlot(_ctx.$slots, "default", {}, () => [
+                  createTextVNode(toDisplayString$1(__props.text), 1)
+                ])
+              ];
+            }
+          }),
+          _: 3
+        }, _parent));
+      } else {
+        _push(`<a${ssrRenderAttrs(mergeProps({
+          class: `transition-colors duration-300 dark:hover:text-white hover:text-gray-900 hover:underline`,
+          href: unref(href)
+        }, _attrs))}>`);
+        ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+          _push(`${ssrInterpolate(__props.text)}`);
+        }, _push, _parent);
+        _push(`</a>`);
+      }
     };
   }
-};
-const _sfc_setup$t = _sfc_main$t.setup;
-_sfc_main$t.setup = (props, ctx) => {
+});
+const _sfc_setup$a = _sfc_main$a.setup;
+_sfc_main$a.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Loop/Row.vue");
-  return _sfc_setup$t ? _sfc_setup$t(props, ctx) : void 0;
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Anchor.vue");
+  return _sfc_setup$a ? _sfc_setup$a(props, ctx) : void 0;
 };
-const __nuxt_component_6$1 = /* @__PURE__ */ _export_sfc(_sfc_main$t, [["__scopeId", "data-v-26832a25"]]);
-function u(r2, n2, ...a2) {
-  if (r2 in n2) {
-    let e2 = n2[r2];
-    return typeof e2 == "function" ? e2(...a2) : e2;
+const Anchor = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$a
+}, Symbol.toStringTag, { value: "Module" }));
+const meta$2 = {
+  layout: "page"
+};
+const _hoisted_1$3 = {
+  viewBox: "0 0 36 36",
+  width: "1.2em",
+  height: "1.2em"
+};
+const _hoisted_2$3 = /* @__PURE__ */ createElementVNode("path", {
+  fill: "currentColor",
+  d: "m19.41 18l8.29-8.29a1 1 0 0 0-1.41-1.41L18 16.59l-8.29-8.3a1 1 0 0 0-1.42 1.42l8.3 8.29l-8.3 8.29A1 1 0 1 0 9.7 27.7l8.3-8.29l8.29 8.29a1 1 0 0 0 1.41-1.41Z",
+  class: "clr-i-outline clr-i-outline-path-1"
+}, null, -1);
+const _hoisted_3$3 = /* @__PURE__ */ createElementVNode("path", {
+  fill: "none",
+  d: "M0 0h36v36H0z"
+}, null, -1);
+const _hoisted_4$1 = [
+  _hoisted_2$3,
+  _hoisted_3$3
+];
+function render$3(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$3, _hoisted_4$1);
+}
+const __unplugin_components_3 = { name: "clarity-times-line", render: render$3 };
+const _hoisted_1$2 = {
+  viewBox: "0 0 16 16",
+  width: "1.2em",
+  height: "1.2em"
+};
+const _hoisted_2$2 = /* @__PURE__ */ createElementVNode("path", {
+  fill: "currentColor",
+  d: "M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2a1 1 0 0 0 0-2z"
+}, null, -1);
+const _hoisted_3$2 = [
+  _hoisted_2$2
+];
+function render$2(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$2, _hoisted_3$2);
+}
+const __unplugin_components_2 = { name: "bi-exclamation-circle-fill", render: render$2 };
+const _hoisted_1$1 = {
+  viewBox: "0 0 36 36",
+  width: "1.2em",
+  height: "1.2em"
+};
+const _hoisted_2$1 = /* @__PURE__ */ createElementVNode("path", {
+  fill: "currentColor",
+  d: "M18 2a16 16 0 1 0 16 16A16 16 0 0 0 18 2Zm8 22.1a1.4 1.4 0 0 1-2 2l-6-6l-6 6.02a1.4 1.4 0 1 1-2-2l6-6.04l-6.17-6.22a1.4 1.4 0 1 1 2-2L18 16.1l6.17-6.17a1.4 1.4 0 1 1 2 2L20 18.08Z",
+  class: "clr-i-solid clr-i-solid-path-1"
+}, null, -1);
+const _hoisted_3$1 = /* @__PURE__ */ createElementVNode("path", {
+  fill: "none",
+  d: "M0 0h36v36H0z"
+}, null, -1);
+const _hoisted_4 = [
+  _hoisted_2$1,
+  _hoisted_3$1
+];
+function render$1(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1$1, _hoisted_4);
+}
+const __unplugin_components_1 = { name: "clarity-times-circle-solid", render: render$1 };
+const _hoisted_1 = {
+  viewBox: "0 0 24 24",
+  width: "1.2em",
+  height: "1.2em"
+};
+const _hoisted_2 = /* @__PURE__ */ createElementVNode("path", {
+  fill: "currentColor",
+  d: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9Z"
+}, null, -1);
+const _hoisted_3 = [
+  _hoisted_2
+];
+function render(_ctx, _cache) {
+  return openBlock(), createElementBlock("svg", _hoisted_1, _hoisted_3);
+}
+const __unplugin_components_0 = { name: "mdi-check-circle", render };
+function u(r, n2, ...a) {
+  if (r in n2) {
+    let e2 = n2[r];
+    return typeof e2 == "function" ? e2(...a) : e2;
   }
-  let t2 = new Error(`Tried to handle "${r2}" but there is no handler defined. Only defined handlers are: ${Object.keys(n2).map((e2) => `"${e2}"`).join(", ")}.`);
+  let t2 = new Error(`Tried to handle "${r}" but there is no handler defined. Only defined handlers are: ${Object.keys(n2).map((e2) => `"${e2}"`).join(", ")}.`);
   throw Error.captureStackTrace && Error.captureStackTrace(t2, u), t2;
 }
-var R = ((o2) => (o2[o2.None = 0] = "None", o2[o2.RenderStrategy = 1] = "RenderStrategy", o2[o2.Static = 2] = "Static", o2))(R || {}), O$1 = ((e2) => (e2[e2.Unmount = 0] = "Unmount", e2[e2.Hidden = 1] = "Hidden", e2))(O$1 || {});
-function P({ visible: r2 = true, features: t2 = 0, ourProps: e2, theirProps: o2, ...i }) {
-  var a2;
+var R = ((o2) => (o2[o2.None = 0] = "None", o2[o2.RenderStrategy = 1] = "RenderStrategy", o2[o2.Static = 2] = "Static", o2))(R || {}), O = ((e2) => (e2[e2.Unmount = 0] = "Unmount", e2[e2.Hidden = 1] = "Hidden", e2))(O || {});
+function V({ visible: r = true, features: t2 = 0, ourProps: e2, theirProps: o2, ...i }) {
+  var a;
   let n2 = k(o2, e2), s2 = Object.assign(i, { props: n2 });
-  if (r2 || t2 & 2 && n2.static)
+  if (r || t2 & 2 && n2.static)
     return p$1(s2);
   if (t2 & 1) {
-    let l2 = (a2 = n2.unmount) == null || a2 ? 0 : 1;
+    let l2 = (a = n2.unmount) == null || a ? 0 : 1;
     return u(l2, { [0]() {
       return null;
     }, [1]() {
@@ -1915,47 +5611,47 @@ function P({ visible: r2 = true, features: t2 = 0, ourProps: e2, theirProps: o2,
   }
   return p$1(s2);
 }
-function p$1({ props: r2, attrs: t2, slots: e2, slot: o2, name: i }) {
-  var y2;
-  let { as: n2, ...s2 } = w$1(r2, ["unmount", "static"]), a2 = (y2 = e2.default) == null ? void 0 : y2.call(e2, o2), l2 = {};
+function p$1({ props: r, attrs: t2, slots: e2, slot: o2, name: i }) {
+  var y;
+  let { as: n2, ...s2 } = w$1(r, ["unmount", "static"]), a = (y = e2.default) == null ? void 0 : y.call(e2, o2), l2 = {};
   if (o2) {
-    let d2 = false, u2 = [];
-    for (let [f2, c2] of Object.entries(o2))
-      typeof c2 == "boolean" && (d2 = true), c2 === true && u2.push(f2);
-    d2 && (l2["data-headlessui-state"] = u2.join(" "));
+    let f2 = false, u2 = [];
+    for (let [d2, c2] of Object.entries(o2))
+      typeof c2 == "boolean" && (f2 = true), c2 === true && u2.push(d2);
+    f2 && (l2["data-headlessui-state"] = u2.join(" "));
   }
   if (n2 === "template") {
-    if (a2 = g$1(a2 != null ? a2 : []), Object.keys(s2).length > 0 || Object.keys(t2).length > 0) {
-      let [d2, ...u2] = a2 != null ? a2 : [];
-      if (!x$1(d2) || u2.length > 0)
-        throw new Error(['Passing props on "template"!', "", `The current component <${i} /> is rendering a "template".`, "However we need to passthrough the following props:", Object.keys(s2).concat(Object.keys(t2)).sort((f2, c2) => f2.localeCompare(c2)).map((f2) => `  - ${f2}`).join(`
-`), "", "You can apply a few solutions:", ['Add an `as="..."` prop, to ensure that we render an actual element instead of a "template".', "Render a single element as the child so that we can forward the props onto that element."].map((f2) => `  - ${f2}`).join(`
+    if (a = g$1(a), Object.keys(s2).length > 0 || Object.keys(t2).length > 0) {
+      let [f2, ...u2] = a != null ? a : [];
+      if (!x(f2) || u2.length > 0)
+        throw new Error(['Passing props on "template"!', "", `The current component <${i} /> is rendering a "template".`, "However we need to passthrough the following props:", Object.keys(s2).concat(Object.keys(t2)).sort((d2, c2) => d2.localeCompare(c2)).map((d2) => `  - ${d2}`).join(`
+`), "", "You can apply a few solutions:", ['Add an `as="..."` prop, to ensure that we render an actual element instead of a "template".', "Render a single element as the child so that we can forward the props onto that element."].map((d2) => `  - ${d2}`).join(`
 `)].join(`
 `));
-      return cloneVNode(d2, Object.assign({}, s2, l2));
+      return cloneVNode(f2, Object.assign({}, s2, l2));
     }
-    return Array.isArray(a2) && a2.length === 1 ? a2[0] : a2;
+    return Array.isArray(a) && a.length === 1 ? a[0] : a;
   }
-  return h$1(n2, Object.assign({}, s2, l2), a2);
+  return h(n2, Object.assign({}, s2, l2), a);
 }
-function g$1(r2) {
-  return r2.flatMap((t2) => t2.type === Fragment$1 ? g$1(t2.children) : [t2]);
+function g$1(r) {
+  return r.flatMap((t2) => t2.type === Fragment$1 ? g$1(t2.children) : [t2]);
 }
-function k(...r2) {
-  if (r2.length === 0)
+function k(...r) {
+  if (r.length === 0)
     return {};
-  if (r2.length === 1)
-    return r2[0];
+  if (r.length === 1)
+    return r[0];
   let t2 = {}, e2 = {};
-  for (let i of r2)
+  for (let i of r)
     for (let n2 in i)
       n2.startsWith("on") && typeof i[n2] == "function" ? (e2[n2] != null || (e2[n2] = []), e2[n2].push(i[n2])) : t2[n2] = i[n2];
   if (t2.disabled || t2["aria-disabled"])
     return Object.assign(t2, Object.fromEntries(Object.keys(e2).map((i) => [i, void 0])));
   for (let i in e2)
     Object.assign(t2, { [i](n2, ...s2) {
-      let a2 = e2[i];
-      for (let l2 of a2) {
+      let a = e2[i];
+      for (let l2 of a) {
         if (n2 instanceof Event && n2.defaultPrevented)
           return;
         l2(n2, ...s2);
@@ -1963,60 +5659,27 @@ function k(...r2) {
     } });
   return t2;
 }
-function V$1(r2) {
-  let t2 = Object.assign({}, r2);
+function P(r) {
+  let t2 = Object.assign({}, r);
   for (let e2 in t2)
     t2[e2] === void 0 && delete t2[e2];
   return t2;
 }
-function w$1(r2, t2 = []) {
-  let e2 = Object.assign({}, r2);
+function w$1(r, t2 = []) {
+  let e2 = Object.assign({}, r);
   for (let o2 of t2)
     o2 in e2 && delete e2[o2];
   return e2;
 }
-function x$1(r2) {
-  return r2 == null ? false : typeof r2.type == "string" || typeof r2.type == "object" || typeof r2.type == "function";
+function x(r) {
+  return r == null ? false : typeof r.type == "string" || typeof r.type == "object" || typeof r.type == "function";
 }
-let e$2 = 0;
+let e = 0;
 function n$1() {
-  return ++e$2;
+  return ++e;
 }
 function t() {
   return n$1();
-}
-var o$1 = ((r2) => (r2.Space = " ", r2.Enter = "Enter", r2.Escape = "Escape", r2.Backspace = "Backspace", r2.Delete = "Delete", r2.ArrowLeft = "ArrowLeft", r2.ArrowUp = "ArrowUp", r2.ArrowRight = "ArrowRight", r2.ArrowDown = "ArrowDown", r2.Home = "Home", r2.End = "End", r2.PageUp = "PageUp", r2.PageDown = "PageDown", r2.Tab = "Tab", r2))(o$1 || {});
-function f$3(r2) {
-  throw new Error("Unexpected object: " + r2);
-}
-var a$1 = ((e2) => (e2[e2.First = 0] = "First", e2[e2.Previous = 1] = "Previous", e2[e2.Next = 2] = "Next", e2[e2.Last = 3] = "Last", e2[e2.Specific = 4] = "Specific", e2[e2.Nothing = 5] = "Nothing", e2))(a$1 || {});
-function x(r2, n2) {
-  let t2 = n2.resolveItems();
-  if (t2.length <= 0)
-    return null;
-  let l2 = n2.resolveActiveIndex(), s2 = l2 != null ? l2 : -1, d2 = (() => {
-    switch (r2.focus) {
-      case 0:
-        return t2.findIndex((e2) => !n2.resolveDisabled(e2));
-      case 1: {
-        let e2 = t2.slice().reverse().findIndex((i, c2, u2) => s2 !== -1 && u2.length - c2 - 1 >= s2 ? false : !n2.resolveDisabled(i));
-        return e2 === -1 ? e2 : t2.length - 1 - e2;
-      }
-      case 2:
-        return t2.findIndex((e2, i) => i <= s2 ? false : !n2.resolveDisabled(e2));
-      case 3: {
-        let e2 = t2.slice().reverse().findIndex((i) => !n2.resolveDisabled(i));
-        return e2 === -1 ? e2 : t2.length - 1 - e2;
-      }
-      case 4:
-        return t2.findIndex((e2) => n2.resolveId(e2) === r2.id);
-      case 5:
-        return null;
-      default:
-        f$3(r2);
-    }
-  })();
-  return d2 === -1 ? l2 : d2;
 }
 function o(n2) {
   var l2;
@@ -2024,7 +5687,7 @@ function o(n2) {
 }
 let n = Symbol("Context");
 var l$1 = ((e2) => (e2[e2.Open = 0] = "Open", e2[e2.Closed = 1] = "Closed", e2))(l$1 || {});
-function f$2() {
+function f() {
   return p() !== null;
 }
 function p() {
@@ -2033,87 +5696,11 @@ function p() {
 function c(o2) {
   provide(n, o2);
 }
-function r(t2, e2) {
-  if (t2)
-    return t2;
-  let n2 = e2 != null ? e2 : "button";
-  if (typeof n2 == "string" && n2.toLowerCase() === "button")
-    return "button";
-}
-function b$1(t2, e2) {
-  let n2 = ref(r(t2.value.type, t2.value.as));
-  return onMounted(() => {
-    n2.value = r(t2.value.type, t2.value.as);
-  }), watchEffect(() => {
-    var o$12;
-    n2.value || !o(e2) || o(e2) instanceof HTMLButtonElement && !((o$12 = o(e2)) != null && o$12.hasAttribute("type")) && (n2.value = "button");
-  }), n2;
-}
-function m$2(r2) {
-  return null;
-}
-let m$1 = ["[contentEditable=true]", "[tabindex]", "a[href]", "area[href]", "button:not([disabled])", "iframe", "input:not([disabled])", "select:not([disabled])", "textarea:not([disabled])"].map((e2) => `${e2}:not([tabindex='-1'])`).join(",");
-var M = ((n2) => (n2[n2.First = 1] = "First", n2[n2.Previous = 2] = "Previous", n2[n2.Next = 4] = "Next", n2[n2.Last = 8] = "Last", n2[n2.WrapAround = 16] = "WrapAround", n2[n2.NoScroll = 32] = "NoScroll", n2))(M || {}), N = ((o2) => (o2[o2.Error = 0] = "Error", o2[o2.Overflow = 1] = "Overflow", o2[o2.Success = 2] = "Success", o2[o2.Underflow = 3] = "Underflow", o2))(N || {}), b = ((r2) => (r2[r2.Previous = -1] = "Previous", r2[r2.Next = 1] = "Next", r2))(b || {});
-var F$2 = ((r2) => (r2[r2.Strict = 0] = "Strict", r2[r2.Loose = 1] = "Loose", r2))(F$2 || {});
-function h(e2, t2 = 0) {
-  var r2;
-  return e2 === ((r2 = m$2()) == null ? void 0 : r2.body) ? false : u(t2, { [0]() {
-    return e2.matches(m$1);
-  }, [1]() {
-    let l2 = e2;
-    for (; l2 !== null; ) {
-      if (l2.matches(m$1))
-        return true;
-      l2 = l2.parentElement;
-    }
-    return false;
-  } });
-}
-function O(e2, t2 = (r2) => r2) {
-  return e2.slice().sort((r2, l2) => {
-    let o2 = t2(r2), s2 = t2(l2);
-    if (o2 === null || s2 === null)
-      return 0;
-    let n2 = o2.compareDocumentPosition(s2);
-    return n2 & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : n2 & Node.DOCUMENT_POSITION_PRECEDING ? 1 : 0;
-  });
-}
-function y(f2, m2, i = computed(() => true)) {
-  ref(null);
-}
-var a = ((e2) => (e2[e2.None = 1] = "None", e2[e2.Focusable = 2] = "Focusable", e2[e2.Hidden = 4] = "Hidden", e2))(a || {});
-let f$1 = defineComponent({ name: "Hidden", props: { as: { type: [Object, String], default: "div" }, features: { type: Number, default: 1 } }, setup(r2, { slots: t2, attrs: d2 }) {
-  return () => {
-    let { features: e2, ...o2 } = r2, n2 = { "aria-hidden": (e2 & 2) === 2 ? true : void 0, style: { position: "fixed", top: 1, left: 1, width: 1, height: 0, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", borderWidth: "0", ...(e2 & 4) === 4 && (e2 & 2) !== 2 && { display: "none" } } };
-    return P({ ourProps: n2, theirProps: o2, slot: {}, attrs: d2, slots: t2, name: "Hidden" });
-  };
-} });
-function e(n2 = {}, r2 = null, t2 = []) {
-  for (let [i, o2] of Object.entries(n2))
-    f(t2, s$1(r2, i), o2);
-  return t2;
-}
-function s$1(n2, r2) {
-  return n2 ? n2 + "[" + r2 + "]" : r2;
-}
-function f(n2, r2, t2) {
-  if (Array.isArray(t2))
-    for (let [i, o2] of t2.entries())
-      f(n2, s$1(r2, i.toString()), o2);
-  else
-    t2 instanceof Date ? n2.push([r2, t2.toISOString()]) : typeof t2 == "boolean" ? n2.push([r2, t2 ? "1" : "0"]) : typeof t2 == "string" ? n2.push([r2, t2]) : typeof t2 == "number" ? n2.push([r2, `${t2}`]) : t2 == null ? n2.push([r2, ""]) : e(t2, r2, n2);
-}
-function d$2(u2, e2, r2) {
-  let i = ref(r2 == null ? void 0 : r2.value), f2 = computed(() => u2.value !== void 0);
-  return [computed(() => f2.value ? u2.value : i.value), function(t2) {
-    return f2.value || (i.value = t2), e2 == null ? void 0 : e2(t2);
-  }];
-}
 function s() {
-  let a2 = [], i = [], t2 = { enqueue(e2) {
+  let a = [], i = [], t2 = { enqueue(e2) {
     i.push(e2);
-  }, addEventListener(e2, n2, o2, r2) {
-    return e2.addEventListener(n2, o2, r2), t2.add(() => e2.removeEventListener(n2, o2, r2));
+  }, addEventListener(e2, n2, o2, r) {
+    return e2.addEventListener(n2, o2, r), t2.add(() => e2.removeEventListener(n2, o2, r));
   }, requestAnimationFrame(...e2) {
     let n2 = requestAnimationFrame(...e2);
     t2.add(() => cancelAnimationFrame(n2));
@@ -2125,9 +5712,9 @@ function s() {
     let n2 = setTimeout(...e2);
     t2.add(() => clearTimeout(n2));
   }, add(e2) {
-    a2.push(e2);
+    a.push(e2);
   }, dispose() {
-    for (let e2 of a2.splice(0))
+    for (let e2 of a.splice(0))
       e2();
   }, async workQueue() {
     for (let e2 of i.splice(0))
@@ -2135,230 +5722,11 @@ function s() {
   } };
   return t2;
 }
-function ue$1(o2, m2) {
-  return o2 === m2;
-}
-var re = ((l2) => (l2[l2.Open = 0] = "Open", l2[l2.Closed = 1] = "Closed", l2))(re || {}), se$1 = ((l2) => (l2[l2.Single = 0] = "Single", l2[l2.Multi = 1] = "Multi", l2))(se$1 || {}), de = ((l2) => (l2[l2.Pointer = 0] = "Pointer", l2[l2.Other = 1] = "Other", l2))(de || {});
-function fe$1(o2) {
-  requestAnimationFrame(() => requestAnimationFrame(o2));
-}
-let H = Symbol("ListboxContext");
-function V(o2) {
-  let m2 = inject(H, null);
-  if (m2 === null) {
-    let l2 = new Error(`<${o2} /> is missing a parent <Listbox /> component.`);
-    throw Error.captureStackTrace && Error.captureStackTrace(l2, V), l2;
-  }
-  return m2;
-}
-let Me = defineComponent({ name: "Listbox", emits: { "update:modelValue": (o2) => true }, props: { as: { type: [Object, String], default: "template" }, disabled: { type: [Boolean], default: false }, by: { type: [String, Function], default: () => ue$1 }, horizontal: { type: [Boolean], default: false }, modelValue: { type: [Object, String, Number, Boolean], default: void 0 }, defaultValue: { type: [Object, String, Number, Boolean], default: void 0 }, name: { type: String, optional: true }, multiple: { type: [Boolean], default: false } }, inheritAttrs: false, setup(o$12, { slots: m2, attrs: l2, emit: L2 }) {
-  let e$12 = ref(1), p2 = ref(null), s2 = ref(null), O$12 = ref(null), d2 = ref([]), S = ref(""), t2 = ref(null), i = ref(1);
-  function k2(a2 = (n2) => n2) {
-    let n2 = t2.value !== null ? d2.value[t2.value] : null, u2 = O(a2(d2.value.slice()), (y2) => o(y2.dataRef.domRef)), c2 = n2 ? u2.indexOf(n2) : null;
-    return c2 === -1 && (c2 = null), { options: u2, activeOptionIndex: c2 };
-  }
-  let h$2 = computed(() => o$12.multiple ? 1 : 0), [w2, r2] = d$2(computed(() => o$12.modelValue), (a2) => L2("update:modelValue", a2), computed(() => o$12.defaultValue)), f2 = { listboxState: e$12, value: w2, mode: h$2, compare(a2, n2) {
-    if (typeof o$12.by == "string") {
-      let u2 = o$12.by;
-      return (a2 == null ? void 0 : a2[u2]) === (n2 == null ? void 0 : n2[u2]);
-    }
-    return o$12.by(a2, n2);
-  }, orientation: computed(() => o$12.horizontal ? "horizontal" : "vertical"), labelRef: p2, buttonRef: s2, optionsRef: O$12, disabled: computed(() => o$12.disabled), options: d2, searchQuery: S, activeOptionIndex: t2, activationTrigger: i, closeListbox() {
-    o$12.disabled || e$12.value !== 1 && (e$12.value = 1, t2.value = null);
-  }, openListbox() {
-    o$12.disabled || e$12.value !== 0 && (e$12.value = 0);
-  }, goToOption(a2, n2, u2) {
-    if (o$12.disabled || e$12.value === 1)
-      return;
-    let c2 = k2(), y2 = x(a2 === a$1.Specific ? { focus: a$1.Specific, id: n2 } : { focus: a2 }, { resolveItems: () => c2.options, resolveActiveIndex: () => c2.activeOptionIndex, resolveId: (T) => T.id, resolveDisabled: (T) => T.dataRef.disabled });
-    S.value = "", t2.value = y2, i.value = u2 != null ? u2 : 1, d2.value = c2.options;
-  }, search(a2) {
-    if (o$12.disabled || e$12.value === 1)
-      return;
-    let u2 = S.value !== "" ? 0 : 1;
-    S.value += a2.toLowerCase();
-    let y2 = (t2.value !== null ? d2.value.slice(t2.value + u2).concat(d2.value.slice(0, t2.value + u2)) : d2.value).find((A) => A.dataRef.textValue.startsWith(S.value) && !A.dataRef.disabled), T = y2 ? d2.value.indexOf(y2) : -1;
-    T === -1 || T === t2.value || (t2.value = T, i.value = 1);
-  }, clearSearch() {
-    o$12.disabled || e$12.value !== 1 && S.value !== "" && (S.value = "");
-  }, registerOption(a2, n2) {
-    let u2 = k2((c2) => [...c2, { id: a2, dataRef: n2 }]);
-    d2.value = u2.options, t2.value = u2.activeOptionIndex;
-  }, unregisterOption(a2) {
-    let n2 = k2((u2) => {
-      let c2 = u2.findIndex((y2) => y2.id === a2);
-      return c2 !== -1 && u2.splice(c2, 1), u2;
-    });
-    d2.value = n2.options, t2.value = n2.activeOptionIndex, i.value = 1;
-  }, select(a2) {
-    o$12.disabled || r2(u(h$2.value, { [0]: () => a2, [1]: () => {
-      let n2 = toRaw(f2.value.value).slice(), u2 = toRaw(a2), c2 = n2.findIndex((y2) => f2.compare(u2, toRaw(y2)));
-      return c2 === -1 ? n2.push(u2) : n2.splice(c2, 1), n2;
-    } }));
-  } };
-  return y([s2, O$12], (a2, n2) => {
-    var u2;
-    f2.closeListbox(), h(n2, F$2.Loose) || (a2.preventDefault(), (u2 = o(s2)) == null || u2.focus());
-  }, computed(() => e$12.value === 0)), provide(H, f2), c(computed(() => u(e$12.value, { [0]: l$1.Open, [1]: l$1.Closed }))), () => {
-    let { name: a$12, modelValue: n2, disabled: u2, ...c2 } = o$12, y2 = { open: e$12.value === 0, disabled: u2, value: w2.value };
-    return h$1(Fragment$1, [...a$12 != null && w2.value != null ? e({ [a$12]: w2.value }).map(([T, A]) => h$1(f$1, V$1({ features: a.Hidden, key: T, as: "input", type: "hidden", hidden: true, readOnly: true, name: T, value: A }))) : [], P({ ourProps: {}, theirProps: { ...l2, ...w$1(c2, ["defaultValue", "onUpdate:modelValue", "horizontal", "multiple", "by"]) }, slot: y2, slots: m2, attrs: l2, name: "Listbox" })]);
-  };
-} }), Pe = defineComponent({ name: "ListboxLabel", props: { as: { type: [Object, String], default: "label" } }, setup(o$12, { attrs: m2, slots: l2 }) {
-  let L2 = V("ListboxLabel"), e2 = `headlessui-listbox-label-${t()}`;
-  function p2() {
-    var s2;
-    (s2 = o(L2.buttonRef)) == null || s2.focus({ preventScroll: true });
-  }
-  return () => {
-    let s2 = { open: L2.listboxState.value === 0, disabled: L2.disabled.value }, O2 = { id: e2, ref: L2.labelRef, onClick: p2 };
-    return P({ ourProps: O2, theirProps: o$12, slot: s2, attrs: m2, slots: l2, name: "ListboxLabel" });
-  };
-} }), Ie = defineComponent({ name: "ListboxButton", props: { as: { type: [Object, String], default: "button" } }, setup(o$2, { attrs: m2, slots: l2, expose: L2 }) {
-  let e2 = V("ListboxButton"), p2 = `headlessui-listbox-button-${t()}`;
-  L2({ el: e2.buttonRef, $el: e2.buttonRef });
-  function s2(t2) {
-    switch (t2.key) {
-      case o$1.Space:
-      case o$1.Enter:
-      case o$1.ArrowDown:
-        t2.preventDefault(), e2.openListbox(), nextTick(() => {
-          var i;
-          (i = o(e2.optionsRef)) == null || i.focus({ preventScroll: true }), e2.value.value || e2.goToOption(a$1.First);
-        });
-        break;
-      case o$1.ArrowUp:
-        t2.preventDefault(), e2.openListbox(), nextTick(() => {
-          var i;
-          (i = o(e2.optionsRef)) == null || i.focus({ preventScroll: true }), e2.value.value || e2.goToOption(a$1.Last);
-        });
-        break;
-    }
-  }
-  function O2(t2) {
-    switch (t2.key) {
-      case o$1.Space:
-        t2.preventDefault();
-        break;
-    }
-  }
-  function d2(t2) {
-    e2.disabled.value || (e2.listboxState.value === 0 ? (e2.closeListbox(), nextTick(() => {
-      var i;
-      return (i = o(e2.buttonRef)) == null ? void 0 : i.focus({ preventScroll: true });
-    })) : (t2.preventDefault(), e2.openListbox(), fe$1(() => {
-      var i;
-      return (i = o(e2.optionsRef)) == null ? void 0 : i.focus({ preventScroll: true });
-    })));
-  }
-  let S = b$1(computed(() => ({ as: o$2.as, type: m2.type })), e2.buttonRef);
-  return () => {
-    var k2, h2;
-    let t2 = { open: e2.listboxState.value === 0, disabled: e2.disabled.value, value: e2.value.value }, i = { ref: e2.buttonRef, id: p2, type: S.value, "aria-haspopup": true, "aria-controls": (k2 = o(e2.optionsRef)) == null ? void 0 : k2.id, "aria-expanded": e2.disabled.value ? void 0 : e2.listboxState.value === 0, "aria-labelledby": e2.labelRef.value ? [(h2 = o(e2.labelRef)) == null ? void 0 : h2.id, p2].join(" ") : void 0, disabled: e2.disabled.value === true ? true : void 0, onKeydown: s2, onKeyup: O2, onClick: d2 };
-    return P({ ourProps: i, theirProps: o$2, slot: t2, attrs: m2, slots: l2, name: "ListboxButton" });
-  };
-} }), Ve = defineComponent({ name: "ListboxOptions", props: { as: { type: [Object, String], default: "ul" }, static: { type: Boolean, default: false }, unmount: { type: Boolean, default: true } }, setup(o$2, { attrs: m2, slots: l2, expose: L2 }) {
-  let e2 = V("ListboxOptions"), p$12 = `headlessui-listbox-options-${t()}`, s2 = ref(null);
-  L2({ el: e2.optionsRef, $el: e2.optionsRef });
-  function O2(t2) {
-    switch (s2.value && clearTimeout(s2.value), t2.key) {
-      case o$1.Space:
-        if (e2.searchQuery.value !== "")
-          return t2.preventDefault(), t2.stopPropagation(), e2.search(t2.key);
-      case o$1.Enter:
-        if (t2.preventDefault(), t2.stopPropagation(), e2.activeOptionIndex.value !== null) {
-          let i = e2.options.value[e2.activeOptionIndex.value];
-          e2.select(i.dataRef.value);
-        }
-        e2.mode.value === 0 && (e2.closeListbox(), nextTick(() => {
-          var i;
-          return (i = o(e2.buttonRef)) == null ? void 0 : i.focus({ preventScroll: true });
-        }));
-        break;
-      case u(e2.orientation.value, { vertical: o$1.ArrowDown, horizontal: o$1.ArrowRight }):
-        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.Next);
-      case u(e2.orientation.value, { vertical: o$1.ArrowUp, horizontal: o$1.ArrowLeft }):
-        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.Previous);
-      case o$1.Home:
-      case o$1.PageUp:
-        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.First);
-      case o$1.End:
-      case o$1.PageDown:
-        return t2.preventDefault(), t2.stopPropagation(), e2.goToOption(a$1.Last);
-      case o$1.Escape:
-        t2.preventDefault(), t2.stopPropagation(), e2.closeListbox(), nextTick(() => {
-          var i;
-          return (i = o(e2.buttonRef)) == null ? void 0 : i.focus({ preventScroll: true });
-        });
-        break;
-      case o$1.Tab:
-        t2.preventDefault(), t2.stopPropagation();
-        break;
-      default:
-        t2.key.length === 1 && (e2.search(t2.key), s2.value = setTimeout(() => e2.clearSearch(), 350));
-        break;
-    }
-  }
-  let d2 = p(), S = computed(() => d2 !== null ? d2.value === l$1.Open : e2.listboxState.value === 0);
-  return () => {
-    var h2, w2, r2, f2;
-    let t2 = { open: e2.listboxState.value === 0 }, i = { "aria-activedescendant": e2.activeOptionIndex.value === null || (h2 = e2.options.value[e2.activeOptionIndex.value]) == null ? void 0 : h2.id, "aria-multiselectable": e2.mode.value === 1 ? true : void 0, "aria-labelledby": (f2 = (w2 = o(e2.labelRef)) == null ? void 0 : w2.id) != null ? f2 : (r2 = o(e2.buttonRef)) == null ? void 0 : r2.id, "aria-orientation": e2.orientation.value, id: p$12, onKeydown: O2, role: "listbox", tabIndex: 0, ref: e2.optionsRef };
-    return P({ ourProps: i, theirProps: o$2, slot: t2, attrs: m2, slots: l2, features: R.RenderStrategy | R.Static, visible: S.value, name: "ListboxOptions" });
-  };
-} }), Ae = defineComponent({ name: "ListboxOption", props: { as: { type: [Object, String], default: "li" }, value: { type: [Object, String, Number, Boolean] }, disabled: { type: Boolean, default: false } }, setup(o$12, { slots: m2, attrs: l2, expose: L2 }) {
-  let e2 = V("ListboxOption"), p2 = `headlessui-listbox-option-${t()}`, s2 = ref(null);
-  L2({ el: s2, $el: s2 });
-  let O2 = computed(() => e2.activeOptionIndex.value !== null ? e2.options.value[e2.activeOptionIndex.value].id === p2 : false), d2 = computed(() => u(e2.mode.value, { [0]: () => e2.compare(toRaw(e2.value.value), toRaw(o$12.value)), [1]: () => toRaw(e2.value.value).some((r2) => e2.compare(toRaw(r2), toRaw(o$12.value))) })), S = computed(() => u(e2.mode.value, { [1]: () => {
-    var f2;
-    let r2 = toRaw(e2.value.value);
-    return ((f2 = e2.options.value.find((a2) => r2.some((n2) => e2.compare(toRaw(n2), toRaw(a2.dataRef.value))))) == null ? void 0 : f2.id) === p2;
-  }, [0]: () => d2.value })), t$1 = computed(() => ({ disabled: o$12.disabled, value: o$12.value, textValue: "", domRef: s2 }));
-  onMounted(() => {
-    var f2, a2;
-    let r2 = (a2 = (f2 = o(s2)) == null ? void 0 : f2.textContent) == null ? void 0 : a2.toLowerCase().trim();
-    r2 !== void 0 && (t$1.value.textValue = r2);
-  }), onMounted(() => e2.registerOption(p2, t$1)), onUnmounted(() => e2.unregisterOption(p2)), onMounted(() => {
-    watch([e2.listboxState, d2], () => {
-      e2.listboxState.value === 0 && (!d2.value || u(e2.mode.value, { [1]: () => {
-        S.value && e2.goToOption(a$1.Specific, p2);
-      }, [0]: () => {
-        e2.goToOption(a$1.Specific, p2);
-      } }));
-    }, { immediate: true });
-  }), watchEffect(() => {
-    e2.listboxState.value === 0 && (!O2.value || e2.activationTrigger.value !== 0 && nextTick(() => {
-      var r2, f2;
-      return (f2 = (r2 = o(s2)) == null ? void 0 : r2.scrollIntoView) == null ? void 0 : f2.call(r2, { block: "nearest" });
-    }));
-  });
-  function i(r2) {
-    if (o$12.disabled)
-      return r2.preventDefault();
-    e2.select(o$12.value), e2.mode.value === 0 && (e2.closeListbox(), nextTick(() => {
-      var f2;
-      return (f2 = o(e2.buttonRef)) == null ? void 0 : f2.focus({ preventScroll: true });
-    }));
-  }
-  function k2() {
-    if (o$12.disabled)
-      return e2.goToOption(a$1.Nothing);
-    e2.goToOption(a$1.Specific, p2);
-  }
-  function h2() {
-    o$12.disabled || O2.value || e2.goToOption(a$1.Specific, p2, 0);
-  }
-  function w2() {
-    o$12.disabled || !O2.value || e2.goToOption(a$1.Nothing);
-  }
-  return () => {
-    let { disabled: r2 } = o$12, f2 = { active: O2.value, selected: d2.value, disabled: r2 }, a2 = { id: p2, ref: s2, role: "option", tabIndex: r2 === true ? void 0 : -1, "aria-disabled": r2 === true ? true : void 0, "aria-selected": d2.value, disabled: void 0, onClick: i, onFocus: k2, onPointermove: h2, onMousemove: h2, onPointerleave: w2, onMouseleave: w2 };
-    return P({ ourProps: a2, theirProps: w$1(o$12, ["value", "disabled"]), slot: f2, attrs: l2, slots: m2, name: "ListboxOption" });
-  };
-} });
-function l(r2) {
+function l(r) {
   let e2 = { called: false };
   return (...t2) => {
     if (!e2.called)
-      return e2.called = true, r2(...t2);
+      return e2.called = true, r(...t2);
   };
 }
 function m(e2, ...t2) {
@@ -2372,24 +5740,24 @@ function F$1(e2, t2) {
   let i = s();
   if (!e2)
     return i.dispose;
-  let { transitionDuration: n2, transitionDelay: a2 } = getComputedStyle(e2), [l2, s$12] = [n2, a2].map((o2) => {
-    let [u2 = 0] = o2.split(",").filter(Boolean).map((r2) => r2.includes("ms") ? parseFloat(r2) : parseFloat(r2) * 1e3).sort((r2, c2) => c2 - r2);
+  let { transitionDuration: n2, transitionDelay: a } = getComputedStyle(e2), [l2, s$1] = [n2, a].map((o2) => {
+    let [u2 = 0] = o2.split(",").filter(Boolean).map((r) => r.includes("ms") ? parseFloat(r) : parseFloat(r) * 1e3).sort((r, c2) => c2 - r);
     return u2;
   });
-  return l2 !== 0 ? i.setTimeout(() => t2("finished"), l2 + s$12) : t2("finished"), i.add(() => t2("cancelled")), i.dispose;
+  return l2 !== 0 ? i.setTimeout(() => t2("finished"), l2 + s$1) : t2("finished"), i.add(() => t2("cancelled")), i.dispose;
 }
-function L(e2, t2, i, n2, a2, l$12) {
-  let s$12 = s(), o2 = l$12 !== void 0 ? l(l$12) : () => {
+function L(e2, t2, i, n2, a, l$12) {
+  let s$1 = s(), o2 = l$12 !== void 0 ? l(l$12) : () => {
   };
-  return d$1(e2, ...a2), m(e2, ...t2, ...i), s$12.nextFrame(() => {
-    d$1(e2, ...i), m(e2, ...n2), s$12.add(F$1(e2, (u2) => (d$1(e2, ...n2, ...t2), m(e2, ...a2), o2(u2))));
-  }), s$12.add(() => d$1(e2, ...t2, ...i, ...n2, ...a2)), s$12.add(() => o2("cancelled")), s$12.dispose;
+  return d$1(e2, ...a), m(e2, ...t2, ...i), s$1.nextFrame(() => {
+    d$1(e2, ...i), m(e2, ...n2), s$1.add(F$1(e2, (u2) => (d$1(e2, ...n2, ...t2), m(e2, ...a), o2(u2))));
+  }), s$1.add(() => d$1(e2, ...t2, ...i, ...n2, ...a)), s$1.add(() => o2("cancelled")), s$1.dispose;
 }
 function d(e2 = "") {
   return e2.split(" ").filter((t2) => t2.trim().length > 1);
 }
 let B = Symbol("TransitionContext");
-var ae = ((a2) => (a2.Visible = "visible", a2.Hidden = "hidden", a2))(ae || {});
+var ae = ((a) => (a.Visible = "visible", a.Hidden = "hidden", a))(ae || {});
 function le() {
   return inject(B, null) !== null;
 }
@@ -2410,35 +5778,35 @@ function w(e2) {
   return "children" in e2 ? w(e2.children) : e2.value.filter(({ state: t2 }) => t2 === "visible").length > 0;
 }
 function K(e2) {
-  let t2 = ref([]), a2 = ref(false);
-  onMounted(() => a2.value = true), onUnmounted(() => a2.value = false);
-  function s2(r2, n2 = O$1.Hidden) {
-    let l2 = t2.value.findIndex(({ id: i }) => i === r2);
-    l2 !== -1 && (u(n2, { [O$1.Unmount]() {
+  let t2 = ref([]), a = ref(false);
+  onMounted(() => a.value = true), onUnmounted(() => a.value = false);
+  function s2(r, n2 = O.Hidden) {
+    let l2 = t2.value.findIndex(({ id: i }) => i === r);
+    l2 !== -1 && (u(n2, { [O.Unmount]() {
       t2.value.splice(l2, 1);
-    }, [O$1.Hidden]() {
+    }, [O.Hidden]() {
       t2.value[l2].state = "hidden";
-    } }), !w(t2) && a2.value && (e2 == null || e2()));
+    } }), !w(t2) && a.value && (e2 == null || e2()));
   }
-  function v2(r2) {
-    let n2 = t2.value.find(({ id: l2 }) => l2 === r2);
-    return n2 ? n2.state !== "visible" && (n2.state = "visible") : t2.value.push({ id: r2, state: "visible" }), () => s2(r2, O$1.Unmount);
+  function v(r) {
+    let n2 = t2.value.find(({ id: l2 }) => l2 === r);
+    return n2 ? n2.state !== "visible" && (n2.state = "visible") : t2.value.push({ id: r, state: "visible" }), () => s2(r, O.Unmount);
   }
-  return { children: t2, register: v2, unregister: s2 };
+  return { children: t2, register: v, unregister: s2 };
 }
-let _ = R.RenderStrategy, oe = defineComponent({ props: { as: { type: [Object, String], default: "div" }, show: { type: [Boolean], default: null }, unmount: { type: [Boolean], default: true }, appear: { type: [Boolean], default: false }, enter: { type: [String], default: "" }, enterFrom: { type: [String], default: "" }, enterTo: { type: [String], default: "" }, entered: { type: [String], default: "" }, leave: { type: [String], default: "" }, leaveFrom: { type: [String], default: "" }, leaveTo: { type: [String], default: "" } }, emits: { beforeEnter: () => true, afterEnter: () => true, beforeLeave: () => true, afterLeave: () => true }, setup(e2, { emit: t$1, attrs: a2, slots: s2, expose: v2 }) {
-  if (!le() && f$2())
-    return () => h$1(fe, { ...e2, onBeforeEnter: () => t$1("beforeEnter"), onAfterEnter: () => t$1("afterEnter"), onBeforeLeave: () => t$1("beforeLeave"), onAfterLeave: () => t$1("afterLeave") }, s2);
-  let r2 = ref(null), n2 = ref("visible"), l2 = computed(() => e2.unmount ? O$1.Unmount : O$1.Hidden);
-  v2({ el: r2, $el: r2 });
-  let { show: i, appear: x2 } = ie(), { register: g$12, unregister: p2 } = se(), R2 = { value: true }, m2 = t(), S = { value: false }, N2 = K(() => {
+let _ = R.RenderStrategy, oe = defineComponent({ props: { as: { type: [Object, String], default: "div" }, show: { type: [Boolean], default: null }, unmount: { type: [Boolean], default: true }, appear: { type: [Boolean], default: false }, enter: { type: [String], default: "" }, enterFrom: { type: [String], default: "" }, enterTo: { type: [String], default: "" }, entered: { type: [String], default: "" }, leave: { type: [String], default: "" }, leaveFrom: { type: [String], default: "" }, leaveTo: { type: [String], default: "" } }, emits: { beforeEnter: () => true, afterEnter: () => true, beforeLeave: () => true, afterLeave: () => true }, setup(e2, { emit: t$1, attrs: a, slots: s2, expose: v }) {
+  if (!le() && f())
+    return () => h(fe, { ...e2, onBeforeEnter: () => t$1("beforeEnter"), onAfterEnter: () => t$1("afterEnter"), onBeforeLeave: () => t$1("beforeLeave"), onAfterLeave: () => t$1("afterLeave") }, s2);
+  let r = ref(null), n2 = ref("visible"), l2 = computed(() => e2.unmount ? O.Unmount : O.Hidden);
+  v({ el: r, $el: r });
+  let { show: i, appear: x2 } = ie(), { register: g$12, unregister: p2 } = se(), R2 = { value: true }, m2 = t(), S = { value: false }, N = K(() => {
     S.value || (n2.value = "hidden", p2(m2), t$1("afterLeave"));
   });
   onMounted(() => {
     let o2 = g$12(m2);
     onUnmounted(o2);
   }), watchEffect(() => {
-    if (l2.value === O$1.Hidden && !!m2) {
+    if (l2.value === O.Hidden && !!m2) {
       if (i && n2.value !== "visible") {
         n2.value = "visible";
         return;
@@ -2446,104 +5814,548 @@ let _ = R.RenderStrategy, oe = defineComponent({ props: { as: { type: [Object, S
       u(n2.value, { ["hidden"]: () => p2(m2), ["visible"]: () => g$12(m2) });
     }
   });
-  let k2 = d(e2.enter), $ = d(e2.enterFrom), q = d(e2.enterTo), O2 = d(e2.entered), z = d(e2.leave), G = d(e2.leaveFrom), J = d(e2.leaveTo);
+  let k2 = d(e2.enter), $ = d(e2.enterFrom), q = d(e2.enterTo), O$1 = d(e2.entered), z = d(e2.leave), G = d(e2.leaveFrom), J = d(e2.leaveTo);
   onMounted(() => {
     watchEffect(() => {
       if (n2.value === "visible") {
-        let o$12 = o(r2);
-        if (o$12 instanceof Comment && o$12.data === "")
+        let o$1 = o(r);
+        if (o$1 instanceof Comment && o$1.data === "")
           throw new Error("Did you forget to passthrough the `ref` to the actual DOM node?");
       }
     });
   });
-  function Q(o$12) {
-    let c2 = R2.value && !x2.value, u2 = o(r2);
-    !u2 || !(u2 instanceof HTMLElement) || c2 || (S.value = true, i.value && t$1("beforeEnter"), i.value || t$1("beforeLeave"), o$12(i.value ? L(u2, k2, $, q, O2, (C) => {
+  function Q(o$1) {
+    let c2 = R2.value && !x2.value, u2 = o(r);
+    !u2 || !(u2 instanceof HTMLElement) || c2 || (S.value = true, i.value && t$1("beforeEnter"), i.value || t$1("beforeLeave"), o$1(i.value ? L(u2, k2, $, q, O$1, (C) => {
       S.value = false, C === g.Finished && t$1("afterEnter");
-    }) : L(u2, z, G, J, O2, (C) => {
-      S.value = false, C === g.Finished && (w(N2) || (n2.value = "hidden", p2(m2), t$1("afterLeave")));
+    }) : L(u2, z, G, J, O$1, (C) => {
+      S.value = false, C === g.Finished && (w(N) || (n2.value = "hidden", p2(m2), t$1("afterLeave")));
     })));
   }
   return onMounted(() => {
     watch([i], (o2, c2, u2) => {
       Q(u2), R2.value = false;
     }, { immediate: true });
-  }), provide(F, N2), c(computed(() => u(n2.value, { ["visible"]: l$1.Open, ["hidden"]: l$1.Closed }))), () => {
-    let { appear: o2, show: c2, enter: u2, enterFrom: C, enterTo: de2, entered: ve, leave: pe, leaveFrom: me, leaveTo: Te, ...W } = e2;
-    return P({ theirProps: W, ourProps: { ref: r2 }, slot: {}, slots: s2, attrs: a2, features: _, visible: n2.value === "visible", name: "TransitionChild" });
+  }), provide(F, N), c(computed(() => u(n2.value, { ["visible"]: l$1.Open, ["hidden"]: l$1.Closed }))), () => {
+    let { appear: o2, show: c2, enter: u2, enterFrom: C, enterTo: de, entered: ve, leave: pe, leaveFrom: me, leaveTo: Te, ...W } = e2;
+    return V({ theirProps: W, ourProps: { ref: r }, slot: {}, slots: s2, attrs: a, features: _, visible: n2.value === "visible", name: "TransitionChild" });
   };
-} }), ue = oe, fe = defineComponent({ inheritAttrs: false, props: { as: { type: [Object, String], default: "div" }, show: { type: [Boolean], default: null }, unmount: { type: [Boolean], default: true }, appear: { type: [Boolean], default: false }, enter: { type: [String], default: "" }, enterFrom: { type: [String], default: "" }, enterTo: { type: [String], default: "" }, entered: { type: [String], default: "" }, leave: { type: [String], default: "" }, leaveFrom: { type: [String], default: "" }, leaveTo: { type: [String], default: "" } }, emits: { beforeEnter: () => true, afterEnter: () => true, beforeLeave: () => true, afterLeave: () => true }, setup(e2, { emit: t2, attrs: a2, slots: s2 }) {
-  let v2 = p(), r2 = computed(() => e2.show === null && v2 !== null ? u(v2.value, { [l$1.Open]: true, [l$1.Closed]: false }) : e2.show);
+} }), ue = oe, fe = defineComponent({ inheritAttrs: false, props: { as: { type: [Object, String], default: "div" }, show: { type: [Boolean], default: null }, unmount: { type: [Boolean], default: true }, appear: { type: [Boolean], default: false }, enter: { type: [String], default: "" }, enterFrom: { type: [String], default: "" }, enterTo: { type: [String], default: "" }, entered: { type: [String], default: "" }, leave: { type: [String], default: "" }, leaveFrom: { type: [String], default: "" }, leaveTo: { type: [String], default: "" } }, emits: { beforeEnter: () => true, afterEnter: () => true, beforeLeave: () => true, afterLeave: () => true }, setup(e2, { emit: t2, attrs: a, slots: s2 }) {
+  let v = p(), r = computed(() => e2.show === null && v !== null ? u(v.value, { [l$1.Open]: true, [l$1.Closed]: false }) : e2.show);
   watchEffect(() => {
-    if (![true, false].includes(r2.value))
+    if (![true, false].includes(r.value))
       throw new Error('A <Transition /> is used but it is missing a `:show="true | false"` prop.');
   });
-  let n2 = ref(r2.value ? "visible" : "hidden"), l2 = K(() => {
+  let n2 = ref(r.value ? "visible" : "hidden"), l2 = K(() => {
     n2.value = "hidden";
-  }), i = ref(true), x2 = { show: r2, appear: computed(() => e2.appear || !i.value) };
+  }), i = ref(true), x2 = { show: r, appear: computed(() => e2.appear || !i.value) };
   return onMounted(() => {
     watchEffect(() => {
-      i.value = false, r2.value ? n2.value = "visible" : w(l2) || (n2.value = "hidden");
+      i.value = false, r.value ? n2.value = "visible" : w(l2) || (n2.value = "hidden");
     });
   }), provide(F, l2), provide(B, x2), () => {
     let g2 = w$1(e2, ["show", "appear", "unmount", "onBeforeEnter", "onBeforeLeave", "onAfterEnter", "onAfterLeave"]), p2 = { unmount: e2.unmount };
-    return P({ ourProps: { ...p2, as: "template" }, theirProps: {}, slot: {}, slots: { ...s2, default: () => [h$1(ue, { onBeforeEnter: () => t2("beforeEnter"), onAfterEnter: () => t2("afterEnter"), onBeforeLeave: () => t2("beforeLeave"), onAfterLeave: () => t2("afterLeave"), ...a2, ...p2, ...g2 }, s2.default)] }, attrs: {}, features: _, visible: n2.value === "visible", name: "Transition" });
+    return V({ ourProps: { ...p2, as: "template" }, theirProps: {}, slot: {}, slots: { ...s2, default: () => [h(ue, { onBeforeEnter: () => t2("beforeEnter"), onAfterEnter: () => t2("afterEnter"), onBeforeLeave: () => t2("beforeLeave"), onAfterLeave: () => t2("afterLeave"), ...a, ...p2, ...g2 }, s2.default)] }, attrs: {}, features: _, visible: n2.value === "visible", name: "Transition" });
   };
 } });
-const _sfc_main$s = {
-  __name: "SortDropdown",
+const _sfc_main$9 = /* @__PURE__ */ defineComponent({
+  __name: "Alert",
   __ssrInlineRender: true,
   props: {
-    options: {
-      type: Array,
-      default: () => []
+    title: {
+      type: String,
+      default: void 0
+    },
+    text: {
+      type: String,
+      default: void 0
+    },
+    type: {
+      type: String,
+      default: "primary"
     }
   },
-  emits: ["select"],
-  setup(__props, { emit }) {
-    return (_ctx, _push, _parent, _attrs) => {
-      {
-        _push(`<!---->`);
-      }
-    };
-  }
-};
-const _sfc_setup$s = _sfc_main$s.setup;
-_sfc_main$s.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/SortDropdown.vue");
-  return _sfc_setup$s ? _sfc_setup$s(props, ctx) : void 0;
-};
-const _sfc_main$r = /* @__PURE__ */ defineComponent({
-  __name: "Filter",
-  __ssrInlineRender: true,
   setup(__props) {
-    const filterOptions = ref([
-      { text: "\u89C0\u770B\u6B21\u6578", value: "" },
-      { text: "\u6536\u85CF\u6B21\u6578", value: "" },
-      { text: "\u4E0A\u50B3\u65E5\u671F(\u6700\u65B0)", value: "" },
-      { text: "\u4E0A\u50B3\u65E5\u671F(\u6700\u820A)", value: "" }
-    ]);
-    const filterSelect = (select) => {
-      return select;
+    const props = __props;
+    const styles = reactive({
+      primary: "",
+      success: "dark:from-green-500/50 via-gray-200 to-gray-200 dark:via-slate-800 dark:to-slate-800",
+      warning: "dark:from-yellow-500/50 via-gray-200 to-gray-200 dark:via-slate-800 dark:to-slate-800",
+      danger: "dark:from-red-500/50 via-gray-200 to-gray-200 dark:via-slate-800 dark:to-slate-800"
+    });
+    const textStyles = reactive({
+      primary: "text-white",
+      success: "text-green-500",
+      warning: "text-orange-500",
+      danger: "text-red-500"
+    });
+    const isDestroyed = ref(false);
+    const selectedType = computed(() => {
+      if (["primary", "success", "warning", "danger"].includes(props.type))
+        return props.type;
+      return "primary";
+    });
+    const selectedStyle = computed(() => styles[selectedType.value]);
+    const selectedTextStyle = computed(() => textStyles[selectedType.value]);
+    const close = () => {
+      isDestroyed.value = true;
     };
     return (_ctx, _push, _parent, _attrs) => {
-      const _component_SortDropdown = _sfc_main$s;
-      _push(ssrRenderComponent(_component_SortDropdown, mergeProps({
-        options: filterOptions.value,
-        onSelect: filterSelect
-      }, _attrs), null, _parent));
+      const _component_IconMdi58checkCircle = __unplugin_components_0;
+      const _component_icon_clarity58times_circle_solid = __unplugin_components_1;
+      const _component_icon_bi58exclamation_circle_fill = __unplugin_components_2;
+      const _component_icon_clarity58times_line = __unplugin_components_3;
+      _push(ssrRenderComponent(unref(fe), mergeProps({
+        show: !isDestroyed.value,
+        appear: ""
+      }, _attrs), {
+        default: withCtx((_2, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(unref(oe), {
+              as: "template",
+              enter: "duration-300 ease-out",
+              "enter-from": "opacity-0",
+              "enter-to": "opacity-100",
+              leave: "duration-300 ease-in",
+              "leave-from": "opacity-100",
+              "leave-to": "opacity-0"
+            }, {
+              default: withCtx((_22, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(`<div class="${ssrRenderClass(`bg-gray-200 dark:bg-slate-800 bg-gradient-to-r shadow-white/50 dark:shadow-slate-900/50 px-6 py-6 rounded-md shadow-lg flex space-x-6 ${unref(selectedStyle)}`)}"${_scopeId2}><div class="flex items-center justify-center"${_scopeId2}>`);
+                  ssrRenderSlot(_ctx.$slots, "icon", {}, () => {
+                    if (unref(selectedType) === "success") {
+                      _push3(ssrRenderComponent(_component_IconMdi58checkCircle, {
+                        class: `text-2xl ${unref(selectedTextStyle)}`
+                      }, null, _parent3, _scopeId2));
+                    } else {
+                      _push3(`<!---->`);
+                    }
+                    if (unref(selectedType) === "danger") {
+                      _push3(ssrRenderComponent(_component_icon_clarity58times_circle_solid, {
+                        class: `text-2xl ${unref(selectedTextStyle)}`
+                      }, null, _parent3, _scopeId2));
+                    } else {
+                      _push3(`<!---->`);
+                    }
+                    if (unref(selectedType) === "warning") {
+                      _push3(ssrRenderComponent(_component_icon_bi58exclamation_circle_fill, {
+                        class: `text-2xl ${unref(selectedTextStyle)}`
+                      }, null, _parent3, _scopeId2));
+                    } else {
+                      _push3(`<!---->`);
+                    }
+                  }, _push3, _parent3, _scopeId2);
+                  _push3(`</div><div class="flex-1"${_scopeId2}><div class="${ssrRenderClass(`font-bold text-lg mb-0.5 ${unref(selectedTextStyle)}`)}"${_scopeId2}>`);
+                  ssrRenderSlot(_ctx.$slots, "title", {}, () => {
+                    _push3(`${ssrInterpolate(props.title)}`);
+                  }, _push3, _parent3, _scopeId2);
+                  _push3(`</div><div class="text-gray-700 dark:text-gray-100"${_scopeId2}>`);
+                  ssrRenderSlot(_ctx.$slots, "title", {}, () => {
+                    _push3(`${ssrInterpolate(props.text)}`);
+                  }, _push3, _parent3, _scopeId2);
+                  _push3(`</div></div><div${_scopeId2}><button class="text-slate-600 hover:text-red-500 dark:text-gray-400 font-bold"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_icon_clarity58times_line, null, null, _parent3, _scopeId2));
+                  _push3(`</button></div></div>`);
+                } else {
+                  return [
+                    createVNode("div", {
+                      class: `bg-gray-200 dark:bg-slate-800 bg-gradient-to-r shadow-white/50 dark:shadow-slate-900/50 px-6 py-6 rounded-md shadow-lg flex space-x-6 ${unref(selectedStyle)}`
+                    }, [
+                      createVNode("div", { class: "flex items-center justify-center" }, [
+                        renderSlot(_ctx.$slots, "icon", {}, () => [
+                          unref(selectedType) === "success" ? (openBlock(), createBlock(_component_IconMdi58checkCircle, {
+                            key: 0,
+                            class: `text-2xl ${unref(selectedTextStyle)}`
+                          }, null, 8, ["class"])) : createCommentVNode("", true),
+                          unref(selectedType) === "danger" ? (openBlock(), createBlock(_component_icon_clarity58times_circle_solid, {
+                            key: 1,
+                            class: `text-2xl ${unref(selectedTextStyle)}`
+                          }, null, 8, ["class"])) : createCommentVNode("", true),
+                          unref(selectedType) === "warning" ? (openBlock(), createBlock(_component_icon_bi58exclamation_circle_fill, {
+                            key: 2,
+                            class: `text-2xl ${unref(selectedTextStyle)}`
+                          }, null, 8, ["class"])) : createCommentVNode("", true)
+                        ])
+                      ]),
+                      createVNode("div", { class: "flex-1" }, [
+                        createVNode("div", {
+                          class: `font-bold text-lg mb-0.5 ${unref(selectedTextStyle)}`
+                        }, [
+                          renderSlot(_ctx.$slots, "title", {}, () => [
+                            createTextVNode(toDisplayString$1(props.title), 1)
+                          ])
+                        ], 2),
+                        createVNode("div", { class: "text-gray-700 dark:text-gray-100" }, [
+                          renderSlot(_ctx.$slots, "title", {}, () => [
+                            createTextVNode(toDisplayString$1(props.text), 1)
+                          ])
+                        ])
+                      ]),
+                      createVNode("div", null, [
+                        createVNode("button", {
+                          class: "text-slate-600 hover:text-red-500 dark:text-gray-400 font-bold",
+                          onClick: close
+                        }, [
+                          createVNode(_component_icon_clarity58times_line)
+                        ])
+                      ])
+                    ], 2)
+                  ];
+                }
+              }),
+              _: 3
+            }, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(unref(oe), {
+                as: "template",
+                enter: "duration-300 ease-out",
+                "enter-from": "opacity-0",
+                "enter-to": "opacity-100",
+                leave: "duration-300 ease-in",
+                "leave-from": "opacity-100",
+                "leave-to": "opacity-0"
+              }, {
+                default: withCtx(() => [
+                  createVNode("div", {
+                    class: `bg-gray-200 dark:bg-slate-800 bg-gradient-to-r shadow-white/50 dark:shadow-slate-900/50 px-6 py-6 rounded-md shadow-lg flex space-x-6 ${unref(selectedStyle)}`
+                  }, [
+                    createVNode("div", { class: "flex items-center justify-center" }, [
+                      renderSlot(_ctx.$slots, "icon", {}, () => [
+                        unref(selectedType) === "success" ? (openBlock(), createBlock(_component_IconMdi58checkCircle, {
+                          key: 0,
+                          class: `text-2xl ${unref(selectedTextStyle)}`
+                        }, null, 8, ["class"])) : createCommentVNode("", true),
+                        unref(selectedType) === "danger" ? (openBlock(), createBlock(_component_icon_clarity58times_circle_solid, {
+                          key: 1,
+                          class: `text-2xl ${unref(selectedTextStyle)}`
+                        }, null, 8, ["class"])) : createCommentVNode("", true),
+                        unref(selectedType) === "warning" ? (openBlock(), createBlock(_component_icon_bi58exclamation_circle_fill, {
+                          key: 2,
+                          class: `text-2xl ${unref(selectedTextStyle)}`
+                        }, null, 8, ["class"])) : createCommentVNode("", true)
+                      ])
+                    ]),
+                    createVNode("div", { class: "flex-1" }, [
+                      createVNode("div", {
+                        class: `font-bold text-lg mb-0.5 ${unref(selectedTextStyle)}`
+                      }, [
+                        renderSlot(_ctx.$slots, "title", {}, () => [
+                          createTextVNode(toDisplayString$1(props.title), 1)
+                        ])
+                      ], 2),
+                      createVNode("div", { class: "text-gray-700 dark:text-gray-100" }, [
+                        renderSlot(_ctx.$slots, "title", {}, () => [
+                          createTextVNode(toDisplayString$1(props.text), 1)
+                        ])
+                      ])
+                    ]),
+                    createVNode("div", null, [
+                      createVNode("button", {
+                        class: "text-slate-600 hover:text-red-500 dark:text-gray-400 font-bold",
+                        onClick: close
+                      }, [
+                        createVNode(_component_icon_clarity58times_line)
+                      ])
+                    ])
+                  ], 2)
+                ]),
+                _: 3
+              })
+            ];
+          }
+        }),
+        _: 3
+      }, _parent));
     };
   }
 });
-const _sfc_setup$r = _sfc_main$r.setup;
-_sfc_main$r.setup = (props, ctx) => {
+const _sfc_setup$9 = _sfc_main$9.setup;
+_sfc_main$9.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Filter.vue");
-  return _sfc_setup$r ? _sfc_setup$r(props, ctx) : void 0;
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Alert.vue");
+  return _sfc_setup$9 ? _sfc_setup$9(props, ctx) : void 0;
 };
+const Alert = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$9
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$8 = /* @__PURE__ */ defineComponent({
+  __name: "index",
+  __ssrInlineRender: true,
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false
+    }
+  },
+  setup(__props) {
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "card duration-300 transition-colors w-full relative rounded overflow-hidden bg-white dark:bg-slate-900 border border-gray-900/10 dark:border-gray-50/[0.2]" }, _attrs))}>`);
+      if (__props.disabled) {
+        _push(`<div class="absolute z-10 top-0 left-0 w-full h-full bg-slate-800/[0.75] cursor-not-allowed"></div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$8 = _sfc_main$8.setup;
+_sfc_main$8.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Card/index.vue");
+  return _sfc_setup$8 ? _sfc_setup$8(props, ctx) : void 0;
+};
+const index = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$8
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$7 = {};
+function _sfc_ssrRender$1(_ctx, _push, _parent, _attrs) {
+  _push(`<div${ssrRenderAttrs(mergeProps({ class: "card-content px-6 py-6 relative" }, _attrs))}>`);
+  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+  _push(`</div>`);
+}
+const _sfc_setup$7 = _sfc_main$7.setup;
+_sfc_main$7.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Card/Content.vue");
+  return _sfc_setup$7 ? _sfc_setup$7(props, ctx) : void 0;
+};
+const __nuxt_component_7 = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["ssrRender", _sfc_ssrRender$1]]);
+const Content = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_7
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$6 = /* @__PURE__ */ defineComponent({
+  __name: "Title",
+  __ssrInlineRender: true,
+  props: {
+    text: {
+      type: String,
+      default: ""
+    }
+  },
+  setup(__props) {
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "text-xl font-semibold mb-2" }, _attrs))}>`);
+      ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+        _push(`${ssrInterpolate(__props.text)}`);
+      }, _push, _parent);
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$6 = _sfc_main$6.setup;
+_sfc_main$6.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Card/Title.vue");
+  return _sfc_setup$6 ? _sfc_setup$6(props, ctx) : void 0;
+};
+const Title$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$6
+}, Symbol.toStringTag, { value: "Module" }));
+const useSyncProps = (props, key, emit) => {
+  return computed({
+    get() {
+      return props[key];
+    },
+    set(value) {
+      emit(`update:${key}`, value);
+    }
+  });
+};
+const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+  __name: "TextInput",
+  __ssrInlineRender: true,
+  props: {
+    modelValue: {
+      type: String,
+      default: ""
+    },
+    placeholder: {
+      type: String,
+      default: ""
+    },
+    size: {
+      type: String,
+      default: "md"
+    },
+    type: {
+      type: String,
+      default: "default"
+    }
+  },
+  emits: ["update:modelValue"],
+  setup(__props, { emit }) {
+    const props = __props;
+    const slots = useSlots();
+    const paddingStyles = reactive({
+      xs: "px-1 py-0.5",
+      sm: "px-2 py-1.5",
+      md: "px-4 py-2",
+      lg: "px-5 py-3"
+    });
+    const fontSizeStyles = reactive({
+      xs: "text-xs",
+      sm: "text-sm",
+      md: "text-base",
+      lg: "text-lg"
+    });
+    const modelValue = useSyncProps(props, "modelValue", emit);
+    const havePreEl = computed(
+      () => typeof slots.prefix !== "undefined" || typeof slots["prefix-disabled"] !== "undefined"
+    );
+    const haveSuEl = computed(() => typeof slots.suffix !== "undefined");
+    const selectedBorderStyle = computed(
+      () => "border-gray-900/10 dark:border-gray-50/[0.2]"
+    );
+    const selectedOnHoverBorderStyle = computed(
+      () => "dark:focus:border-white focus:border-gray-900"
+    );
+    const selectedPaddingStyle = computed(
+      () => paddingStyles[props.size] || paddingStyles.md
+    );
+    const selectedFontSizeStyle = computed(
+      () => fontSizeStyles[props.size] || fontSizeStyles.md
+    );
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: `text-input-container relative flex` }, _attrs))}>`);
+      if (unref(slots)["prefix-disabled"]) {
+        _push(`<div class="${ssrRenderClass(`flex rounded-l bg-gray-100 dark:bg-slate-800 text-gray-500 border ${unref(selectedBorderStyle)}`)}">`);
+        ssrRenderSlot(_ctx.$slots, "prefix-disabled", {}, null, _push, _parent);
+        _push(`</div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(slots).prefix) {
+        _push(`<div class="${ssrRenderClass(`flex rounded-l border ${unref(selectedBorderStyle)}`)}">`);
+        ssrRenderSlot(_ctx.$slots, "prefix", {}, null, _push, _parent);
+        _push(`</div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`<div class="text-input-wrapper relative flex flex-1"><input${ssrRenderDynamicModel(__props.type, unref(modelValue), null)} class="${ssrRenderClass(`text-input w-full flex-1 bg-transparent outline-none border ${unref(havePreEl) ? "" : "rounded-l"} ${unref(haveSuEl) ? "" : "rounded-r"} ${unref(selectedBorderStyle)} ${unref(selectedOnHoverBorderStyle)} ${unref(selectedPaddingStyle)} ${unref(selectedFontSizeStyle)}`)}"${ssrRenderAttr("type", __props.type)}${ssrRenderAttr("placeholder", __props.placeholder)}></div>`);
+      if (unref(slots).suffix) {
+        _push(`<div class="${ssrRenderClass(`flex rounded-r border ${unref(selectedBorderStyle)}`)}">`);
+        ssrRenderSlot(_ctx.$slots, "suffix", {}, null, _push, _parent);
+        _push(`</div>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$5 = _sfc_main$5.setup;
+_sfc_main$5.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Form/TextInput.vue");
+  return _sfc_setup$5 ? _sfc_setup$5(props, ctx) : void 0;
+};
+const TextInput = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$5
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$4 = {};
+function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
+  _push(`<div${ssrRenderAttrs(mergeProps({ class: "card-footer px-6 py-2 text-sm bg-white dark:bg-slate-800 border-t border-gray-900/10 dark:border-gray-50/[0.2]" }, _attrs))}>`);
+  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+  _push(`</div>`);
+}
+const _sfc_setup$4 = _sfc_main$4.setup;
+_sfc_main$4.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Card/Footer.vue");
+  return _sfc_setup$4 ? _sfc_setup$4(props, ctx) : void 0;
+};
+const __nuxt_component_10 = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["ssrRender", _sfc_ssrRender]]);
+const Footer = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_10
+}, Symbol.toStringTag, { value: "Module" }));
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+  __name: "Switch",
+  __ssrInlineRender: true,
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    },
+    on: {
+      type: Boolean,
+      default: false
+    },
+    id: {
+      type: String,
+      default: void 0
+    }
+  },
+  emits: ["update:modelValue"],
+  setup(__props, { emit }) {
+    const props = __props;
+    const randomId = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const id = ref(props.id || randomId());
+    ref();
+    const checked = useSyncProps(props, "modelValue", emit);
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<label${ssrRenderAttrs(mergeProps({
+        for: id.value,
+        class: "flex cursor-pointer"
+      }, _attrs))}><label${ssrRenderAttr("for", id.value)} class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in"><input${ssrRenderAttr("id", id.value)} type="checkbox" class="switch-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-600 appearance-none cursor-pointer"${ssrIncludeBooleanAttr(unref(checked)) ? " checked" : ""}><label${ssrRenderAttr("for", id.value)} class="switch-label block overflow-hidden h-6 rounded-full bg-gray-200 dark:bg-slate-700 cursor-pointer border border-slate-300 dark:border-slate-500"></label></label>`);
+      ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+      _push(`</label>`);
+    };
+  }
+});
+const _sfc_setup$3 = _sfc_main$3.setup;
+_sfc_main$3.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Form/Switch.vue");
+  return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
+};
+const Switch = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$3
+}, Symbol.toStringTag, { value: "Module" }));
+const meta$1 = {
+  layout: "page"
+};
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "Title",
+  __ssrInlineRender: true,
+  props: {
+    text: {
+      type: String,
+      default: ""
+    }
+  },
+  setup(__props) {
+    return (_ctx, _push, _parent, _attrs) => {
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "text-2xl font-semibold mb-2" }, _attrs))}>`);
+      ssrRenderSlot(_ctx.$slots, "default", {}, () => {
+        _push(`${ssrInterpolate(__props.text)}`);
+      }, _push, _parent);
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$2 = _sfc_main$2.setup;
+_sfc_main$2.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Page/Section/Title.vue");
+  return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
+};
+const Title$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: _sfc_main$2
+}, Symbol.toStringTag, { value: "Module" }));
 /*!
-  * pinia v2.0.23
+  * pinia v2.0.22
   * (c) 2022 Eduardo San Martin Morote
   * @license MIT
   */
@@ -2643,7 +6455,7 @@ function isComputed(o2) {
 function createOptionsStore(id, options, pinia, hot) {
   const { state, actions, getters } = options;
   const initialState = pinia.state.value[id];
-  let store2;
+  let store;
   function setup() {
     if (!initialState && (!("production" !== "production") )) {
       {
@@ -2654,20 +6466,20 @@ function createOptionsStore(id, options, pinia, hot) {
     return assign(localState, actions, Object.keys(getters || {}).reduce((computedGetters, name) => {
       computedGetters[name] = markRaw(computed(() => {
         setActivePinia(pinia);
-        const store3 = pinia._s.get(id);
-        return getters[name].call(store3, store3);
+        const store2 = pinia._s.get(id);
+        return getters[name].call(store2, store2);
       }));
       return computedGetters;
     }, {}));
   }
-  store2 = createSetupStore(id, setup, options, pinia, hot, true);
-  store2.$reset = function $reset() {
+  store = createSetupStore(id, setup, options, pinia, hot, true);
+  store.$reset = function $reset() {
     const newState = state ? state() : {};
     this.$patch(($state) => {
       assign($state, newState);
     });
   };
-  return store2;
+  return store;
 }
 function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) {
   let scope;
@@ -2738,13 +6550,13 @@ function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) 
       triggerSubscriptions(actionSubscriptions, {
         args,
         name,
-        store: store2,
+        store,
         after,
         onError
       });
       let ret;
       try {
-        ret = action.apply(this && this.$id === $id ? this : store2, args);
+        ret = action.apply(this && this.$id === $id ? this : store, args);
       } catch (error) {
         triggerSubscriptions(onErrorCallbackList, error);
         throw error;
@@ -2783,8 +6595,11 @@ function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) 
     },
     $dispose
   };
-  const store2 = reactive(partialStore);
-  pinia._s.set($id, store2);
+  const store = reactive(assign(
+    {},
+    partialStore
+  ));
+  pinia._s.set($id, store);
   const setupStore = pinia._e.run(() => {
     scope = effectScope();
     return scope.run(() => setup());
@@ -2813,10 +6628,10 @@ function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) 
     } else ;
   }
   {
-    assign(store2, setupStore);
-    assign(toRaw(store2), setupStore);
+    assign(store, setupStore);
+    assign(toRaw(store), setupStore);
   }
-  Object.defineProperty(store2, "$state", {
+  Object.defineProperty(store, "$state", {
     get: () => pinia.state.value[$id],
     set: (state) => {
       $patch(($state) => {
@@ -2826,8 +6641,8 @@ function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) 
   });
   pinia._p.forEach((extender) => {
     {
-      assign(store2, scope.run(() => extender({
-        store: store2,
+      assign(store, scope.run(() => extender({
+        store,
         app: pinia._a,
         pinia,
         options: optionsForPlugin
@@ -2835,11 +6650,11 @@ function createSetupStore($id, setup, options = {}, pinia, hot, isOptionsStore) 
     }
   });
   if (initialState && isOptionsStore && options.hydrate) {
-    options.hydrate(store2.$state, initialState);
+    options.hydrate(store.$state, initialState);
   }
   isListening = true;
   isSyncListening = true;
-  return store2;
+  return store;
 }
 function defineStore(idOrOptions, setup, setupOptions) {
   let id;
@@ -2865,2278 +6680,157 @@ function defineStore(idOrOptions, setup, setupOptions) {
         createOptionsStore(id, options, pinia);
       }
     }
-    const store2 = pinia._s.get(id);
-    return store2;
+    const store = pinia._s.get(id);
+    return store;
   }
   useStore.$id = id;
   return useStore;
 }
-function storeToRefs(store2) {
-  {
-    store2 = toRaw(store2);
-    const refs = {};
-    for (const key in store2) {
-      const value = store2[key];
-      if (isRef(value) || isReactive(value)) {
-        refs[key] = toRef(store2, key);
-      }
-    }
-    return refs;
-  }
-}
-const storage = {
-  suffix: "_deadtime",
-  get(key) {
-    return store.get(key);
-  },
-  info() {
-    const d2 = {};
-    store.each((value, key) => {
-      d2[key] = value;
-    });
-    return d2;
-  },
-  set(key, value, expires) {
-    store.set(key, value);
-    if (expires)
-      store.set(
-        `${key}${this.suffix}`,
-        Date.parse(String(new Date())) + expires * 1e3
-      );
-  },
-  isExpired(key) {
-    return (this.getExpiration(key) || 0) - Date.parse(String(new Date())) <= 2e3;
-  },
-  getExpiration(key) {
-    return this.get(key + this.suffix);
-  },
-  remove(key) {
-    store.remove(key);
-    this.removeExpiration(key);
-  },
-  removeExpiration(key) {
-    store.remove(key + this.suffix);
-  },
-  clearAll() {
-    store.clearAll();
-  }
-};
-const useUserStore = defineStore("user", () => {
-  const token = ref("");
-  function setToken(data) {
-    token.value = data.token;
-    storage.set("token", data.token, data.expire);
-    storage.set("refreshToken", data.refreshToken, data.refreshExpire);
-  }
-  const isLogin = ref(false);
-  async function refreshToken(token2) {
-    try {
-      const { data, error } = await useHttpFetchPost("/auth/refresh", {
-        body: { refreshToken: token2 }
-      });
-      if (!error) {
-        setToken(data);
-        await get();
-        set2(data);
-      }
-    } catch (e2) {
-      logout();
-    }
-  }
-  const info = ref(null);
-  async function get() {
-    const { code, error, data } = await useHttpFetchPost("/user/person");
-    if (error && code === 1005) {
-      const storeRefreshToken = storage.get("refreshToken");
-      await refreshToken(storeRefreshToken);
-    } else {
-      set2(data);
-    }
-    return data;
-  }
-  function set2(value) {
-    isLogin.value = true;
-    info.value = value;
-    storage.set("userInfo", value);
-  }
-  async function update(form) {
-    const $alert = useState("alert");
-    const updatePick = (({ firstName, lastName, birthday, gender, intro }) => ({
-      firstName,
-      lastName,
-      birthday,
-      gender,
-      intro
-    }))(form);
-    if (JSON.stringify(form) === JSON.stringify(updatePick))
-      return $alert.value = {
-        type: "info",
-        text: "\u672A\u4FEE\u6539\u500B\u4EBA\u8CC7\u6599",
-        center: true
-      };
-    const $loading = useState("loading");
-    $loading.value = true;
-    const { error, message } = await useHttpFetchPost("/user/update", {
-      body: {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        birthday: form.birthday,
-        gender: form.gender,
-        intro: form.intro
-      }
-    });
-    $loading.value = false;
-    if (error) {
-      return $alert.value = { type: "error", text: message, center: true };
-    }
-    updateField({
-      firstName: form.firstName,
-      lastName: form.lastName,
-      birthday: form.birthday,
-      gender: form.gender,
-      intro: form.intro
-    });
-    $alert.value = { type: "success", text: "\u500B\u4EBA\u8CC7\u6599\u5DF2\u66F4\u65B0", center: true };
-  }
-  function updateField(obj) {
-    for (const key in obj) {
-      info.value[key] = obj[key];
-    }
-    storage.set("userInfo", info.value);
-  }
-  async function login(loginForm) {
-    const { data, error, message } = await useHttpFetchPost(
-      "/auth/login",
-      {
-        body: {
-          phone: loginForm.phone,
-          password: loginForm.password
-        }
-      }
-    );
-    const $alert = useState("alert");
-    const $auth = useState("showAuth", () => false);
-    if (error && message) {
-      $alert.value = { type: "error", text: message, center: true };
-    } else {
-      $auth.value = false;
-      await setToken(data);
-      await get();
-      $alert.value = { type: "success", title: "\u767B\u5165\u6210\u529F" };
-      if (loginForm.rememberMe)
-        storage.set("loginData", loginForm);
-      else
-        storage.remove("loginData");
-    }
-  }
-  async function register(registerForm) {
-    const { error, message, data } = await useHttpFetchPost("/auth/register", {
-      body: {
-        firstName: registerForm.firstName,
-        lastName: registerForm.lastName,
-        birthday: registerForm.birthday,
-        phone: registerForm.phone,
-        password: registerForm.password,
-        gender: registerForm.gender,
-        passwordConfirm: registerForm.passwordConfirm,
-        verifyCode: registerForm.verifyCode
-      }
-    });
-    const $alert = useState("alert");
-    const $auth = useState("showAuth", () => false);
-    if (error && message) {
-      $alert.value = { type: "error", text: message, center: true };
-    } else {
-      $auth.value = false;
-      await setToken(data);
-      await get();
-      $alert.value = { type: "success", title: "\u767B\u5165\u6210\u529F" };
-      if (data.rememberMe)
-        storage.set("loginData", data);
-      else
-        storage.remove("loginData");
-    }
-    if (error) {
-      const $alert2 = useState("alert");
-      $alert2.value = {
-        type: "error",
-        title: "\u9A57\u8B49\u932F\u8AA4",
-        text: message,
-        center: true
-      };
-    }
-    return { error, message, data };
-  }
-  async function forgot(forgotForm) {
-    const { error, message, data } = await useHttpFetchPost("/auth/forgot", {
-      body: {
-        phone: forgotForm.phone,
-        password: forgotForm.password,
-        passwordConfirm: forgotForm.passwordConfirm,
-        verifyCode: forgotForm.verifyCode
-      }
-    });
-    const $alert = useState("alert");
-    const $auth = useState("showAuth", () => false);
-    if (error && message) {
-      $alert.value = { type: "error", text: message, center: true };
-    } else {
-      $auth.value = false;
-      await setToken(data);
-      await get();
-      $alert.value = { type: "success", title: "\u4FEE\u6539\u6210\u529F\uFF0C\u5DF2\u767B\u5165" };
-      if (data.rememberMe)
-        storage.set("loginData", forgotForm);
-      else
-        storage.remove("loginData");
-    }
-    if (error) {
-      const $alert2 = useState("alert");
-      $alert2.value = {
-        type: "error",
-        title: "\u9A57\u8B49\u932F\u8AA4",
-        text: message,
-        center: true
-      };
-    }
-    return { error, message, data };
-  }
-  async function logout() {
-    const $alert = useState("alert");
-    await useHttpFetchPost("/user/logout");
-    $alert.value = {
-      type: "success",
-      title: "\u767B\u51FA\u6210\u529F"
-    };
-    clear();
-  }
-  async function clear() {
-    return await new Promise((resolve) => {
-      var _a;
-      storage.remove("userInfo");
-      storage.remove("token");
-      const isLoginState = useState("isLogin");
-      isLoginState.value = false;
-      isLogin.value = false;
-      info.value = null;
-      token.value = "";
-      const route = useRoute();
-      const router = useRouter();
-      const middleware = (_a = route.meta.middleware) != null ? _a : [];
-      if (middleware && middleware.includes("auth"))
-        router.push("/");
-      resolve("");
-    });
-  }
-  return {
-    token,
-    info,
-    isLogin,
-    get,
-    set: set2,
-    update,
-    updateField,
-    login,
-    register,
-    forgot,
-    logout,
-    clear,
-    setToken,
-    refreshToken
-  };
-});
-function getTodayExpired() {
-  const current = new Date();
-  const full = 24 * 60 * 60;
-  const hours = current.getHours();
-  const minutes = current.getMinutes();
-  const seconds = current.getSeconds();
-  const total = hours * 60 + minutes * 60 + seconds;
-  return full - total;
-}
-const useTipStore = defineStore("tip", () => {
-  const info = ref(null);
-  const storageName = "tip";
-  function detect() {
-    const todayTip = storage.get(storageName);
-    return !todayTip || storage.isExpired(storageName);
-  }
-  async function get() {
-    if (!detect())
-      return;
-    try {
-      const tip = await useHttpFetchPost("/tip/today");
-      const { data, error } = tip;
-      if (!error) {
-        const $show = useState("tip.show", () => false);
-        const $tip = useState("tip.data");
-        $show.value = true;
-        $tip.value = {
-          id: data.id,
-          title: data.title,
-          content: data.content,
-          publishDate: data.publishDate
-        };
-        set2(data);
-        return data;
-      }
-    } catch (e2) {
-    }
-  }
-  function set2(value) {
-    info.value = value;
-    storage.set(storageName, 1, getTodayExpired());
-  }
-  function clear() {
-    storage.remove("today_tip");
-    info.value = {};
-  }
-  return {
-    info,
-    get,
-    set: set2,
-    clear
-  };
-});
-function useBaseStore() {
-  const user = useUserStore();
-  const tip = useTipStore();
-  return {
-    user,
-    tip
-  };
-}
-const fetchConfig = {
-  baseURL: "/api"
-};
-function useGetFetchOptions(options = {}) {
-  var _a, _b, _c, _d, _e;
-  options.baseURL = (_a = options.baseURL) != null ? _a : fetchConfig.baseURL;
-  options.headers = (_b = options.headers) != null ? _b : {};
-  options.initialCache = (_c = options.initialCache) != null ? _c : false;
-  options.lazy = (_d = options.lazy) != null ? _d : false;
-  options.async = (_e = options.async) != null ? _e : false;
-  options.body = { ...options.body, server: true };
-  if (options.multipart) {
-    options.headers = {
-      ...options.headers,
-      Accept: "*/*",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE",
-      "Access-Control-Allow-Headers": "origin,X-Requested-With,content-type,accept",
-      "Access-Control-Allow-Credentials": "true"
-    };
-    delete options.headers["Content-Type"];
-  }
-  const { user } = useBaseStore();
-  const { token: tokenStore } = storeToRefs(user);
-  const token = tokenStore.value || storage.get("token");
-  if (token)
-    options.headers.Authorization = token;
-  else
-    delete options.headers.Authorization;
-  return options;
-}
-async function useHttp(key, url, options = {}) {
-  options = useGetFetchOptions(options);
-  options.key = key;
-  if (options.async) {
-    const res2 = await useAsyncData(
-      key,
-      () => $fetch(fetchConfig.baseURL + url, { ...options }),
-      "$8vqA66Og8F"
-    );
-    return { ...res2 };
-  }
-  if (options.$) {
-    const data = ref(null);
-    const error = ref(null);
-    return await $fetch(url, options).then((res2) => {
-      data.value = res2.data;
-      return {
-        data,
-        error
-      };
-    }).catch((err) => {
-      var _a;
-      const msg = (_a = err == null ? void 0 : err.data) == null ? void 0 : _a.data;
-      error.value = msg;
-      return {
-        data,
-        error
-      };
-    });
-  }
-  const res = await useFetch(url, {
-    ...options,
-    onRequest({ options: options2 }) {
-      return useGetFetchOptions(options2);
-    },
-    transform: (res2) => {
-      return res2.data;
-    }
-  }, "$GUC9qGhG6d");
-  return res;
-}
-function useHttpPost(key, url, options = {}) {
-  options.method = "POST";
-  return useHttp(key, url, options);
-}
-async function useHttpFetch(url, options = {}) {
-  options = useGetFetchOptions(options);
-  const {
-    error,
-    code,
-    message = "",
-    data = null
-  } = await $fetch(fetchConfig.baseURL + url, { ...options });
-  if (error && code === 1005) {
-    const router = useRouter();
-    router.push("/");
-  }
-  return {
-    code,
-    error,
-    message,
-    data
-  };
-}
-function useHttpFetchPost(url, options = {}) {
-  options.method = "POST";
-  return useHttpFetch(url, options);
-}
-const meta$e = {
-  layout: "blog"
-};
-const meta$d = void 0;
-const interpolatePath = (route, match) => {
-  return match.path.replace(/(:\w+)\([^)]+\)/g, "$1").replace(/(:\w+)[?+*]/g, "$1").replace(/:\w+/g, (r2) => {
-    var _a;
-    return ((_a = route.params[r2.slice(1)]) == null ? void 0 : _a.toString()) || "";
-  });
-};
-const generateRouteKey = (override, routeProps) => {
-  var _a;
-  const matchedRoute = routeProps.route.matched.find((m2) => {
-    var _a2;
-    return ((_a2 = m2.components) == null ? void 0 : _a2.default) === routeProps.Component.type;
-  });
-  const source = (_a = override != null ? override : matchedRoute == null ? void 0 : matchedRoute.meta.key) != null ? _a : matchedRoute && interpolatePath(routeProps.route, matchedRoute);
-  return typeof source === "function" ? source(routeProps.route) : source;
-};
-const wrapInKeepAlive = (props, children) => {
-  return { default: () => children };
-};
-const Fragment = defineComponent({
-  setup(_props, { slots }) {
-    return () => {
-      var _a;
-      return (_a = slots.default) == null ? void 0 : _a.call(slots);
-    };
-  }
-});
-const _wrapIf = (component, props, slots) => {
-  return { default: () => props ? h$1(component, props === true ? {} : props, slots) : h$1(Fragment, {}, slots) };
-};
-const __nuxt_component_1$1 = defineComponent({
-  name: "NuxtPage",
-  inheritAttrs: false,
-  props: {
-    name: {
-      type: String
-    },
-    transition: {
-      type: [Boolean, Object],
-      default: void 0
-    },
-    keepalive: {
-      type: [Boolean, Object],
-      default: void 0
-    },
-    route: {
-      type: Object
-    },
-    pageKey: {
-      type: [Function, String],
-      default: null
-    }
-  },
-  setup(props, { attrs }) {
-    const nuxtApp = useNuxtApp();
-    return () => {
-      return h$1(RouterView, { name: props.name, route: props.route, ...attrs }, {
-        default: (routeProps) => {
-          var _a, _b, _c, _d;
-          if (!routeProps.Component) {
-            return;
-          }
-          const key = generateRouteKey(props.pageKey, routeProps);
-          const done = nuxtApp.deferHydration();
-          const hasTransition = !!((_b = (_a = props.transition) != null ? _a : routeProps.route.meta.pageTransition) != null ? _b : appPageTransition);
-          const transitionProps = hasTransition && _mergeTransitionProps([
-            props.transition,
-            routeProps.route.meta.pageTransition,
-            appPageTransition,
-            { onAfterLeave: () => {
-              nuxtApp.callHook("page:transition:finish", routeProps.Component);
-            } }
-          ].filter(Boolean));
-          return _wrapIf(
-            Transition,
-            hasTransition && transitionProps,
-            wrapInKeepAlive(
-              (_d = (_c = props.keepalive) != null ? _c : routeProps.route.meta.keepalive) != null ? _d : appKeepalive,
-              h$1(Suspense, {
-                onPending: () => nuxtApp.callHook("page:start", routeProps.Component),
-                onResolve: () => {
-                  nextTick(() => nuxtApp.callHook("page:finish", routeProps.Component).finally(done));
-                }
-              }, { default: () => h$1(Component, { key, routeProps, pageKey: key, hasTransition }) })
-            )
-          ).default();
-        }
-      });
-    };
-  }
-});
-function _toArray(val) {
-  return Array.isArray(val) ? val : val ? [val] : [];
-}
-function _mergeTransitionProps(routeProps) {
-  const _props = routeProps.map((prop) => ({
-    ...prop,
-    onAfterLeave: _toArray(prop.onAfterLeave)
-  }));
-  return defu(..._props);
-}
-const Component = defineComponent({
-  props: ["routeProps", "pageKey", "hasTransition"],
-  setup(props) {
-    const previousKey = props.pageKey;
-    const previousRoute = props.routeProps.route;
-    const route = {};
-    for (const key in props.routeProps.route) {
-      route[key] = computed(() => previousKey === props.pageKey ? props.routeProps.route[key] : previousRoute[key]);
-    }
-    provide("_route", reactive(route));
-    return () => {
-      return h$1(props.routeProps.Component);
-    };
-  }
-});
-const _hoisted_1$o = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$o = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M15.71 12.71a6 6 0 1 0-7.42 0a10 10 0 0 0-6.22 8.18a1 1 0 0 0 2 .22a8 8 0 0 1 15.9 0a1 1 0 0 0 1 .89h.11a1 1 0 0 0 .88-1.1a10 10 0 0 0-6.25-8.19ZM12 12a4 4 0 1 1 4-4a4 4 0 0 1-4 4Z"
-}, null, -1);
-const _hoisted_3$o = [
-  _hoisted_2$o
-];
-function render$o(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$o, _hoisted_3$o);
-}
-const UilUser = { name: "uil-user", render: render$o };
-const _hoisted_1$n = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$n = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M9 10h1a1 1 0 0 0 0-2H9a1 1 0 0 0 0 2Zm0 2a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2Zm11-3.06a1.31 1.31 0 0 0-.06-.27v-.09a1.07 1.07 0 0 0-.19-.28l-6-6a1.07 1.07 0 0 0-.28-.19a.32.32 0 0 0-.09 0a.88.88 0 0 0-.33-.11H7a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8.94Zm-6-3.53L16.59 8H15a1 1 0 0 1-1-1ZM18 19a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5v3a3 3 0 0 0 3 3h3Zm-3-3H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2Z"
-}, null, -1);
-const _hoisted_3$n = [
-  _hoisted_2$n
-];
-function render$n(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$n, _hoisted_3$n);
-}
-const UilFileAlt = { name: "uil-file-alt", render: render$n };
-const _hoisted_1$m = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$m = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M20.16 5A6.29 6.29 0 0 0 12 4.36a6.27 6.27 0 0 0-8.16 9.48l6.21 6.22a2.78 2.78 0 0 0 3.9 0l6.21-6.22a6.27 6.27 0 0 0 0-8.84Zm-1.41 7.46l-6.21 6.21a.76.76 0 0 1-1.08 0l-6.21-6.24a4.29 4.29 0 0 1 0-6a4.27 4.27 0 0 1 6 0a1 1 0 0 0 1.42 0a4.27 4.27 0 0 1 6 0a4.29 4.29 0 0 1 .08 6Z"
-}, null, -1);
-const _hoisted_3$m = [
-  _hoisted_2$m
-];
-function render$m(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$m, _hoisted_3$m);
-}
-const UilHeart = { name: "uil-heart", render: render$m };
-const _hoisted_1$l = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$l = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M17.09 2.82a8 8 0 0 0-6.68-1.66a8 8 0 0 0-6.27 6.32a8.07 8.07 0 0 0 1.72 6.65A4.54 4.54 0 0 1 7 17v3a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3v-2.81A5.17 5.17 0 0 1 18.22 14a8 8 0 0 0-1.13-11.2ZM15 20a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1h6Zm1.67-7.24A7.13 7.13 0 0 0 15 17h-2v-3a1 1 0 0 0-2 0v3H9a6.5 6.5 0 0 0-1.6-4.16a6 6 0 0 1 3.39-9.72A6 6 0 0 1 18 9a5.89 5.89 0 0 1-1.33 3.76Z"
-}, null, -1);
-const _hoisted_3$l = [
-  _hoisted_2$l
-];
-function render$l(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$l, _hoisted_3$l);
-}
-const UilLightbulbAlt = { name: "uil-lightbulb-alt", render: render$l };
-const _hoisted_1$k = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$k = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "m12.59 13l-2.3 2.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l4-4a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76a1 1 0 0 0-.21-.33l-4-4a1 1 0 1 0-1.42 1.42l2.3 2.29H3a1 1 0 0 0 0 2ZM12 2a10 10 0 0 0-9 5.55a1 1 0 0 0 1.8.9A8 8 0 1 1 12 20a7.93 7.93 0 0 1-7.16-4.45a1 1 0 0 0-1.8.9A10 10 0 1 0 12 2Z"
-}, null, -1);
-const _hoisted_3$k = [
-  _hoisted_2$k
-];
-function render$k(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$k, _hoisted_3$k);
-}
-const UilSignOutAlt = { name: "uil-sign-out-alt", render: render$k };
-const meta$c = {
-  middleware: ["auth"]
-};
-const _sfc_main$q = /* @__PURE__ */ defineComponent({
-  __name: "Form",
-  __ssrInlineRender: true,
-  emits: ["submit"],
-  setup(__props, { emit }) {
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<form${ssrRenderAttrs(_attrs)}>`);
-      ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-      _push(`<button type="submit" hidden></button></form>`);
-    };
-  }
-});
-const _sfc_setup$q = _sfc_main$q.setup;
-_sfc_main$q.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form.vue");
-  return _sfc_setup$q ? _sfc_setup$q(props, ctx) : void 0;
-};
-const _sfc_main$p = {
-  __name: "Text",
-  __ssrInlineRender: true,
-  props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    placeholder: {
-      type: String,
-      default: ""
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    value: {
-      type: String,
-      default: ""
-    },
-    center: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: "md"
-    },
-    id: {
-      type: String,
-      default: ""
-    },
-    required: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ["update:modelValue"],
-  setup(__props, { emit }) {
-    const props = __props;
-    const defaultStyle = computed(
-      () => props.disabled ? `
-  block w-full border cursor-not-allowed
-  duration-200
-  border-gray-600/[0.3] bg-gray-100
-  text-opacity-50
-  dark:border-gray-50/[0.2] dark:bg-gray-800` : `
-  block w-full border
-  duration-200 
-  bg-transparent border-gray-600/[0.3] focus:bg-gray-200
-  dark:border-gray-50/[0.2] dark:focus:bg-gray-800`
-    );
-    const labelSizeStyles = reactive({
-      lg: "text-base",
-      md: "text-sm",
-      sm: "text-xs",
-      xs: "text-xs"
-    });
-    const inputSizeStyles = reactive({
-      lg: "h-12 px-4 text-lg rounded-lg",
-      md: "h-10 px-4 text-base rounded",
-      sm: "h-8 px-4 text-sm rounded",
-      xs: "h-7 px-4 text-xs rounded"
-    });
-    const labelSize = computed(
-      () => labelSizeStyles[props.size] || labelSizeStyles.md
-    );
-    const inputSize = computed(
-      () => inputSizeStyles[props.size] || inputSizeStyles.md
-    );
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(_attrs)}><div class="${ssrRenderClass([unref(labelSize), "flex items-center mb-2"])}"><label${ssrRenderAttr("for", __props.id)} class="${ssrRenderClass([[{ "cursor-pointer": __props.id }], "block font-bold tracking-wide"])}">${ssrInterpolate(__props.label)}</label>`);
-      ssrRenderSlot(_ctx.$slots, "label", {}, null, _push, _parent);
-      _push(`</div><div class="relative model"><input${ssrRenderAttr("id", __props.id)} type="text" class="${ssrRenderClass([{ "text-center": __props.center }, unref(defaultStyle), unref(inputSize)])}"${ssrRenderAttr("placeholder", __props.placeholder)}${ssrRenderAttr("value", props.modelValue || __props.value)}${ssrIncludeBooleanAttr(__props.disabled) ? " disabled" : ""}${ssrIncludeBooleanAttr(__props.required) ? " required" : ""}><div class="absolute transform -translate-y-1/2 right-2 top-1/2">`);
-      ssrRenderSlot(_ctx.$slots, "symbol", {}, null, _push, _parent);
-      _push(`</div></div></div>`);
-    };
-  }
-};
-const _sfc_setup$p = _sfc_main$p.setup;
-_sfc_main$p.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form/Text.vue");
-  return _sfc_setup$p ? _sfc_setup$p(props, ctx) : void 0;
-};
-const _sfc_main$o = {
-  __name: "Captcha",
-  __ssrInlineRender: true,
-  props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    id: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    placeholder: {
-      type: String,
-      default: ""
-    },
-    length: {
-      type: Number,
-      default: 6
-    },
-    getCaptcha: {
-      type: Function,
-      default: () => {
-      }
-    }
-  },
-  emits: ["update:modelValue", "captcha"],
-  setup(__props, { emit }) {
-    const defaultStyle = `
-  block w-full border
-  duration-200 
-  bg-transparent border-gray-600/[0.3] focus:bg-gray-200
-  dark:border-gray-50/[0.2] dark:focus:bg-gray-800
-`;
-    ref("");
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "mb-1 form-group form-group__captcha" }, _attrs))}><label${ssrRenderAttr("for", __props.id)} class="block mb-2 font-bold tracking-wide cursor-pointer text-sm">${ssrInterpolate(__props.label)}</label><div class="flex"><input${ssrRenderAttr("placeholder", __props.placeholder)} class="${ssrRenderClass([defaultStyle, "h-10 px-4 text-base rounded mr-4"])}" type="text"${ssrRenderAttr("value", __props.modelValue)}><div class="flex cursor-pointer items-center justify-center rounded bg-blue-500 text-white ml-auto text-sm truncate w-20"> \u767C\u9001 </div></div></div>`);
-    };
-  }
-};
-const _sfc_setup$o = _sfc_main$o.setup;
-_sfc_main$o.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form/Captcha.vue");
-  return _sfc_setup$o ? _sfc_setup$o(props, ctx) : void 0;
-};
-const meta$b = void 0;
-const meta$a = void 0;
-const meta$9 = void 0;
-const _sfc_main$n = /* @__PURE__ */ defineComponent({
-  __name: "Image",
-  __ssrInlineRender: true,
-  props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    id: {
-      type: String,
-      default: ""
-    },
-    required: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ["update:modelValue"],
-  setup(__props, { emit }) {
-    const imageData = ref("");
-    const labelSizeStyles = reactive({
-      lg: "text-base",
-      md: "text-sm",
-      sm: "text-xs",
-      xs: "text-xs"
-    });
-    const labelSize = computed(() => labelSizeStyles.md);
-    useState("message");
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(_attrs)} data-v-cd586c4d><div class="${ssrRenderClass([unref(labelSize), "flex items-center mb-2"])}" data-v-cd586c4d><label${ssrRenderAttr("for", __props.id)} class="${ssrRenderClass([[{ "cursor-pointer": __props.id }], "block font-bold tracking-wide"])}" data-v-cd586c4d>${ssrInterpolate(__props.label)}</label>`);
-      ssrRenderSlot(_ctx.$slots, "label", {}, null, _push, _parent);
-      _push(`</div><div class="${ssrRenderClass([{ model: !imageData.value }, "relative border border-gray-300 border-opacity-40 rounded dark:bg-white/[0.05] bg-gray-100"])}" data-v-cd586c4d>`);
-      if (imageData.value.length > 0) {
-        _push(`<div data-v-cd586c4d><img class="preview w-full h-full"${ssrRenderAttr("src", imageData.value)} data-v-cd586c4d></div>`);
-      } else {
-        _push(`<div class="p-c text-xs" data-v-cd586c4d>\u9EDE\u64CA\u4E0A\u50B3\u5716\u7247</div>`);
-      }
-      _push(`<input${ssrRenderAttr("id", __props.id)} type="file" accept="image/*" class="absolute w-full h-full cursor-pointer opacity-0 top-0 left-0"${ssrIncludeBooleanAttr(__props.required) ? " required" : ""} data-v-cd586c4d></div></div>`);
-    };
-  }
-});
-const _sfc_setup$n = _sfc_main$n.setup;
-_sfc_main$n.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form/Image.vue");
-  return _sfc_setup$n ? _sfc_setup$n(props, ctx) : void 0;
-};
-const __nuxt_component_2 = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["__scopeId", "data-v-cd586c4d"]]);
-const meta$8 = void 0;
-const _sfc_main$m = {
-  __name: "Date",
-  __ssrInlineRender: true,
-  props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    placeholder: {
-      type: String,
-      default: ""
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    value: {
-      type: String,
-      default: ""
-    },
-    size: {
-      type: String,
-      default: "md"
-    },
-    id: {
-      type: String,
-      default: ""
-    },
-    required: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ["update:modelValue"],
-  setup(__props, { emit }) {
-    const props = __props;
-    const defaultStyle = computed(
-      () => props.disabled ? `
-  block w-full border cursor-not-allowed
-  duration-200
-  border-gray-600/[0.3] bg-gray-100
-  text-opacity-50
-  dark:border-gray-50/[0.2] dark:bg-gray-800` : `
-  block w-full border
-  duration-200 
-  bg-transparent border-gray-600/[0.3] focus:bg-gray-200
-  dark:border-gray-50/[0.2] dark:focus:bg-gray-800`
-    );
-    const labelSizeStyles = reactive({
-      lg: "text-base",
-      md: "text-sm",
-      sm: "text-xs",
-      xs: "text-xs"
-    });
-    const inputSizeStyles = reactive({
-      lg: "h-12 px-4 text-lg rounded-lg",
-      md: "h-10 px-4 text-base rounded",
-      sm: "h-8 px-4 text-sm rounded",
-      xs: "h-7 px-4 text-xs rounded"
-    });
-    const labelSize = computed(
-      () => labelSizeStyles[props.size] || labelSizeStyles.md
-    );
-    const inputSize = computed(
-      () => inputSizeStyles[props.size] || inputSizeStyles.md
-    );
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "form-group form-group_select" }, _attrs))} data-v-85ac86be><div class="${ssrRenderClass([unref(labelSize), "flex items-center mb-2"])}" data-v-85ac86be><label${ssrRenderAttr("for", __props.id)} class="${ssrRenderClass([[{ "cursor-pointer": __props.id }], "block font-bold tracking-wide"])}" data-v-85ac86be>${ssrInterpolate(__props.label)}</label>`);
-      ssrRenderSlot(_ctx.$slots, "label", {}, null, _push, _parent);
-      _push(`</div><div class="model relative" data-v-85ac86be><input${ssrRenderAttr("id", __props.id)} type="date" class="${ssrRenderClass([unref(defaultStyle), unref(inputSize)])}"${ssrRenderAttr("placeholder", __props.placeholder)}${ssrRenderAttr("value", props.modelValue || __props.value)}${ssrIncludeBooleanAttr(__props.disabled) ? " disabled" : ""}${ssrIncludeBooleanAttr(__props.required) ? " required" : ""} data-v-85ac86be></div></div>`);
-    };
-  }
-};
-const _sfc_setup$m = _sfc_main$m.setup;
-_sfc_main$m.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form/Date.vue");
-  return _sfc_setup$m ? _sfc_setup$m(props, ctx) : void 0;
-};
-const __nuxt_component_3$1 = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["__scopeId", "data-v-85ac86be"]]);
-const _sfc_main$l = {
-  __name: "Radio",
-  __ssrInlineRender: true,
-  props: {
-    id: {
-      type: String,
-      default: ""
-    },
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    options: {
-      type: Array,
-      default: () => []
-    },
-    border: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ["update:modelValue"],
-  setup(__props, { emit }) {
-    const props = __props;
-    const defaultStyle = computed(
-      () => props.disabled ? `
-  w-full border cursor-not-allowed
-  duration-200
-  border-gray-600/[0.3] bg-gray-100
-  text-opacity-50
-  dark:border-gray-50/[0.2] dark:bg-gray-800` : `
-  w-full border
-  duration-200 
-  bg-transparent border-gray-600/[0.3] focus:bg-gray-200
-  dark:border-gray-50/[0.2] dark:focus:bg-gray-800`
-    );
-    const inputSizeStyles = reactive({
-      lg: "h-12 px-4 text-lg rounded-lg",
-      md: "h-10 px-4 text-base rounded",
-      sm: "h-8 px-4 text-sm rounded",
-      xs: "h-7 px-4 text-xs rounded"
-    });
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "form-group form-group_input__radio" }, _attrs))} data-v-a4fece0e><label${ssrRenderAttr("for", __props.id)} class="block mb-2 font-bold tracking-wide cursor-pointer text-sm" data-v-a4fece0e>${ssrInterpolate(__props.label)}</label><div role="radiogroup" class="${ssrRenderClass([[unref(defaultStyle), inputSizeStyles.md], "flex flex-wrap space-x-3"])}" data-v-a4fece0e><!--[-->`);
-      ssrRenderList(__props.options, (option, index) => {
-        _push(`<div class="flex items-center py-3" data-v-a4fece0e><div class="bg-white dark:bg-gray-100 rounded-full w-4 h-4 flex flex-shrink-0 justify-center items-center relative" data-v-a4fece0e><input${ssrRenderAttr("id", option.value)}${ssrIncludeBooleanAttr(index === 0) ? " checked" : ""}${ssrRenderAttr("value", option.value)} type="radio" name="radio" class="checkbox appearance-none border rounded-full border-gray-400 absolute cursor-pointer w-full h-full checked:border-none" data-v-a4fece0e><div class="check-icon hidden border-4 border-indigo-700 rounded-full w-full h-full z-1" data-v-a4fece0e></div></div><label${ssrRenderAttr("for", option.value)} class="ml-2 text-sm leading-4 font-normal text-gray-800 dark:text-gray-100" data-v-a4fece0e>${ssrInterpolate(option.label)}</label></div>`);
-      });
-      _push(`<!--]--></div></div>`);
-    };
-  }
-};
-const _sfc_setup$l = _sfc_main$l.setup;
-_sfc_main$l.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form/Radio.vue");
-  return _sfc_setup$l ? _sfc_setup$l(props, ctx) : void 0;
-};
-const __nuxt_component_4 = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["__scopeId", "data-v-a4fece0e"]]);
-const __nuxt_component_5$1 = defineComponent({
-  name: "ClientOnly",
-  props: ["fallback", "placeholder", "placeholderTag", "fallbackTag"],
-  setup(_2, { slots }) {
-    const mounted = ref(false);
-    return (props) => {
-      var _a;
-      if (mounted.value) {
-        return (_a = slots.default) == null ? void 0 : _a.call(slots);
-      }
-      const slot = slots.fallback || slots.placeholder;
-      if (slot) {
-        return slot();
-      }
-      const fallbackStr = props.fallback || props.placeholder || "";
-      const fallbackTag = props.fallbackTag || props.placeholderTag || "span";
-      return createElementBlock(fallbackTag, null, fallbackStr);
-    };
-  }
-});
-const _sfc_main$k = /* @__PURE__ */ defineComponent({
-  __name: "Editor",
-  __ssrInlineRender: true,
-  props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    placeholder: {
-      type: String,
-      default: ""
-    },
-    size: {
-      type: String,
-      default: "md"
-    },
-    id: {
-      type: String,
-      default: ""
-    }
-  },
-  emits: ["update:modelValue"],
-  async setup(__props, { emit }) {
-    const props = __props;
-    computed(
-      () => `
-  w-full border
-  duration-200 
-  bg-transparent border-gray-600/[0.3] focus:bg-gray-200
-  dark:border-gray-50/[0.2] dark:focus:bg-gray-800`
-    );
-    const labelSizeStyles = reactive({
-      lg: "text-base",
-      md: "text-sm",
-      sm: "text-xs",
-      xs: "text-xs"
-    });
-    const inputSizeStyles = reactive({
-      lg: "text-lg rounded-lg",
-      md: "text-base rounded",
-      sm: "text-sm rounded",
-      xs: "text-xs rounded"
-    });
-    const labelSize = computed(
-      () => labelSizeStyles[props.size] || labelSizeStyles.md
-    );
-    computed(
-      () => inputSizeStyles[props.size] || inputSizeStyles.md
-    );
-    const editor = ref(null);
-    watch(
-      () => props.modelValue,
-      (val) => {
-        if (!val.length) {
-          editor.value.setHTML("");
-        }
-      }
-    );
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_client_only = __nuxt_component_5$1;
-      _push(`<div${ssrRenderAttrs(_attrs)} data-v-503145fc><div class="${ssrRenderClass([unref(labelSize), "fic mb-2"])}" data-v-503145fc><label${ssrRenderAttr("for", __props.id)} class="${ssrRenderClass([[{ "cursor-pointer": __props.id }], "block font-bold tracking-wide"])}" data-v-503145fc>${ssrInterpolate(__props.label)}</label>`);
-      ssrRenderSlot(_ctx.$slots, "label", {}, null, _push, _parent);
-      _push(`</div><div class="relative model" data-v-503145fc>`);
-      _push(ssrRenderComponent(_component_client_only, null, null, _parent));
-      _push(`<div class="absolute transform -translate-y-1/2 right-2 top-1/2" data-v-503145fc>`);
-      ssrRenderSlot(_ctx.$slots, "symbol", {}, null, _push, _parent);
-      _push(`</div></div></div>`);
-    };
-  }
-});
-const _sfc_setup$k = _sfc_main$k.setup;
-_sfc_main$k.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form/Editor.vue");
-  return _sfc_setup$k ? _sfc_setup$k(props, ctx) : void 0;
-};
-const __nuxt_component_5 = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["__scopeId", "data-v-503145fc"]]);
-const meta$7 = void 0;
-const _hoisted_1$j = {
-  viewBox: "0 0 512 512",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$j = /* @__PURE__ */ createElementVNode("path", {
-  fill: "none",
-  stroke: "currentColor",
-  "stroke-linecap": "round",
-  "stroke-linejoin": "round",
-  "stroke-width": "32",
-  d: "M255.66 112c-77.94 0-157.89 45.11-220.83 135.33a16 16 0 0 0-.27 17.77C82.92 340.8 161.8 400 255.66 400c92.84 0 173.34-59.38 221.79-135.25a16.14 16.14 0 0 0 0-17.47C428.89 172.28 347.8 112 255.66 112Z"
-}, null, -1);
-const _hoisted_3$j = /* @__PURE__ */ createElementVNode("circle", {
-  cx: "256",
-  cy: "256",
-  r: "80",
-  fill: "none",
-  stroke: "currentColor",
-  "stroke-miterlimit": "10",
-  "stroke-width": "32"
-}, null, -1);
-const _hoisted_4$3 = [
-  _hoisted_2$j,
-  _hoisted_3$j
-];
-function render$j(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$j, _hoisted_4$3);
-}
-const IonEyeOutline = { name: "ion-eye-outline", render: render$j };
-const _hoisted_1$i = {
-  viewBox: "0 0 512 512",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$i = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M432 448a15.92 15.92 0 0 1-11.31-4.69l-352-352a16 16 0 0 1 22.62-22.62l352 352A16 16 0 0 1 432 448Zm-176.34-64c-41.49 0-81.5-12.28-118.92-36.5c-34.07-22-64.74-53.51-88.7-91v-.08c19.94-28.57 41.78-52.73 65.24-72.21a2 2 0 0 0 .14-2.94L93.5 161.38a2 2 0 0 0-2.71-.12c-24.92 21-48.05 46.76-69.08 76.92a31.92 31.92 0 0 0-.64 35.54c26.41 41.33 60.4 76.14 98.28 100.65C162 402 207.9 416 255.66 416a239.13 239.13 0 0 0 75.8-12.58a2 2 0 0 0 .77-3.31l-21.58-21.58a4 4 0 0 0-3.83-1a204.8 204.8 0 0 1-51.16 6.47Zm235.18-145.4c-26.46-40.92-60.79-75.68-99.27-100.53C349 110.55 302 96 255.66 96a227.34 227.34 0 0 0-74.89 12.83a2 2 0 0 0-.75 3.31l21.55 21.55a4 4 0 0 0 3.88 1a192.82 192.82 0 0 1 50.21-6.69c40.69 0 80.58 12.43 118.55 37c34.71 22.4 65.74 53.88 89.76 91a.13.13 0 0 1 0 .16a310.72 310.72 0 0 1-64.12 72.73a2 2 0 0 0-.15 2.95l19.9 19.89a2 2 0 0 0 2.7.13a343.49 343.49 0 0 0 68.64-78.48a32.2 32.2 0 0 0-.1-34.78Z"
-}, null, -1);
-const _hoisted_3$i = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M256 160a95.88 95.88 0 0 0-21.37 2.4a2 2 0 0 0-1 3.38l112.59 112.56a2 2 0 0 0 3.38-1A96 96 0 0 0 256 160Zm-90.22 73.66a2 2 0 0 0-3.38 1a96 96 0 0 0 115 115a2 2 0 0 0 1-3.38Z"
-}, null, -1);
-const _hoisted_4$2 = [
-  _hoisted_2$i,
-  _hoisted_3$i
-];
-function render$i(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$i, _hoisted_4$2);
-}
-const IonEyeOffOutline = { name: "ion-eye-off-outline", render: render$i };
-const _sfc_main$j = {
-  __name: "Password",
-  __ssrInlineRender: true,
-  props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    value: {
-      type: String,
-      default: ""
-    },
-    label: {
-      type: String,
-      default: ""
-    },
-    placeholder: {
-      type: String,
-      default: ""
-    },
-    size: {
-      type: String,
-      default: "md"
-    },
-    id: {
-      type: String,
-      default: ""
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ["update:modelValue"],
-  setup(__props, { emit }) {
-    const props = __props;
-    const showPw = ref$1(true);
-    const defaultStyle = computed(
-      () => props.disabled ? `
-  block w-full border cursor-not-allowed
-  duration-200
-  border-gray-600/[0.3] bg-gray-100
-  dark:border-gray-50/[0.2] dark:bg-gray-800` : `
-  block w-full border
-  duration-200 
-  bg-transparent border-gray-600/[0.3] focus:bg-gray-200
-  dark:border-gray-50/[0.2] dark:focus:bg-gray-800`
-    );
-    const labelSizeStyles = reactive({
-      lg: "text-base",
-      md: "text-sm",
-      sm: "text-xs",
-      xs: "text-xs"
-    });
-    const inputSizeStyles = reactive({
-      lg: "h-12 px-4 text-lg rounded-lg",
-      md: "h-10 px-4 text-base rounded",
-      sm: "h-8 px-4 text-sm rounded",
-      xs: "h-7 px-4 text-xs rounded"
-    });
-    const labelSize = computed(
-      () => labelSizeStyles[props.size] || labelSizeStyles.md
-    );
-    const inputSize = computed(
-      () => inputSizeStyles[props.size] || inputSizeStyles.md
-    );
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<div${ssrRenderAttrs(_attrs)}><div class="${ssrRenderClass([unref(labelSize), "flex items-center mb-2"])}"><label${ssrRenderAttr("for", __props.id)} class="${ssrRenderClass([[{ "cursor-pointer": __props.id }], "block font-bold tracking-wide"])}">${ssrInterpolate(__props.label)}</label>`);
-      ssrRenderSlot(_ctx.$slots, "label", {}, null, _push, _parent);
-      _push(`</div><div class="flex items-center"><div class="relative model flex-1"><input${ssrRenderAttr("id", __props.id)} class="${ssrRenderClass([unref(defaultStyle), unref(inputSize)])}"${ssrRenderAttr("type", showPw.value ? "password" : "text")}${ssrRenderAttr("placeholder", __props.placeholder)}${ssrRenderAttr("value", __props.modelValue || __props.value)}${ssrIncludeBooleanAttr(__props.disabled) ? " disabled" : ""} autocomplete="on"><div class="absolute flex transform -translate-y-1/2 icon top-1/2 right-2 cursor-pointer">`);
-      _push(ssrRenderComponent(unref(IonEyeOutline), {
-        style: showPw.value ? null : { display: "none" },
-        class: { disabled: __props.disabled }
-      }, null, _parent));
-      _push(ssrRenderComponent(unref(IonEyeOffOutline), {
-        style: !showPw.value ? null : { display: "none" }
-      }, null, _parent));
-      _push(`</div></div>`);
-      ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-      _push(`</div></div>`);
-    };
-  }
-};
-const _sfc_setup$j = _sfc_main$j.setup;
-_sfc_main$j.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Form/Password.vue");
-  return _sfc_setup$j ? _sfc_setup$j(props, ctx) : void 0;
-};
-const meta$6 = void 0;
-const _hoisted_1$h = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$h = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "m12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35Z"
-}, null, -1);
-const _hoisted_3$h = [
-  _hoisted_2$h
-];
-function render$h(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$h, _hoisted_3$h);
-}
-const __unplugin_components_1$3 = { name: "mdi-heart", render: render$h };
-const _hoisted_1$g = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$g = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "m12.1 18.55l-.1.1l-.11-.1C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5c1.54 0 3.04 1 3.57 2.36h1.86C13.46 6 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5c0 2.89-3.14 5.74-7.9 10.05M16.5 3c-1.74 0-3.41.81-4.5 2.08C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.41 2 8.5c0 3.77 3.4 6.86 8.55 11.53L12 21.35l1.45-1.32C18.6 15.36 22 12.27 22 8.5C22 5.41 19.58 3 16.5 3Z"
-}, null, -1);
-const _hoisted_3$g = [
-  _hoisted_2$g
-];
-function render$g(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$g, _hoisted_3$g);
-}
-const __unplugin_components_0$5 = { name: "mdi-heart-outline", render: render$g };
-const _hoisted_1$f = {
-  viewBox: "0 0 512 512",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$f = /* @__PURE__ */ createElementVNode("path", {
-  d: "M331.3 308.7L278.6 256l52.7-52.7c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-52.7-52.7c-6.2-6.2-15.6-7.1-22.6 0-7.1 7.1-6 16.6 0 22.6l52.7 52.7-52.7 52.7c-6.7 6.7-6.4 16.3 0 22.6 6.4 6.4 16.4 6.2 22.6 0l52.7-52.7 52.7 52.7c6.2 6.2 16.4 6.2 22.6 0 6.3-6.2 6.3-16.4 0-22.6z",
-  fill: "currentColor"
-}, null, -1);
-const _hoisted_3$f = /* @__PURE__ */ createElementVNode("path", {
-  d: "M256 76c48.1 0 93.3 18.7 127.3 52.7S436 207.9 436 256s-18.7 93.3-52.7 127.3S304.1 436 256 436c-48.1 0-93.3-18.7-127.3-52.7S76 304.1 76 256s18.7-93.3 52.7-127.3S207.9 76 256 76m0-28C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48z",
-  fill: "currentColor"
-}, null, -1);
-const _hoisted_4$1 = [
-  _hoisted_2$f,
-  _hoisted_3$f
-];
-function render$f(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$f, _hoisted_4$1);
-}
-const __unplugin_components_0$4 = { name: "ion-ios-close-circle-outline", render: render$f };
-const _hoisted_1$e = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$e = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8A8 8 0 0 1 12 20Z",
-  opacity: ".5"
-}, null, -1);
-const _hoisted_3$e = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M20 12h2A10 10 0 0 0 12 2V4A8 8 0 0 1 20 12Z"
-}, [
-  /* @__PURE__ */ createElementVNode("animateTransform", {
-    attributeName: "transform",
-    dur: "1s",
-    from: "0 12 12",
-    repeatCount: "indefinite",
-    to: "360 12 12",
-    type: "rotate"
-  })
-], -1);
-const _hoisted_4 = [
-  _hoisted_2$e,
-  _hoisted_3$e
-];
-function render$e(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$e, _hoisted_4);
-}
-const EosIconsLoading = { name: "eos-icons-loading", render: render$e };
-const _sfc_main$i = /* @__PURE__ */ defineComponent({
-  __name: "Row",
-  __ssrInlineRender: true,
-  props: {
-    list: {
-      type: Array,
-      default: () => []
-    }
-  },
-  setup(__props) {
-    const $bodyLock = useState("body.lock");
-    const dialogInfo = ref({});
-    const dialogShow = ref(false);
-    const dialogLoading = ref(false);
-    const closeDialog = () => {
-      dialogShow.value = false;
-      $bodyLock.value = false;
-      setTimeout(() => {
-        dialogInfo.value = {};
-      }, 150);
-    };
-    const collection = async (id) => {
-      const { data, error } = await useHttpFetchPost("/tip/collection", {
-        body: { id }
-      });
-      if (!error)
-        dialogInfo.value.isCollection = data.status;
-    };
-    return (_ctx, _push, _parent, _attrs) => {
-      _push(`<!--[--><!--[-->`);
-      ssrRenderList(__props.list, (item) => {
-        _push(`<div class="flex items-center flex-wrap py-3 px-5 border bg-transparent border-gray-400/[0.4] dark:border-gray-600/[0.3] dark:border-gray-50/[0.2] mb-2 last-mb-0 rounded-sm dark:shadow cursor-pointer duration-200"><div class="title font-bold mr-auto">${ssrInterpolate(item.title)}</div><div class="text-sm">${ssrInterpolate(item.publishDate)}</div></div>`);
-      });
-      _push(`<!--]-->`);
-      ssrRenderTeleport(_push, (_push2) => {
-        _push2(ssrRenderComponent(unref(fe), {
-          show: dialogShow.value,
-          appear: ""
-        }, {
-          default: withCtx((_2, _push3, _parent2, _scopeId) => {
-            if (_push3) {
-              _push3(ssrRenderComponent(unref(oe), {
-                as: "template",
-                enter: "duration-150 linear",
-                "enter-from": "opacity-0",
-                "enter-to": "opacity-100",
-                leave: "duration-150 linear",
-                "leave-from": "opacity-100",
-                "leave-to": "opacity-0"
-              }, {
-                default: withCtx((_22, _push4, _parent3, _scopeId2) => {
-                  if (_push4) {
-                    _push4(`<div class="fixed top-0 left-0 w-full h-full z-20"${_scopeId2}><div class="absolute top-0 left-0 w-full h-full cursor-pointer backdrop-filter backdrop-blur-sm bg-dark-900/50"${_scopeId2}>`);
-                    if (dialogLoading.value) {
-                      _push4(ssrRenderComponent(unref(EosIconsLoading), { class: "absolute text-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl" }, null, _parent3, _scopeId2));
-                    } else {
-                      _push4(`<!---->`);
-                    }
-                    _push4(`</div>`);
-                    if (!dialogLoading.value) {
-                      _push4(`<div class="px-10 pb-8 max-w-[44em] w-11/12 absolute overflow-x-hidden overflow-y-auto transform -translate-x-1/2 -translate-y-1/2 rounded-lg backdrop-filter backdrop-blur left-1/2 top-1/2 max-h-4/5 bg-light-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-100/[0.15] shadow"${_scopeId2}>`);
-                      if (dialogInfo.value.title) {
-                        _push4(`<div class="bg-light-100 dark:bg-gray-800 sticky top-0 pt-7 pb-3 flex flex-wrap justify-between relative text-lg pl-[0.1em] tracking-widest font-bold"${_scopeId2}>${ssrInterpolate(dialogInfo.value.title)} <div class="flex items-center space-x-3"${_scopeId2}><div class="cursor-pointer flex items-center"${_scopeId2}>`);
-                        _push4(ssrRenderComponent(unref(__unplugin_components_0$5), {
-                          style: !dialogInfo.value.isCollection ? null : { display: "none" },
-                          class: "w-6"
-                        }, null, _parent3, _scopeId2));
-                        _push4(ssrRenderComponent(unref(__unplugin_components_1$3), {
-                          style: dialogInfo.value.isCollection ? null : { display: "none" },
-                          class: "text-red-600 w-6"
-                        }, null, _parent3, _scopeId2));
-                        _push4(`</div>`);
-                        _push4(ssrRenderComponent(unref(__unplugin_components_0$4), {
-                          class: "text-2xl w-6 cursor-pointer",
-                          onClick: closeDialog
-                        }, null, _parent3, _scopeId2));
-                        _push4(`</div></div>`);
-                      } else {
-                        _push4(`<!---->`);
-                      }
-                      _push4(`<div class="text-sm opacity-60"${_scopeId2}>${ssrInterpolate(dialogInfo.value.publishDate)}</div>`);
-                      if (dialogInfo.value.content) {
-                        _push4(`<div class="py-4"${_scopeId2}>${dialogInfo.value.content}</div>`);
-                      } else {
-                        _push4(`<!---->`);
-                      }
-                      _push4(`</div>`);
-                    } else {
-                      _push4(`<!---->`);
-                    }
-                    _push4(`</div>`);
-                  } else {
-                    return [
-                      createVNode("div", { class: "fixed top-0 left-0 w-full h-full z-20" }, [
-                        createVNode("div", {
-                          class: "absolute top-0 left-0 w-full h-full cursor-pointer backdrop-filter backdrop-blur-sm bg-dark-900/50",
-                          onClick: closeDialog
-                        }, [
-                          dialogLoading.value ? (openBlock(), createBlock(unref(EosIconsLoading), {
-                            key: 0,
-                            class: "absolute text-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl"
-                          })) : createCommentVNode("", true)
-                        ]),
-                        !dialogLoading.value ? (openBlock(), createBlock("div", {
-                          key: 0,
-                          class: "px-10 pb-8 max-w-[44em] w-11/12 absolute overflow-x-hidden overflow-y-auto transform -translate-x-1/2 -translate-y-1/2 rounded-lg backdrop-filter backdrop-blur left-1/2 top-1/2 max-h-4/5 bg-light-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-100/[0.15] shadow"
-                        }, [
-                          dialogInfo.value.title ? (openBlock(), createBlock("div", {
-                            key: 0,
-                            class: "bg-light-100 dark:bg-gray-800 sticky top-0 pt-7 pb-3 flex flex-wrap justify-between relative text-lg pl-[0.1em] tracking-widest font-bold"
-                          }, [
-                            createTextVNode(toDisplayString(dialogInfo.value.title) + " ", 1),
-                            createVNode("div", { class: "flex items-center space-x-3" }, [
-                              createVNode("div", {
-                                class: "cursor-pointer flex items-center",
-                                onClick: ($event) => collection(dialogInfo.value.id)
-                              }, [
-                                withDirectives(createVNode(unref(__unplugin_components_0$5), { class: "w-6" }, null, 512), [
-                                  [vShow, !dialogInfo.value.isCollection]
-                                ]),
-                                withDirectives(createVNode(unref(__unplugin_components_1$3), { class: "text-red-600 w-6" }, null, 512), [
-                                  [vShow, dialogInfo.value.isCollection]
-                                ])
-                              ], 8, ["onClick"]),
-                              createVNode(unref(__unplugin_components_0$4), {
-                                class: "text-2xl w-6 cursor-pointer",
-                                onClick: closeDialog
-                              })
-                            ])
-                          ])) : createCommentVNode("", true),
-                          createVNode("div", { class: "text-sm opacity-60" }, toDisplayString(dialogInfo.value.publishDate), 1),
-                          dialogInfo.value.content ? (openBlock(), createBlock("div", {
-                            key: 1,
-                            class: "py-4",
-                            innerHTML: dialogInfo.value.content
-                          }, null, 8, ["innerHTML"])) : createCommentVNode("", true)
-                        ])) : createCommentVNode("", true)
-                      ])
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-            } else {
-              return [
-                createVNode(unref(oe), {
-                  as: "template",
-                  enter: "duration-150 linear",
-                  "enter-from": "opacity-0",
-                  "enter-to": "opacity-100",
-                  leave: "duration-150 linear",
-                  "leave-from": "opacity-100",
-                  "leave-to": "opacity-0"
-                }, {
-                  default: withCtx(() => [
-                    createVNode("div", { class: "fixed top-0 left-0 w-full h-full z-20" }, [
-                      createVNode("div", {
-                        class: "absolute top-0 left-0 w-full h-full cursor-pointer backdrop-filter backdrop-blur-sm bg-dark-900/50",
-                        onClick: closeDialog
-                      }, [
-                        dialogLoading.value ? (openBlock(), createBlock(unref(EosIconsLoading), {
-                          key: 0,
-                          class: "absolute text-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl"
-                        })) : createCommentVNode("", true)
-                      ]),
-                      !dialogLoading.value ? (openBlock(), createBlock("div", {
-                        key: 0,
-                        class: "px-10 pb-8 max-w-[44em] w-11/12 absolute overflow-x-hidden overflow-y-auto transform -translate-x-1/2 -translate-y-1/2 rounded-lg backdrop-filter backdrop-blur left-1/2 top-1/2 max-h-4/5 bg-light-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-100/[0.15] shadow"
-                      }, [
-                        dialogInfo.value.title ? (openBlock(), createBlock("div", {
-                          key: 0,
-                          class: "bg-light-100 dark:bg-gray-800 sticky top-0 pt-7 pb-3 flex flex-wrap justify-between relative text-lg pl-[0.1em] tracking-widest font-bold"
-                        }, [
-                          createTextVNode(toDisplayString(dialogInfo.value.title) + " ", 1),
-                          createVNode("div", { class: "flex items-center space-x-3" }, [
-                            createVNode("div", {
-                              class: "cursor-pointer flex items-center",
-                              onClick: ($event) => collection(dialogInfo.value.id)
-                            }, [
-                              withDirectives(createVNode(unref(__unplugin_components_0$5), { class: "w-6" }, null, 512), [
-                                [vShow, !dialogInfo.value.isCollection]
-                              ]),
-                              withDirectives(createVNode(unref(__unplugin_components_1$3), { class: "text-red-600 w-6" }, null, 512), [
-                                [vShow, dialogInfo.value.isCollection]
-                              ])
-                            ], 8, ["onClick"]),
-                            createVNode(unref(__unplugin_components_0$4), {
-                              class: "text-2xl w-6 cursor-pointer",
-                              onClick: closeDialog
-                            })
-                          ])
-                        ])) : createCommentVNode("", true),
-                        createVNode("div", { class: "text-sm opacity-60" }, toDisplayString(dialogInfo.value.publishDate), 1),
-                        dialogInfo.value.content ? (openBlock(), createBlock("div", {
-                          key: 1,
-                          class: "py-4",
-                          innerHTML: dialogInfo.value.content
-                        }, null, 8, ["innerHTML"])) : createCommentVNode("", true)
-                      ])) : createCommentVNode("", true)
-                    ])
-                  ]),
-                  _: 1
-                })
-              ];
-            }
-          }),
-          _: 1
-        }, _parent));
-      }, "body", false, _parent);
-      _push(`<!--]-->`);
-    };
-  }
-});
-const _sfc_setup$i = _sfc_main$i.setup;
-_sfc_main$i.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Tip/Row.vue");
-  return _sfc_setup$i ? _sfc_setup$i(props, ctx) : void 0;
-};
-const meta$5 = void 0;
-const meta$4 = void 0;
-const meta$3 = void 0;
-const _sfc_main$h = {};
-function _sfc_ssrRender$1(_ctx, _push, _parent, _attrs) {
-  _push(`<div${ssrRenderAttrs(mergeProps({ class: "px-4 lg:px-8" }, _attrs))}>`);
-  ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-  _push(`</div>`);
-}
-const _sfc_setup$h = _sfc_main$h.setup;
-_sfc_main$h.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Header.vue");
-  return _sfc_setup$h ? _sfc_setup$h(props, ctx) : void 0;
-};
-const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["ssrRender", _sfc_ssrRender$1]]);
-const _hoisted_1$d = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$d = /* @__PURE__ */ createElementVNode("g", {
-  fill: "none",
-  stroke: "currentColor",
-  "stroke-linecap": "round",
-  "stroke-linejoin": "round",
-  "stroke-width": "2"
-}, [
-  /* @__PURE__ */ createElementVNode("circle", {
-    cx: "12",
-    cy: "12",
-    r: "9"
+const useCounter = defineStore("counter", {
+  state: () => ({
+    count: 0
   }),
-  /* @__PURE__ */ createElementVNode("path", { d: "M12 7v3.764a2 2 0 0 0 1.106 1.789L16 14" })
-], -1);
-const _hoisted_3$d = [
-  _hoisted_2$d
-];
-function render$d(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$d, _hoisted_3$d);
-}
-const __unplugin_components_1$2 = { name: "majesticons-clock-line", render: render$d };
-const _hoisted_1$c = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$c = /* @__PURE__ */ createElementVNode("g", { fill: "currentColor" }, [
-  /* @__PURE__ */ createElementVNode("path", { d: "M12 4a8 8 0 1 0 0 16a8 8 0 0 0 0-16zM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12z" }),
-  /* @__PURE__ */ createElementVNode("path", { d: "M12 8a3 3 0 1 0 0 6a3 3 0 0 0 0-6zm-5 3a5 5 0 1 1 10 0a5 5 0 0 1-10 0z" }),
-  /* @__PURE__ */ createElementVNode("path", { d: "M12 16a5.003 5.003 0 0 0-4.716 3.333a1 1 0 1 1-1.885-.666a7.002 7.002 0 0 1 13.202 0a1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 12 16z" })
-], -1);
-const _hoisted_3$c = [
-  _hoisted_2$c
-];
-function render$c(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$c, _hoisted_3$c);
-}
-const __unplugin_components_0$3 = { name: "majesticons-user-circle-line", render: render$c };
-const _sfc_main$g = /* @__PURE__ */ defineComponent({
-  __name: "Meta",
-  __ssrInlineRender: true,
-  props: {
-    author: {
-      type: Object,
-      default: () => {
-      }
+  actions: {
+    increment() {
+      this.count++;
     },
-    publishTime: {
-      type: String,
-      default: ""
-    }
-  },
-  setup(__props) {
-    const props = __props;
-    return (_ctx, _push, _parent, _attrs) => {
-      var _a, _b;
-      const _component_IconMajesticons58userCircleLine = __unplugin_components_0$3;
-      const _component_IconMajesticons58clockLine = __unplugin_components_1$2;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "py-2 text-sm font-bold text-gray-600 dark:text-gray-400" }, _attrs))}><div class="space-y-2 lg:space-y-0 lg:flex lg:flex-wrap lg:space-x-4"><div class="flex items-center space-x-2">`);
-      _push(ssrRenderComponent(_component_IconMajesticons58userCircleLine, null, null, _parent));
-      _push(`<span>${ssrInterpolate(((_a = props.author) == null ? void 0 : _a.firstName) + ((_b = props.author) == null ? void 0 : _b.lastName))}</span></div><div class="flex items-center space-x-2">`);
-      _push(ssrRenderComponent(_component_IconMajesticons58clockLine, null, null, _parent));
-      _push(`<span>${ssrInterpolate(props.publishTime)}</span></div></div></div>`);
-    };
-  }
-});
-const _sfc_setup$g = _sfc_main$g.setup;
-_sfc_main$g.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Meta.vue");
-  return _sfc_setup$g ? _sfc_setup$g(props, ctx) : void 0;
-};
-const _sfc_main$f = /* @__PURE__ */ defineComponent({
-  __name: "Single",
-  __ssrInlineRender: true,
-  props: {
-    content: {
-      type: String,
-      default: ""
-    }
-  },
-  setup(__props) {
-    const { user } = useBaseStore();
-    storeToRefs(user);
-    useState("showAuth");
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_client_only = __nuxt_component_5$1;
-      _push(ssrRenderComponent(_component_client_only, _attrs, null, _parent));
-    };
-  }
-});
-const _sfc_setup$f = _sfc_main$f.setup;
-_sfc_main$f.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Content/Single.vue");
-  return _sfc_setup$f ? _sfc_setup$f(props, ctx) : void 0;
-};
-const __nuxt_component_6 = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["__scopeId", "data-v-e8a1a146"]]);
-const _sfc_main$e = {};
-function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
-  _push(`video`);
-}
-const _sfc_setup$e = _sfc_main$e.setup;
-_sfc_main$e.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Content/Video.vue");
-  return _sfc_setup$e ? _sfc_setup$e(props, ctx) : void 0;
-};
-const __nuxt_component_7 = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["ssrRender", _sfc_ssrRender]]);
-const _imports_0$1 = "" + globalThis.__publicAssetsURL("user.png");
-const _sfc_main$d = /* @__PURE__ */ defineComponent({
-  __name: "Author",
-  __ssrInlineRender: true,
-  props: {
-    author: {
-      type: Object,
-      default: () => {
-      }
-    }
-  },
-  setup(__props) {
-    const props = __props;
-    return (_ctx, _push, _parent, _attrs) => {
-      var _a, _b, _c;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex flex-wrap" }, _attrs))}><div class="flex flex-wrap items-center w-full pb-4 border-gray-900/10 dark:border-gray-50/[0.2] lg:w-auto lg:pb-0 lg:pr-16 lg:mr-16 lg:border-b-0 lg:border-r-1"><div class="mr-6 overflow-hidden rounded-full shadow-sm shadow w-16 h-16 shadow-blue-200"><img${ssrRenderAttr("src", _imports_0$1)} class="object-cover w-full h-full"></div><div class="font-bold"><p class="pb-1 text-lg">${ssrInterpolate(((_a = props.author) == null ? void 0 : _a.firstName) + ((_b = props.author) == null ? void 0 : _b.lastName))}</p><p class="text-sm tracking-widest dark:text-gray-400"> \u5C08\u6B04\u7DE8\u8F2F </p></div></div><div class="flex-1 py-3 space-y-3 text-sm text-gray-800 lg:pr-4 dark:text-gray-300">${((_c = props.author) == null ? void 0 : _c.intro) || "\u5C1A\u672A\u8F38\u5165\u81EA\u6211\u4ECB\u7D39"}</div></div>`);
-    };
-  }
-});
-const _sfc_setup$d = _sfc_main$d.setup;
-_sfc_main$d.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Author.vue");
-  return _sfc_setup$d ? _sfc_setup$d(props, ctx) : void 0;
-};
-const _sfc_main$c = {
-  __name: "Column",
-  __ssrInlineRender: true,
-  props: {
-    list: {
-      type: Array,
-      default: () => []
+    decrement() {
+      this.count--;
     },
-    infinite: {
-      type: Boolean,
-      default: false
+    reset() {
+      this.count = 0;
     },
-    loading: {
-      type: Boolean,
-      default: false
+    increment2x() {
+      this.count *= 2;
     }
-  },
-  setup(__props) {
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_nuxt_link = __nuxt_component_0$2;
-      const _component_IconFluent58thumb_like_16_filled = __unplugin_components_0$6;
-      const _component_IconRi58eye_fill = __unplugin_components_1$4;
-      const _component_ArticleLoopRowLoading = __nuxt_component_1$2;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "block" }, _attrs))}><!--[-->`);
-      ssrRenderList(__props.list, (article) => {
-        _push(ssrRenderComponent(_component_nuxt_link, {
-          key: article.id,
-          to: `/news/article/${article.slug}`,
-          class: "flex pb-3 mb-3 border-gray-200 dark:border-gray-700 border-b-1 last-border-b-0 last-mb-0 last-pb-0"
-        }, {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(`<div class="flex flex-wrap w-full"${_scopeId}><div class="relative w-20 h-20 mr-4"${_scopeId}><img${ssrRenderAttr("src", article.thumbnail)} class="absolute object-cover w-full h-full"${_scopeId}></div><div class="flex flex-col content-between flex-1"${_scopeId}><h3 class="text-base font-bold ellipsis"${_scopeId}>${ssrInterpolate(article.title)}</h3><div class="flex flex-wrap justify-between w-full pt-1 pb-2 mt-auto text-xs text-gray-600 dark:text-gray-400"${_scopeId}><div class="flex w-full mb-1 space-x-4 text-gray-700 dark:text-gray-300" itemprop="author"${_scopeId}><p${_scopeId}>${ssrInterpolate(article.author)}</p><p${_scopeId}>${ssrInterpolate(article.categories)}</p></div><div class="flex"${_scopeId}><span class="tracking-wider" itemprop="create-date"${_scopeId}>${ssrInterpolate(article.publishTime)}</span></div><div class="flex"${_scopeId}><div class="flex items-center mr-3 space-x-2"${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_IconFluent58thumb_like_16_filled, { class: "text-green-400" }, null, _parent2, _scopeId));
-              _push2(`<span${_scopeId}>${ssrInterpolate(article.likes)}</span></div><div class="flex items-center mr-3 space-x-2"${_scopeId}>`);
-              _push2(ssrRenderComponent(_component_IconRi58eye_fill, { class: "text-green-400" }, null, _parent2, _scopeId));
-              _push2(`<span${_scopeId}>${ssrInterpolate(article.views)}</span></div></div></div></div></div>`);
-            } else {
-              return [
-                createVNode("div", { class: "flex flex-wrap w-full" }, [
-                  createVNode("div", { class: "relative w-20 h-20 mr-4" }, [
-                    createVNode("img", {
-                      src: article.thumbnail,
-                      class: "absolute object-cover w-full h-full"
-                    }, null, 8, ["src"])
-                  ]),
-                  createVNode("div", { class: "flex flex-col content-between flex-1" }, [
-                    createVNode("h3", { class: "text-base font-bold ellipsis" }, toDisplayString(article.title), 1),
-                    createVNode("div", { class: "flex flex-wrap justify-between w-full pt-1 pb-2 mt-auto text-xs text-gray-600 dark:text-gray-400" }, [
-                      createVNode("div", {
-                        class: "flex w-full mb-1 space-x-4 text-gray-700 dark:text-gray-300",
-                        itemprop: "author"
-                      }, [
-                        createVNode("p", null, toDisplayString(article.author), 1),
-                        createVNode("p", null, toDisplayString(article.categories), 1)
-                      ]),
-                      createVNode("div", { class: "flex" }, [
-                        createVNode("span", {
-                          class: "tracking-wider",
-                          itemprop: "create-date"
-                        }, toDisplayString(article.publishTime), 1)
-                      ]),
-                      createVNode("div", { class: "flex" }, [
-                        createVNode("div", { class: "flex items-center mr-3 space-x-2" }, [
-                          createVNode(_component_IconFluent58thumb_like_16_filled, { class: "text-green-400" }),
-                          createVNode("span", null, toDisplayString(article.likes), 1)
-                        ]),
-                        createVNode("div", { class: "flex items-center mr-3 space-x-2" }, [
-                          createVNode(_component_IconRi58eye_fill, { class: "text-green-400" }),
-                          createVNode("span", null, toDisplayString(article.views), 1)
-                        ])
-                      ])
-                    ])
-                  ])
-                ])
-              ];
-            }
-          }),
-          _: 2
-        }, _parent));
-      });
-      _push(`<!--]-->`);
-      if (__props.infinite && __props.loading) {
-        _push(ssrRenderComponent(_component_ArticleLoopRowLoading, { class: "mt-2" }, null, _parent));
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div>`);
-    };
-  }
-};
-const _sfc_setup$c = _sfc_main$c.setup;
-_sfc_main$c.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Loop/Column.vue");
-  return _sfc_setup$c ? _sfc_setup$c(props, ctx) : void 0;
-};
-const _sfc_main$b = /* @__PURE__ */ defineComponent({
-  __name: "Form",
-  __ssrInlineRender: true,
-  emits: ["submit"],
-  setup(__props, { emit }) {
-    const { user } = useBaseStore();
-    const { isLogin, info } = storeToRefs(user);
-    useState("showAuth");
-    const message = ref("");
-    return (_ctx, _push, _parent, _attrs) => {
-      var _a, _b;
-      const _component_UIFormEditor = __nuxt_component_5;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "pb-5" }, _attrs))}>`);
-      if (unref(isLogin)) {
-        _push(`<div><div class="flex"><div class="mr-4"><div class="rounded-full overflow-hidden w-12 h-12"><img${ssrRenderAttr("src", _imports_0$1)} class="object-cover w-full h-full"></div><div class="text-center text-xs mt-2">${ssrInterpolate(((_a = unref(info)) == null ? void 0 : _a.firstName) + ((_b = unref(info)) == null ? void 0 : _b.lastName))}</div></div><div class="flex-1">`);
-        _push(ssrRenderComponent(_component_UIFormEditor, {
-          modelValue: message.value,
-          "onUpdate:modelValue": ($event) => message.value = $event,
-          placeholder: "\u767C\u8868\u7559\u8A00...",
-          class: "mb-3"
-        }, null, _parent));
-        _push(`<div class="cursor-pointer inline-block text-sm text-center bg-green-400 dark:bg-green-400 w-fit px-3 rounded h-8 leading-8 text-white"> \u9001\u51FA </div></div></div></div>`);
-      } else {
-        _push(`<!---->`);
-      }
-      if (!unref(isLogin)) {
-        _push(`<div><div class="flex"><div class="mr-4"><div class="rounded-full overflow-hidden w-12 h-12"><img${ssrRenderAttr("src", _imports_0$1)} class="object-cover w-full h-full"></div></div><div class="flex-1"><div class="w-full h-14 rounded py-2 px-4 text-sm mb-4 cursor-pointer bg-transparent dark:focus:bg-gray-300/[0.1] duration-200 border border-gray-300 dark:border-gray-300/[0.2]"><span class="opacity-70"> \u8ACB\u5148\u767B\u5165\u6703\u54E1...</span></div><div class="text-sm cursor-pointer inline-block text-center bg-green-500 px-3 rounded h-8 leading-8 text-white"> \u767B\u5165 </div></div></div></div>`);
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div>`);
-    };
   }
 });
-const _sfc_setup$b = _sfc_main$b.setup;
-_sfc_main$b.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Comment/Form.vue");
-  return _sfc_setup$b ? _sfc_setup$b(props, ctx) : void 0;
-};
-const _hoisted_1$b = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$b = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M13.12 2.06L7.58 7.6c-.37.37-.58.88-.58 1.41V19c0 1.1.9 2 2 2h9c.8 0 1.52-.48 1.84-1.21l3.26-7.61C23.94 10.2 22.49 8 20.34 8h-5.65l.95-4.58c.1-.5-.05-1.01-.41-1.37c-.59-.58-1.53-.58-2.11.01zM3 21c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2s-2 .9-2 2v8c0 1.1.9 2 2 2z"
-}, null, -1);
-const _hoisted_3$b = [
-  _hoisted_2$b
-];
-function render$b(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$b, _hoisted_3$b);
-}
-const __unplugin_components_3$2 = { name: "ic-round-thumb-up", render: render$b };
-const _hoisted_1$a = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$a = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M9 21h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2h-6.31l.95-4.57l.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.58 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2zM9 9l4.34-4.34L12 10h9v2l-3 7H9V9zM1 9h4v12H1z"
-}, null, -1);
-const _hoisted_3$a = [
-  _hoisted_2$a
-];
-function render$a(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$a, _hoisted_3$a);
-}
-const __unplugin_components_2$2 = { name: "ic-outline-thumb-up", render: render$a };
-const _sfc_main$a = /* @__PURE__ */ defineComponent({
-  __name: "Child",
-  __ssrInlineRender: true,
-  props: ["comment"],
-  setup(__props) {
-    useState("message");
-    useState("auth");
-    const { user } = useBaseStore();
-    storeToRefs(user);
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_IconIc58outlineThumbUp = __unplugin_components_2$2;
-      const _component_IconIc58roundThumbUp = __unplugin_components_3$2;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex py-3 mb-1 border-b last:border-b-0 last:pb-0 last:mb-0 last-border-0 border-gray-200 dark:border-gray-700" }, _attrs))}><div class="rounded-full mr-4 overflow-hidden w-10 h-10"><img${ssrRenderAttr("src", _imports_0$1)} class="object-cover w-full h-full"></div><div class="flex-1"><p class="text-sm">${ssrInterpolate(__props.comment.author)}</p><p class="text-xs opacity-80 pb-2">${ssrInterpolate(__props.comment.createTime)}</p><div class="pb-2">${__props.comment.content}</div><div class="flex items-center space-x-4"><div class="cursor-pointer flex items-center space-x-1">`);
-      if (!__props.comment.isLike) {
-        _push(ssrRenderComponent(_component_IconIc58outlineThumbUp, { class: "duration-300 w-4" }, null, _parent));
-      } else {
-        _push(ssrRenderComponent(_component_IconIc58roundThumbUp, { class: "text-blue-600 w-4" }, null, _parent));
-      }
-      _push(`<span class="min-w-3 text-left">${ssrInterpolate(__props.comment.likes)}</span></div></div></div></div>`);
-    };
-  }
-});
-const _sfc_setup$a = _sfc_main$a.setup;
-_sfc_main$a.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Comment/Child.vue");
-  return _sfc_setup$a ? _sfc_setup$a(props, ctx) : void 0;
-};
-const _hoisted_1$9 = {
-  viewBox: "0 0 512 512",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$9 = /* @__PURE__ */ createElementVNode("path", {
-  d: "M128 320l128-128 128 128z",
-  fill: "currentColor"
-}, null, -1);
-const _hoisted_3$9 = [
-  _hoisted_2$9
-];
-function render$9(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$9, _hoisted_3$9);
-}
-const __unplugin_components_4 = { name: "ion-md-arrow-dropup", render: render$9 };
-const _hoisted_1$8 = {
-  viewBox: "0 0 512 512",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$8 = /* @__PURE__ */ createElementVNode("path", {
-  d: "M128 192l128 128 128-128z",
-  fill: "currentColor"
-}, null, -1);
-const _hoisted_3$8 = [
-  _hoisted_2$8
-];
-function render$8(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$8, _hoisted_3$8);
-}
-const __unplugin_components_3$1 = { name: "ion-md-arrow-dropdown", render: render$8 };
-const _hoisted_1$7 = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$7 = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M12 9a1 1 0 1 0 1 1a1 1 0 0 0-1-1Zm7-7H5a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11.59l3.7 3.71A1 1 0 0 0 21 22a.84.84 0 0 0 .38-.08A1 1 0 0 0 22 21V5a3 3 0 0 0-3-3Zm1 16.59l-2.29-2.3A1 1 0 0 0 17 16H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1ZM8 9a1 1 0 1 0 1 1a1 1 0 0 0-1-1Zm8 0a1 1 0 1 0 1 1a1 1 0 0 0-1-1Z"
-}, null, -1);
-const _hoisted_3$7 = [
-  _hoisted_2$7
-];
-function render$7(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$7, _hoisted_3$7);
-}
-const __unplugin_components_2$1 = { name: "uil-comment-alt-dots", render: render$7 };
-const _sfc_main$9 = /* @__PURE__ */ defineComponent({
-  __name: "Item",
-  __ssrInlineRender: true,
-  props: {
-    comment: {
-      type: Object,
-      default: () => {
-      }
+const useIdentity = defineStore("identity", {
+  state: () => ({
+    firstName: "Alfian",
+    lastName: "Dwi"
+  }),
+  actions: {
+    setFirstName(firstName) {
+      this.firstName = firstName;
     },
-    articleId: {
-      type: Number,
-      default: null
+    setLastName(lastName) {
+      this.lastName = lastName;
+    },
+    reset() {
+      this.firstName = "Alfian";
+      this.lastName = "Dwi";
     }
   },
-  emits: ["like"],
-  setup(__props) {
-    const props = __props;
-    const children = ref([]);
-    ref({});
-    const commentListOpen = ref(false);
-    const $message = useState("message");
-    useState("showAuth");
-    const { user } = useBaseStore();
-    storeToRefs(user);
-    const submit = (e2) => {
-      createComment(e2);
-    };
-    const createComment = async (content) => {
-      const { error, message, data } = await useHttpFetchPost("/comment/create", {
-        body: {
-          content,
-          articleId: props.articleId,
-          parentId: props.comment.id
-        }
-      });
-      if (error) {
-        return $message.value = message;
-      }
-      children.value.unshift(data);
-    };
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_IconIc58roundThumbUp = __unplugin_components_3$2;
-      const _component_IconIc58outlineThumbUp = __unplugin_components_2$2;
-      const _component_IconUil58commentAltDots = __unplugin_components_2$1;
-      const _component_IconIon58mdArrowDropdown = __unplugin_components_3$1;
-      const _component_IconIon58mdArrowDropup = __unplugin_components_4;
-      const _component_ArticleCommentChild = _sfc_main$a;
-      const _component_ArticleCommentForm = _sfc_main$b;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "py-3 mb-1 border-b border-gray-200 dark:border-gray-700 last:border-b-0 last:pb-0 last:mb-0" }, _attrs))}><div class="flex w-full"><div class="rounded-full mr-4 overflow-hidden w-12 h-12"><img${ssrRenderAttr("src", _imports_0$1)} class="object-cover w-full h-full"></div><div class="flex-1"><p class="text-sm">${ssrInterpolate(__props.comment.author)}</p><p class="text-xs opacity-80 pb-2">${ssrInterpolate(__props.comment.createTime)}</p><div class="pb-2">${__props.comment.content}</div><div class="flex items-center space-x-4"><div class="cursor-pointer flex items-center">`);
-      _push(ssrRenderComponent(_component_IconIc58roundThumbUp, {
-        style: __props.comment.isLike ? null : { display: "none" },
-        class: "text-blue-600 w-4"
-      }, null, _parent));
-      _push(ssrRenderComponent(_component_IconIc58outlineThumbUp, {
-        style: !__props.comment.isLike ? null : { display: "none" },
-        class: "duration-300 w-4"
-      }, null, _parent));
-      _push(`<span class="min-w-3 text-left ml-1">${ssrInterpolate(__props.comment.likes)}</span></div><div class="flex items-center space-x-1 cursor-pointer">`);
-      _push(ssrRenderComponent(_component_IconUil58commentAltDots, { class: "w-4" }, null, _parent));
-      _push(`<span>${ssrInterpolate(__props.comment.comments)}</span></div></div>`);
-      if (__props.comment.hasChild) {
-        _push(`<!--[--><div class="w-fit text-sm cursor-pointer pt-4 pb-2 text-gary-800 dark:text-gray-200">`);
-        if (!commentListOpen.value) {
-          _push(`<div class="flex items-center text-sm space-x-2">`);
-          _push(ssrRenderComponent(_component_IconIon58mdArrowDropdown, { class: "w-4 mr-1 flex items-center" }, null, _parent));
-          _push(` \u5C55\u958B </div>`);
-        } else {
-          _push(`<!---->`);
-        }
-        if (commentListOpen.value) {
-          _push(`<div class="flex items-center space-x-2">`);
-          _push(ssrRenderComponent(_component_IconIon58mdArrowDropup, { class: "w-4 mr-1 flex items-center" }, null, _parent));
-          _push(` \u6536\u8D77 </div>`);
-        } else {
-          _push(`<!---->`);
-        }
-        _push(`</div>`);
-        if (commentListOpen.value) {
-          _push(`<div class="w-full"><div class="py-3 mb-1 border-b last:border-b-0 last-border-0 border-gray-200 dark:border-gray-700"><!--[-->`);
-          ssrRenderList(children.value, (child) => {
-            _push(ssrRenderComponent(_component_ArticleCommentChild, {
-              key: child.id,
-              comment: child
-            }, null, _parent));
-          });
-          _push(`<!--]--></div></div>`);
-        } else {
-          _push(`<!---->`);
-        }
-        _push(`<!--]-->`);
-      } else {
-        _push(`<!---->`);
-      }
-      if (commentListOpen.value) {
-        _push(ssrRenderComponent(_component_ArticleCommentForm, {
-          class: "pt-4",
-          onSubmit: submit
-        }, null, _parent));
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div></div></div>`);
-    };
+  getters: {
+    fullName() {
+      return `${this.firstName} ${this.lastName}`;
+    }
   }
 });
-const _sfc_setup$9 = _sfc_main$9.setup;
-_sfc_main$9.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Comment/Item.vue");
-  return _sfc_setup$9 ? _sfc_setup$9(props, ctx) : void 0;
+const meta = {
+  layout: "page"
 };
-const _sfc_main$8 = {
-  __name: "Comment",
-  __ssrInlineRender: true,
-  props: {
-    commentList: {
-      type: Array,
-      default: () => []
-    },
-    articleId: {
-      type: Number,
-      default: null
-    }
-  },
-  emits: ["submit"],
-  setup(__props, { emit }) {
-    const submit = (e2) => {
-      emit("submit", e2);
-    };
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_ArticleCommentForm = _sfc_main$b;
-      const _component_ArticleCommentItem = _sfc_main$9;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "comment-container" }, _attrs))}>`);
-      _push(ssrRenderComponent(_component_ArticleCommentForm, { onSubmit: submit }, null, _parent));
-      _push(`<!--[-->`);
-      ssrRenderList(__props.commentList, (comment, index) => {
-        _push(ssrRenderComponent(_component_ArticleCommentItem, {
-          key: index,
-          "article-id": __props.articleId,
-          comment,
-          onSubmit: submit
-        }, null, _parent));
-      });
-      _push(`<!--]--></div>`);
-    };
-  }
-};
-const _sfc_setup$8 = _sfc_main$8.setup;
-_sfc_main$8.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Article/Comment.vue");
-  return _sfc_setup$8 ? _sfc_setup$8(props, ctx) : void 0;
-};
-const meta$2 = {
-  layout: "blog"
-};
-const meta$1 = {
-  layout: "blog"
-};
-const meta = void 0;
 const _routes = [
+  {
+    name: "slug",
+    path: "/:slug(.*)*",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/node_modules/.pnpm/@nuxt+content@2.2.0/node_modules/@nuxt/content/dist/runtime/pages/document-driven.vue",
+    children: [],
+    meta: meta$9,
+    alias: [],
+    redirect: void 0,
+    component: () => import('./_nuxt/document-driven.eb7ed227.mjs').then((m2) => m2.default || m2)
+  },
   {
     name: "404",
     path: "/:catchAll(.*)*",
-    file: "/Users/kurou/project/nuxt3-awesome-starter/pages/404.vue",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/404.vue",
     children: [],
-    meta: meta$f,
-    alias: [],
-    redirect: void 0,
-    component: () => import('./_nuxt/404.30e6d8b1.mjs').then((m2) => m2.default || m2)
+    meta: meta$8,
+    alias: (meta$8 == null ? void 0 : meta$8.alias) || [],
+    redirect: (meta$8 == null ? void 0 : meta$8.redirect) || void 0,
+    component: () => import('./_nuxt/404.a5825e03.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: "blank",
+    path: "/blank",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/blank.vue",
+    children: [],
+    meta: meta$7,
+    alias: (meta$7 == null ? void 0 : meta$7.alias) || [],
+    redirect: (meta$7 == null ? void 0 : meta$7.redirect) || void 0,
+    component: () => import('./_nuxt/blank.6a9c2c7a.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: "dashboard",
+    path: "/dashboard",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/dashboard/index.vue",
+    children: [],
+    meta: meta$6,
+    alias: (meta$6 == null ? void 0 : meta$6.alias) || [],
+    redirect: (meta$6 == null ? void 0 : meta$6.redirect) || void 0,
+    component: () => import('./_nuxt/index.3bd4371a.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: "getting-started",
+    path: "/getting-started",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/getting-started.vue",
+    children: [],
+    meta: meta$5,
+    alias: (meta$5 == null ? void 0 : meta$5.alias) || [],
+    redirect: (meta$5 == null ? void 0 : meta$5.redirect) || void 0,
+    component: () => import('./_nuxt/getting-started.dc4da7cd.mjs').then((m2) => m2.default || m2)
   },
   {
     name: "index",
     path: "/",
-    file: "/Users/kurou/project/nuxt3-awesome-starter/pages/index.vue",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/index.vue",
     children: [],
-    meta: meta$e,
-    alias: (meta$e == null ? void 0 : meta$e.alias) || [],
-    redirect: (meta$e == null ? void 0 : meta$e.redirect) || void 0,
-    component: () => import('./_nuxt/index.adc1e4fe.mjs').then((m2) => m2.default || m2)
+    meta: meta$4,
+    alias: (meta$4 == null ? void 0 : meta$4.alias) || [],
+    redirect: (meta$4 == null ? void 0 : meta$4.redirect) || void 0,
+    component: () => import('./_nuxt/index.44c93707.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: "member-rule",
-    path: "/member-rule",
-    file: "/Users/kurou/project/nuxt3-awesome-starter/pages/member-rule.vue",
+    name: "post-slut",
+    path: "/post/:slut",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/post/[slut].vue",
     children: [],
-    meta: meta$d,
-    alias: [],
-    redirect: void 0,
-    component: () => import('./_nuxt/member-rule.20156645.mjs').then((m2) => m2.default || m2)
+    meta: meta$3,
+    alias: (meta$3 == null ? void 0 : meta$3.alias) || [],
+    redirect: (meta$3 == null ? void 0 : meta$3.redirect) || void 0,
+    component: () => import('./_nuxt/_slut_.a005eebb.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: "my",
-    path: "/my",
-    file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my.vue",
-    children: [
-      {
-        name: "my-account-change-phone",
-        path: "account/change-phone",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/account/change-phone.vue",
-        children: [],
-        meta: meta$b,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/change-phone.09a16a76.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-account-email-binding",
-        path: "account/email-binding",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/account/email-binding.vue",
-        children: [],
-        meta: meta$a,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/email-binding.0e1600a9.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-account-email-verify",
-        path: "account/email-verify",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/account/email-verify.vue",
-        children: [],
-        meta: meta$9,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/email-verify.10f9b02d.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-account-identify-verify",
-        path: "account/identify-verify",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/account/identify-verify.vue",
-        children: [],
-        meta: meta$8,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/identify-verify.0d0e5b07.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-account",
-        path: "account",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/account/index.vue",
-        children: [],
-        meta: meta$7,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/index.84e6bd7b.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-account-reset-password",
-        path: "account/reset-password",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/account/reset-password.vue",
-        children: [],
-        meta: meta$6,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/reset-password.a0b86f55.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-collections",
-        path: "collections",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/collections.vue",
-        children: [],
-        meta: meta$5,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/collections.f2bcec62.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-history",
-        path: "history",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/history.vue",
-        children: [],
-        meta: meta$4,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/history.e5b9aa41.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: "my-tips",
-        path: "tips",
-        file: "/Users/kurou/project/nuxt3-awesome-starter/pages/my/tips.vue",
-        children: [],
-        meta: meta$3,
-        alias: [],
-        redirect: void 0,
-        component: () => import('./_nuxt/tips.3cc444b1.mjs').then((m2) => m2.default || m2)
-      }
-    ],
-    meta: meta$c,
-    alias: (meta$c == null ? void 0 : meta$c.alias) || [],
-    redirect: (meta$c == null ? void 0 : meta$c.redirect) || void 0,
-    component: () => import('./_nuxt/my.93c36da4.mjs').then((m2) => m2.default || m2)
-  },
-  {
-    name: "news-article-articleSlug",
-    path: "/news/article/:articleSlug",
-    file: "/Users/kurou/project/nuxt3-awesome-starter/pages/news/article/[articleSlug].vue",
+    name: "post",
+    path: "/post",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/post/index.vue",
     children: [],
     meta: meta$2,
     alias: (meta$2 == null ? void 0 : meta$2.alias) || [],
     redirect: (meta$2 == null ? void 0 : meta$2.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.55913d8d.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.a2c3c4a9.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: "news-category-categorySlug",
-    path: "/news/category/:categorySlug",
-    file: "/Users/kurou/project/nuxt3-awesome-starter/pages/news/category/[categorySlug].vue",
+    name: "setting",
+    path: "/setting",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/setting.vue",
     children: [],
     meta: meta$1,
     alias: (meta$1 == null ? void 0 : meta$1.alias) || [],
     redirect: (meta$1 == null ? void 0 : meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.ef815213.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/setting.be1fa223.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: "news-type-video",
-    path: "/news/type/video",
-    file: "/Users/kurou/project/nuxt3-awesome-starter/pages/news/type/video.vue",
+    name: "test",
+    path: "/test",
+    file: "/Users/kurou/project/nuxt3/nuxt3-awesome-starter/pages/test.vue",
     children: [],
     meta,
-    alias: [],
-    redirect: void 0,
-    component: () => import('./_nuxt/video.b0ae5810.mjs').then((m2) => m2.default || m2)
+    alias: (meta == null ? void 0 : meta.alias) || [],
+    redirect: (meta == null ? void 0 : meta.redirect) || void 0,
+    component: () => import('./_nuxt/test.35873084.mjs').then((m2) => m2.default || m2)
   }
 ];
 const routerOptions0 = {
@@ -5174,12 +6868,12 @@ function _getHashElementScrollMarginTop(selector) {
   }
   return 0;
 }
-function _isDifferentRoute(a2, b2) {
-  const samePageComponent = a2.matched[0] === b2.matched[0];
+function _isDifferentRoute(a, b) {
+  const samePageComponent = a.matched[0] === b.matched[0];
   if (!samePageComponent) {
     return true;
   }
-  if (samePageComponent && JSON.stringify(a2.params) !== JSON.stringify(b2.params)) {
+  if (samePageComponent && JSON.stringify(a.params) !== JSON.stringify(b.params)) {
     return true;
   }
   return false;
@@ -5204,10 +6898,8 @@ const validate = defineNuxtRouteMiddleware(async (to) => {
 const globalMiddleware = [
   validate
 ];
-const namedMiddleware = {
-  auth: () => import('./_nuxt/auth.391f4c4e.mjs')
-};
-const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlugin(async (nuxtApp) => {
+const namedMiddleware = {};
+const node_modules__pnpm_nuxt3_643_0_0_rc_13_27772354_a0a59e2_3qgq5m7bqj7palvvc4uezrk4iq_node_modules_nuxt3_dist_pages_runtime_router_mjs_li16ybVNyb = defineNuxtPlugin(async (nuxtApp) => {
   var _a, _b, _c, _d;
   let __temp, __restore;
   let routerBase = useRuntimeConfig().app.baseURL;
@@ -5286,7 +6978,7 @@ const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlu
       }
     }
     for (const entry2 of middlewareEntries) {
-      const middleware = typeof entry2 === "string" ? nuxtApp._middleware.named[entry2] || await ((_b2 = namedMiddleware[entry2]) == null ? void 0 : _b2.call(namedMiddleware).then((r2) => r2.default || r2)) : entry2;
+      const middleware = typeof entry2 === "string" ? nuxtApp._middleware.named[entry2] || await ((_b2 = namedMiddleware[entry2]) == null ? void 0 : _b2.call(namedMiddleware).then((r) => r.default || r)) : entry2;
       if (!middleware) {
         throw new Error(`Unknown route middleware: '${entry2}'.`);
       }
@@ -5317,7 +7009,7 @@ const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlu
       nuxtApp.ssrContext.event.res.statusCode = 404;
     } else {
       const currentURL = to.fullPath || "/";
-      if (!isEqual(currentURL, initialURL)) {
+      if (!isEqual$1(currentURL, initialURL)) {
         await callWithNuxt(nuxtApp, navigateTo, [currentURL]);
       }
     }
@@ -5335,7 +7027,289 @@ const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlu
   });
   return { provide: { router } };
 });
-const node_modules__64pinia_nuxt_dist_runtime_plugin_vue3_mjs_A0OWXRrUgq = defineNuxtPlugin((nuxtApp) => {
+const navBottomLink = (link) => {
+  if (!link.children) {
+    return link._path;
+  }
+  for (const child of (link == null ? void 0 : link.children) || []) {
+    const result = navBottomLink(child);
+    if (result) {
+      return result;
+    }
+  }
+};
+const navDirFromPath = (path, tree) => {
+  for (const file of tree) {
+    if (file._path === path && !file._id) {
+      return file.children;
+    }
+    if (file.children) {
+      const result = navDirFromPath(path, file.children);
+      if (result) {
+        return result;
+      }
+    }
+  }
+};
+const navPageFromPath = (path, tree) => {
+  for (const file of tree) {
+    if (file._path === path) {
+      return file;
+    }
+    if (file.children) {
+      const result = navPageFromPath(path, file.children);
+      if (result) {
+        return result;
+      }
+    }
+  }
+};
+const navKeyFromPath = (path, key, tree) => {
+  let value;
+  const goDeep = (path2, tree2) => {
+    for (const file of tree2) {
+      if ((path2 == null ? void 0 : path2.startsWith(file._path)) && file[key]) {
+        value = file[key];
+      }
+      if (file._path === path2) {
+        return;
+      }
+      if (file.children) {
+        goDeep(path2, file.children);
+      }
+    }
+  };
+  goDeep(path, tree);
+  return value;
+};
+const useContentHelpers = () => {
+  return {
+    navBottomLink,
+    navDirFromPath,
+    navPageFromPath,
+    navKeyFromPath
+  };
+};
+const fetchContentNavigation = async (queryBuilder) => {
+  let params = queryBuilder;
+  if (typeof (params == null ? void 0 : params.params) === "function") {
+    params = params.params();
+  }
+  const apiPath = withContentBase(params ? `/navigation/${hash(params)}.json` : "/navigation");
+  {
+    addPrerenderPath(apiPath);
+  }
+  if (shouldUseClientDB()) {
+    const generateNavigation = await import('./_nuxt/client-db.27671087.mjs').then((m2) => m2.generateNavigation);
+    return generateNavigation(params || {});
+  }
+  const data = await $fetch(apiPath, {
+    method: "GET",
+    responseType: "json",
+    params: {
+      _params: jsonStringify(params || {}),
+      previewToken: useCookie("previewToken").value
+    }
+  });
+  if (typeof data === "string" && data.startsWith("<!DOCTYPE html>")) {
+    throw new Error("Not found");
+  }
+  return data;
+};
+const node_modules__pnpm__64nuxt_43content_642_2_0_node_modules__64nuxt_content_dist_runtime_plugins_documentDriven_mjs_vZGyqQOxUD = defineNuxtPlugin((nuxt) => {
+  var _a, _b;
+  const { documentDriven: moduleOptions, clientDB } = (_b = (_a = useRuntimeConfig()) == null ? void 0 : _a.public) == null ? void 0 : _b.content;
+  const findLayout = (to, page2, navigation, globals) => {
+    var _a2;
+    if (page2 && (page2 == null ? void 0 : page2.layout)) {
+      return page2.layout;
+    }
+    if (to.matched.length && ((_a2 = to.matched[0].meta) == null ? void 0 : _a2.layout)) {
+      return to.matched[0].meta.layout;
+    }
+    if (navigation && page2) {
+      const { navKeyFromPath: navKeyFromPath2 } = useContentHelpers();
+      const layoutFromNav = navKeyFromPath2(page2._path, "layout", navigation);
+      if (layoutFromNav) {
+        return layoutFromNav;
+      }
+    }
+    if (moduleOptions.layoutFallbacks && globals) {
+      let layoutFallback;
+      for (const fallback of moduleOptions.layoutFallbacks) {
+        if (globals[fallback] && globals[fallback].layout) {
+          layoutFallback = globals[fallback].layout;
+          break;
+        }
+      }
+      if (layoutFallback) {
+        return layoutFallback;
+      }
+    }
+    return "default";
+  };
+  const refresh = async (to, force = false) => {
+    const routeConfig = to.meta.documentDriven || {};
+    if (to.meta.documentDriven === false) {
+      return;
+    }
+    !force && nuxt.callHook("content:middleware:start");
+    const { navigation, pages, globals, surrounds } = useContentState();
+    const _path = withoutTrailingSlash(to.path);
+    const promises = [];
+    if (moduleOptions.navigation && routeConfig.navigation !== false) {
+      const navigationQuery = () => {
+        const { navigation: navigation2 } = useContentState();
+        if (navigation2.value && !force) {
+          return navigation2.value;
+        }
+        return fetchContentNavigation().then((_navigation) => {
+          navigation2.value = _navigation;
+          return _navigation;
+        }).catch((_2) => {
+        });
+      };
+      promises.push(navigationQuery);
+    } else {
+      promises.push(() => Promise.resolve(null));
+    }
+    if (moduleOptions.globals) {
+      const globalsQuery = () => {
+        const { globals: globals2 } = useContentState();
+        if (typeof moduleOptions.globals === "object" && Array.isArray(moduleOptions.globals)) {
+          console.log("Globals must be a list of keys with QueryBuilderParams as a value.");
+          return;
+        }
+        return Promise.all(
+          Object.entries(moduleOptions.globals).map(
+            ([key, query]) => {
+              if (!force && globals2.value[key]) {
+                return globals2.value[key];
+              }
+              let type = "findOne";
+              if (query == null ? void 0 : query.type) {
+                type = query.type;
+              }
+              return queryContent(query)[type]().catch(() => {
+              });
+            }
+          )
+        ).then(
+          (values) => {
+            return values.reduce(
+              (acc, value, index2) => {
+                const key = Object.keys(moduleOptions.globals)[index2];
+                acc[key] = value;
+                return acc;
+              },
+              {}
+            );
+          }
+        );
+      };
+      promises.push(globalsQuery);
+    } else {
+      promises.push(() => Promise.resolve(null));
+    }
+    if (moduleOptions.page && routeConfig.page !== false) {
+      let where = { _path };
+      if (typeof routeConfig.page === "string") {
+        where = { _path: routeConfig.page };
+      }
+      if (typeof routeConfig.page === "object") {
+        where = routeConfig.page;
+      }
+      const pageQuery = () => {
+        const { pages: pages2 } = useContentState();
+        if (!force && pages2.value[_path] && pages2.value[_path]._path === _path) {
+          return pages2.value[_path];
+        }
+        return queryContent().where(where).findOne().catch(() => {
+        });
+      };
+      promises.push(pageQuery);
+    } else {
+      promises.push(() => Promise.resolve(null));
+    }
+    if (moduleOptions.surround && routeConfig.surround !== false) {
+      let surround = _path;
+      if (["string", "object"].includes(typeof routeConfig.page)) {
+        surround = routeConfig.page;
+      }
+      if (["string", "object"].includes(typeof routeConfig.surround)) {
+        surround = routeConfig.surround;
+      }
+      const surroundQuery = () => {
+        const { surrounds: surrounds2 } = useContentState();
+        if (!force && surrounds2.value[_path]) {
+          return surrounds2.value[_path];
+        }
+        return queryContent().where({
+          _partial: { $not: true },
+          navigation: { $not: false }
+        }).without(["body"]).findSurround(surround).catch(() => {
+        });
+      };
+      promises.push(surroundQuery);
+    } else {
+      promises.push(() => Promise.resolve(null));
+    }
+    return await Promise.all(promises.map((promise) => promise())).then(async ([
+      _navigation,
+      _globals,
+      _page,
+      _surround
+    ]) => {
+      var _a2, _b2, _c, _d;
+      if (_navigation) {
+        navigation.value = _navigation;
+      }
+      if (_globals) {
+        globals.value = _globals;
+      }
+      if (_page == null ? void 0 : _page.redirect) {
+        return _page == null ? void 0 : _page.redirect;
+      }
+      if ((_b2 = (_a2 = _page == null ? void 0 : _page._dir) == null ? void 0 : _a2.navigation) == null ? void 0 : _b2.redirect) {
+        return (_d = (_c = _page == null ? void 0 : _page._dir) == null ? void 0 : _c.navigation) == null ? void 0 : _d.redirect;
+      }
+      if (_page) {
+        const layoutName = findLayout(to, _page, _navigation, _globals);
+        const layout2 = layouts[layoutName];
+        if (layout2 && (layout2 == null ? void 0 : layout2.__asyncLoader) && !layout2.__asyncResolved) {
+          await layout2.__asyncLoader();
+        }
+        to.meta.layout = layoutName;
+        _page.layout = layoutName;
+        pages.value[_path] = _page;
+      }
+      if (_surround) {
+        surrounds.value[_path] = _surround;
+      }
+    });
+  };
+  addRouteMiddleware(async (to, from) => {
+    if (to.path.includes("favicon.ico")) {
+      return;
+    }
+    const redirect = await refresh(to, false);
+    if (redirect) {
+      if (hasProtocol(redirect)) {
+        return callWithNuxt(nuxt, navigateTo, [redirect, { external: true }]);
+      } else {
+        return redirect;
+      }
+    }
+  });
+  {
+    delete nuxt.payload.prerenderedAt;
+  }
+  nuxt.hook("app:data:refresh", async () => false);
+});
+const node_modules__pnpm__64nuxt_43content_642_2_0_node_modules__64nuxt_content_dist_runtime_plugins_ws_mjs_3W4BH9cvku = defineNuxtPlugin(() => {
+  useRuntimeConfig().public;
+});
+const node_modules__pnpm__64pinia_43nuxt_640_4_2_ni6iema7j2wg3vv7conib4kacm_node_modules__64pinia_nuxt_dist_runtime_plugin_vue3_mjs_PMAokU7xtF = defineNuxtPlugin((nuxtApp) => {
   const pinia = createPinia();
   nuxtApp.vueApp.use(pinia);
   setActivePinia(pinia);
@@ -5348,6 +7322,1263 @@ const node_modules__64pinia_nuxt_dist_runtime_plugin_vue3_mjs_A0OWXRrUgq = defin
     }
   };
 });
+const optionsLoader = () => Promise.resolve({ "locale": "en", "fallbackLocale": "en", "availableLocales": ["en", "id", "ja", "ko"] });
+const locale_en = {
+  "components": {
+    "language_switcher": {
+      "change_language": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["change language"]);
+      }
+    },
+    "theme_switcher": {
+      "theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["theme"]);
+      },
+      "change_theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["change theme"]);
+      }
+    }
+  },
+  "pages": {
+    "index": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["nuxt 3[]awesome[]starter"]);
+      }
+    },
+    404: {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["page not found"]);
+      }
+    },
+    "blank": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["blank"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["blank page"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["this is a blank page"]);
+      },
+      "just_blank_page_with_title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["just blank page with title"]);
+      }
+    },
+    "post": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["post"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["post"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["this is a post page"]);
+      }
+    },
+    "test": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["test"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["testing"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["this is a test page"]);
+      },
+      "counter": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["counter"]);
+      },
+      "increment": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["increment"]);
+      },
+      "decrement": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["decrement"]);
+      },
+      "reset": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["reset"]);
+      },
+      "identity": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["identity"]);
+      },
+      "full_name": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["fullName"]);
+      }
+    },
+    "getting-started": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["getting started"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["getting started"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["this is a getting started page"]);
+      }
+    },
+    "setting": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["setting"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["setting"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["this is a setting page"]);
+      },
+      "sections": {
+        "validate_username": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["validate github profile"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["type your github username and click the button to validate."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["Learn more about"]);
+          },
+          "footer_button": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["validate"]);
+          },
+          "footer_link": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github users api"]);
+          }
+        },
+        "bot_id": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["bot id"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["This is your bot ID."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["Used when interacting with the bot."]);
+          }
+        },
+        "protection_spam": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["spam protection"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["toggle enable to remove the red border"]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["if enable we will secure your comments from spam"]);
+          }
+        },
+        "advanced_enable_advanced": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["enable advanced settings"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["you can enable advanced settings to change the settings"]);
+          }
+        },
+        "advanced_dir_listing": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["directory listing"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["if no index file is present within a directory, the directory contents will be displayed."]);
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["dashboard"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["dashboard"]);
+      },
+      "index": {
+        "nav": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["home"]);
+        },
+        "title": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["home"]);
+        }
+      }
+    }
+  },
+  "banners": {
+    "welcome": (ctx) => {
+      const { normalize: _normalize, interpolate: _interpolate, named: _named } = ctx;
+      return _normalize(["hello, welcome to ", _interpolate(_named("app_name")), "!"]);
+    }
+  },
+  "others": {
+    "learn_more": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["learn more"]);
+    },
+    "copy": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["copy"]);
+    },
+    "enabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["enabled"]);
+    },
+    "disabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["disabled"]);
+    }
+  }
+};
+const locale_id = {
+  "components": {
+    "language_switcher": {
+      "change_language": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["ganti bahasa"]);
+      }
+    },
+    "theme_switcher": {
+      "theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["tema"]);
+      },
+      "change_theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["ganti tema"]);
+      }
+    }
+  },
+  "pages": {
+    "404": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["halaman tidak ditemukan"]);
+      }
+    },
+    "index": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["nuxt 3[]luar biasa[]pemula"]);
+      }
+    },
+    "blank": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["kosong"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["halaman kosong"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["ini adalah halaman kosong"]);
+      },
+      "just_blank_page_with_title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["hanya halaman kosong dengan judul"]);
+      }
+    },
+    "post": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["pos"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["pos"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["ini adalah halaman posting"]);
+      }
+    },
+    "test": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["uji"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["pengujian"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["ini adalah halaman percobaan"]);
+      },
+      "counter": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["menangkal"]);
+      },
+      "increment": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["kenaikan"]);
+      },
+      "decrement": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["pengurangan"]);
+      },
+      "reset": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["mengatur ulang"]);
+      },
+      "identity": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["identitas"]);
+      },
+      "full_name": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["nama lengkap"]);
+      }
+    },
+    "getting-started": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["mulai"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["mulai"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["ini adalah halaman memulai"]);
+      }
+    },
+    "setting": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["pengaturan"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["pengaturan"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["ini adalah halaman pengaturan"]);
+      },
+      "sections": {
+        "validate_username": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["validasi profil github"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["ketik nama pengguna github anda dan klik tombol untuk memvalidasi."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["belajar lebih tentang"]);
+          },
+          "footer_button": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["mengesahkan"]);
+          },
+          "footer_link": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["pengguna github api"]);
+          }
+        },
+        "bot_id": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["id bot"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["ini adalah id bot anda."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["digunakan saat berinteraksi dengan bot."]);
+          }
+        },
+        "protection_spam": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["proteksi spam"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["alihkan aktifkan untuk menghapus batas merah"]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["jika memungkinkan kami akan mengamankan komentar anda dari spam"]);
+          }
+        },
+        "advanced_enable_advanced": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["aktifkan pengaturan lanjutan"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["anda dapat mengaktifkan pengaturan lanjutan untuk mengubah pengaturan"]);
+          }
+        },
+        "advanced_dir_listing": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["daftar direktori"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["jika tidak ada file indeks dalam direktori, isi direktori akan ditampilkan."]);
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["dasbor"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["dasbor"]);
+      },
+      "index": {
+        "nav": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["rumah"]);
+        },
+        "title": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["rumah"]);
+        }
+      }
+    }
+  },
+  "banners": {
+    "welcome": (ctx) => {
+      const { normalize: _normalize, interpolate: _interpolate, named: _named } = ctx;
+      return _normalize(["halo, selamat datang di ", _interpolate(_named("app_name")), "!"]);
+    }
+  },
+  "others": {
+    "learn_more": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["belajarlah lagi"]);
+    },
+    "copy": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["salinan"]);
+    },
+    "enabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["diaktifkan"]);
+    },
+    "disabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["dengan disabilitas"]);
+    }
+  }
+};
+const locale_ja = {
+  "components": {
+    "language_switcher": {
+      "change_language": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8A00\u8A9E\u3092\u5909\u66F4"]);
+      }
+    },
+    "theme_switcher": {
+      "theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30C6\u30FC\u30DE"]);
+      },
+      "change_theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30C6\u30FC\u30DE\u3092\u5909\u66F4"]);
+      }
+    }
+  },
+  "pages": {
+    "404": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30DA\u30FC\u30B8\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093"]);
+      }
+    },
+    "index": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["nuxt 3[]\u7D20\u6674\u3089\u3057\u3044[]\u30B9\u30BF\u30FC\u30BF\u30FC"]);
+      }
+    },
+    "blank": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u7A7A\u6B04"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u7A7A\u767D\u30DA\u30FC\u30B8"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u3053\u308C\u306F\u7A7A\u767D\u306E\u30DA\u30FC\u30B8\u3067\u3059"]);
+      },
+      "just_blank_page_with_title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30BF\u30A4\u30C8\u30EB\u306E\u3042\u308B\u7A7A\u767D\u306E\u30DA\u30FC\u30B8"]);
+      }
+    },
+    "post": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5F79\u8077"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5F79\u8077"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u3053\u308C\u306F\u6295\u7A3F\u30DA\u30FC\u30B8\u3067\u3059"]);
+      }
+    },
+    "test": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30C6\u30B9\u30C8"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30C6\u30B9\u30C8"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u3053\u308C\u306F\u30C6\u30B9\u30C8\u30DA\u30FC\u30B8\u3067\u3059"]);
+      },
+      "counter": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30AB\u30A6\u30F3\u30BF\u30FC"]);
+      },
+      "increment": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30A4\u30F3\u30AF\u30EA\u30E1\u30F3\u30C8"]);
+      },
+      "decrement": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30C7\u30AF\u30EA\u30E1\u30F3\u30C8"]);
+      },
+      "reset": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30EA\u30BB\u30C3\u30C8"]);
+      },
+      "identity": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8EAB\u5143"]);
+      },
+      "full_name": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30D5\u30EB\u30CD\u30FC\u30E0"]);
+      }
+    },
+    "getting-started": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5165\u9580"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5165\u9580"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u3053\u308C\u306F\u5165\u9580\u30DA\u30FC\u30B8\u3067\u3059"]);
+      }
+    },
+    "setting": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8A2D\u5B9A"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8A2D\u5B9A"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8A2D\u5B9A\u30DA\u30FC\u30B8\u3067\u3059"]);
+      },
+      "sections": {
+        "validate_username": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github \u30D7\u30ED\u30D5\u30A1\u30A4\u30EB\u3092\u691C\u8A3C\u3059\u308B"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github \u30E6\u30FC\u30B6\u30FC\u540D\u3092\u5165\u529B\u3057\u3001\u30DC\u30BF\u30F3\u3092\u30AF\u30EA\u30C3\u30AF\u3057\u3066\u691C\u8A3C\u3057\u307E\u3059\u3002"]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u8A73\u3057\u304F\u306F\u3053\u3061\u3089"]);
+          },
+          "footer_button": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u691C\u8A3C"]);
+          },
+          "footer_link": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github \u30E6\u30FC\u30B6\u30FC api"]);
+          }
+        },
+        "bot_id": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u30DC\u30C3\u30C8id"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u3053\u308C\u304C\u30DC\u30C3\u30C8 id \u3067\u3059\u3002"]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u30DC\u30C3\u30C8\u3068\u5BFE\u8A71\u3059\u308B\u3068\u304D\u306B\u4F7F\u7528\u3055\u308C\u307E\u3059\u3002"]);
+          }
+        },
+        "protection_spam": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u30B9\u30D1\u30E0\u4FDD\u8B77"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u6709\u52B9\u306B\u5207\u308A\u66FF\u3048\u3066\u3001\u8D64\u3044\u67A0\u3092\u524A\u9664\u3057\u307E\u3059"]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u6709\u52B9\u306B\u3059\u308B\u3068\u3001\u30B3\u30E1\u30F3\u30C8\u3092\u30B9\u30D1\u30E0\u304B\u3089\u4FDD\u8B77\u3057\u307E\u3059"]);
+          }
+        },
+        "advanced_enable_advanced": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u8A73\u7D30\u8A2D\u5B9A\u3092\u6709\u52B9\u306B\u3059\u308B"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u8A73\u7D30\u8A2D\u5B9A\u3092\u6709\u52B9\u306B\u3057\u3066\u8A2D\u5B9A\u3092\u5909\u66F4\u3067\u304D\u307E\u3059"]);
+          }
+        },
+        "advanced_dir_listing": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u30C7\u30A3\u30EC\u30AF\u30C8\u30EA\u4E00\u89A7"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u30C7\u30A3\u30EC\u30AF\u30C8\u30EA\u5185\u306B\u30A4\u30F3\u30C7\u30C3\u30AF\u30B9 \u30D5\u30A1\u30A4\u30EB\u304C\u5B58\u5728\u3057\u306A\u3044\u5834\u5408\u306F\u3001\u30C7\u30A3\u30EC\u30AF\u30C8\u30EA\u306E\u5185\u5BB9\u304C\u8868\u793A\u3055\u308C\u307E\u3059\u3002"]);
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30C0\u30C3\u30B7\u30E5\u30DC\u30FC\u30C9"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u30C0\u30C3\u30B7\u30E5\u30DC\u30FC\u30C9"]);
+      },
+      "index": {
+        "nav": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["\u5BB6"]);
+        },
+        "title": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["\u5BB6"]);
+        }
+      }
+    }
+  },
+  "banners": {
+    "welcome": (ctx) => {
+      const { normalize: _normalize, interpolate: _interpolate, named: _named } = ctx;
+      return _normalize(["\u3053\u3093\u306B\u3061\u306F\u3001", _interpolate(_named("app_name")), " \u3078\u3088\u3046\u3053\u305D!"]);
+    }
+  },
+  "others": {
+    "learn_more": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u3082\u3063\u3068\u8A73\u3057\u304F\u77E5\u308B"]);
+    },
+    "copy": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u30B3\u30D4\u30FC"]);
+    },
+    "enabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u6709\u52B9"]);
+    },
+    "disabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u7121\u52B9"]);
+    }
+  }
+};
+const locale_ko = {
+  "components": {
+    "language_switcher": {
+      "change_language": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC5B8\uC5B4 \uBCC0\uACBD"]);
+      }
+    },
+    "theme_switcher": {
+      "theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC8FC\uC81C"]);
+      },
+      "change_theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uD14C\uB9C8 \uBCC0\uACBD"]);
+      }
+    }
+  },
+  "pages": {
+    "404": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uD398\uC774\uC9C0\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4"]);
+      }
+    },
+    "index": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["nuxt 3[]\uBA4B\uC9C4[]\uC2A4\uD0C0\uD130"]);
+      }
+    },
+    "blank": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uACF5\uBC31"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uBE48 \uD398\uC774\uC9C0"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC774\uAC83\uC740 \uBE48 \uD398\uC774\uC9C0\uC785\uB2C8\uB2E4"]);
+      },
+      "just_blank_page_with_title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC81C\uBAA9\uC774 \uC788\uB294 \uBE48 \uD398\uC774\uC9C0"]);
+      }
+    },
+    "post": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uAC8C\uC2DC\uD558\uB2E4"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uAC8C\uC2DC\uD558\uB2E4"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC774\uAC83\uC740 \uAC8C\uC2DC\uBB3C \uD398\uC774\uC9C0\uC785\uB2C8\uB2E4"]);
+      }
+    },
+    "test": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uD14C\uC2A4\uD2B8"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uD14C\uC2A4\uD2B8"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC774\uAC83\uC740 \uD14C\uC2A4\uD2B8 \uD398\uC774\uC9C0\uC785\uB2C8\uB2E4"]);
+      },
+      "counter": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uCE74\uC6B4\uD130"]);
+      },
+      "increment": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC99D\uAC00"]);
+      },
+      "decrement": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uAC10\uC18C"]);
+      },
+      "reset": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uCD08\uAE30\uD654"]);
+      },
+      "identity": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC2E0\uC6D0"]);
+      },
+      "full_name": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC804\uCCB4 \uC774\uB984"]);
+      }
+    },
+    "getting-started": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC2DC\uC791\uD558\uAE30"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC2DC\uC791\uD558\uAE30"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC774\uAC83\uC740 \uC2DC\uC791 \uD398\uC774\uC9C0\uC785\uB2C8\uB2E4"]);
+      }
+    },
+    "setting": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uD658\uACBD"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uD658\uACBD"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uC774\uAC83\uC740 \uC124\uC815 \uD398\uC774\uC9C0\uC785\uB2C8\uB2E4"]);
+      },
+      "sections": {
+        "validate_username": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github \uD504\uB85C\uD544 \uD655\uC778"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github \uC0AC\uC6A9\uC790 \uC774\uB984\uC744 \uC785\uB825\uD558\uACE0 \uBC84\uD2BC\uC744 \uD074\uB9AD\uD558\uC5EC \uD655\uC778\uD558\uC2ED\uC2DC\uC624."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uC5D0 \uB300\uD574 \uC790\uC138\uD788 \uC54C\uC544\uBCF4\uAE30"]);
+          },
+          "footer_button": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uD655\uC778"]);
+          },
+          "footer_link": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github \uC0AC\uC6A9\uC790 api"]);
+          }
+        },
+        "bot_id": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uBD07 \uC544\uC774\uB514"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uC774\uAC83\uC740 \uBD07 id\uC785\uB2C8\uB2E4."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uBD07\uACFC \uC0C1\uD638 \uC791\uC6A9\uD560 \uB54C \uC0AC\uC6A9\uB429\uB2C8\uB2E4."]);
+          }
+        },
+        "protection_spam": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uC2A4\uD338 \uBC29\uC9C0"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uD65C\uC131\uD654\uB97C \uD1A0\uAE00\uD558\uC5EC \uBE68\uAC04\uC0C9 \uD14C\uB450\uB9AC\uB97C \uC81C\uAC70\uD569\uB2C8\uB2E4."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uD65C\uC131\uD654\uD558\uBA74 \uC2A4\uD338\uC73C\uB85C\uBD80\uD130 \uB313\uAE00\uC744 \uBCF4\uD638\uD569\uB2C8\uB2E4."]);
+          }
+        },
+        "advanced_enable_advanced": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uACE0\uAE09 \uC124\uC815 \uD65C\uC131\uD654"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uACE0\uAE09 \uC124\uC815\uC744 \uD65C\uC131\uD654\uD558\uC5EC \uC124\uC815\uC744 \uBCC0\uACBD\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4"]);
+          }
+        },
+        "advanced_dir_listing": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uB514\uB809\uD1A0\uB9AC \uBAA9\uB85D"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\uB514\uB809\uD1A0\uB9AC \uB0B4\uC5D0 \uC778\uB371\uC2A4 \uD30C\uC77C\uC774 \uC5C6\uC73C\uBA74 \uB514\uB809\uD1A0\uB9AC \uB0B4\uC6A9\uC774 \uD45C\uC2DC\uB429\uB2C8\uB2E4."]);
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uACC4\uAE30\uBC18"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\uACC4\uAE30\uBC18"]);
+      },
+      "index": {
+        "nav": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["\uC9D1"]);
+        },
+        "title": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["\uC9D1"]);
+        }
+      }
+    }
+  },
+  "banners": {
+    "welcome": (ctx) => {
+      const { normalize: _normalize, interpolate: _interpolate, named: _named } = ctx;
+      return _normalize(["\uC548\uB155\uD558\uC138\uC694, ", _interpolate(_named("app_name")), "\uC5D0 \uC624\uC2E0 \uAC83\uC744 \uD658\uC601\uD569\uB2C8\uB2E4!"]);
+    }
+  },
+  "others": {
+    "learn_more": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\uB354 \uC54C\uC544\uBCF4\uAE30"]);
+    },
+    "copy": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\uBCF5\uC0AC"]);
+    },
+    "enabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\uD65C\uC131\uD654"]);
+    },
+    "disabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\uC7A5\uC560\uAC00 \uC788\uB294"]);
+    }
+  }
+};
+const locale_zh = {
+  "components": {
+    "language_switcher": {
+      "change_language": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5207\u6362\u8BED\u8A00"]);
+      }
+    },
+    "theme_switcher": {
+      "theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u4E3B\u9898"]);
+      },
+      "change_theme": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5207\u6362\u4E3B\u9898"]);
+      }
+    }
+  },
+  "pages": {
+    "index": {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["nuxt 3[]awesome[]starter"]);
+      }
+    },
+    404: {
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u627E\u4E0D\u5230\u8BE5\u9875\u9762"]);
+      }
+    },
+    "blank": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u7A7A\u767D"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u7A7A\u767D\u9875"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8FD9\u662F\u4E00\u4E2A\u7A7A\u767D\u9875"]);
+      },
+      "just_blank_page_with_title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u53EA\u662F\u5E26\u6709\u6807\u9898\u7684\u7A7A\u767D\u9875"]);
+      }
+    },
+    "post": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u6587\u7AE0"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u6587\u7AE0"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8FD9\u662F\u4E00\u4E2A\u6587\u7AE0\u9875\u9762"]);
+      }
+    },
+    "test": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u6D4B\u8BD5"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u6D4B\u8BD5"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8FD9\u662F\u4E00\u4E2A\u6D4B\u8BD5\u9875\u9762"]);
+      },
+      "counter": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8BA1\u6570\u5668"]);
+      },
+      "increment": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u589E\u52A0"]);
+      },
+      "decrement": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u51CF\u5C11"]);
+      },
+      "reset": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u91CD\u7F6E"]);
+      },
+      "identity": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u6807\u8BC6"]);
+      },
+      "full_name": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5168\u540D"]);
+      }
+    },
+    "getting-started": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5FEB\u901F\u5F00\u59CB"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u5FEB\u901F\u5F00\u59CB"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8FD9\u662F\u4E00\u4E2A\u5FEB\u901F\u5F00\u59CB\u9875\u9762"]);
+      }
+    },
+    "setting": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8BBE\u7F6E"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8BBE\u7F6E"]);
+      },
+      "description": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u8FD9\u662F\u4E00\u4E2A\u8BBE\u7F6E\u9875\u9762"]);
+      },
+      "sections": {
+        "validate_username": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u9A8C\u8BC1 github \u914D\u7F6E\u6587\u4EF6"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u8F93\u5165\u60A8\u7684 github \u7528\u6237\u540D\uFF0C\u7136\u540E\u5355\u51FB\u6309\u94AE\u8FDB\u884C\u9A8C\u8BC1\u3002"]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u4E86\u89E3\u66F4\u591A"]);
+          },
+          "footer_button": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u9A8C\u8BC1"]);
+          },
+          "footer_link": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["github \u7528\u6237 api"]);
+          }
+        },
+        "bot_id": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u673A\u5668\u4EBA id"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u8FD9\u662F\u4F60\u7684\u673A\u5668\u4EBA ID."]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u5728\u4E0E\u673A\u5668\u4EBA\u4EA4\u4E92\u65F6\u4F7F\u7528\u3002"]);
+          }
+        },
+        "protection_spam": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u5783\u573E\u90AE\u4EF6\u9632\u62A4"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u5207\u6362\u542F\u7528\u4EE5\u5220\u9664\u7EA2\u8272\u8FB9\u6846"]);
+          },
+          "footer": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u5982\u679C\u542F\u7528\uFF0C\u6211\u4EEC\u5C06\u4FDD\u62A4\u60A8\u7684\u8BC4\u8BBA\u514D\u53D7\u5783\u573E\u90AE\u4EF6\u7684\u4FB5\u5BB3"]);
+          }
+        },
+        "advanced_enable_advanced": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u9AD8\u7EA7\u8BBE\u7F6E"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u60A8\u53EF\u4EE5\u542F\u7528\u9AD8\u7EA7\u8BBE\u7F6E\u4EE5\u66F4\u6539\u8BBE\u7F6E"]);
+          }
+        },
+        "advanced_dir_listing": {
+          "title": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u76EE\u5F55\u5217\u8868"]);
+          },
+          "description": (ctx) => {
+            const { normalize: _normalize } = ctx;
+            return _normalize(["\u5982\u679C\u76EE\u5F55\u4E2D\u4E0D\u5B58\u5728\u7D22\u5F15\u6587\u4EF6\uFF0C\u5219\u5C06\u663E\u793A\u76EE\u5F55\u5185\u5BB9\u3002"]);
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "nav": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u4EEA\u8868\u76D8"]);
+      },
+      "title": (ctx) => {
+        const { normalize: _normalize } = ctx;
+        return _normalize(["\u4EEA\u8868\u76D8"]);
+      },
+      "index": {
+        "nav": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["\u4E3B\u9875"]);
+        },
+        "title": (ctx) => {
+          const { normalize: _normalize } = ctx;
+          return _normalize(["\u4E3B\u9875"]);
+        }
+      }
+    }
+  },
+  "banners": {
+    "welcome": (ctx) => {
+      const { normalize: _normalize, interpolate: _interpolate, named: _named } = ctx;
+      return _normalize(["\u4F60\u597D, \u6B22\u8FCE\u6765\u5230 ", _interpolate(_named("app_name")), "!"]);
+    }
+  },
+  "others": {
+    "learn_more": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u4E86\u89E3\u66F4\u591A"]);
+    },
+    "copy": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u590D\u5236"]);
+    },
+    "enabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u542F\u7528"]);
+    },
+    "disabled": (ctx) => {
+      const { normalize: _normalize } = ctx;
+      return _normalize(["\u7981\u7528"]);
+    }
+  }
+};
+const messages = { "en": locale_en, "id": locale_id, "ja": locale_ja, "ko": locale_ko, "zh": locale_zh };
+const isEmpty = (obj) => Object.keys(obj).length === 0;
+const _nuxt_plugin_mjs_FRmGFsEaPh = defineNuxtPlugin(async (nuxt) => {
+  const { vueApp: app2 } = nuxt;
+  const loadedOptions = await optionsLoader();
+  if (!isEmpty(messages)) {
+    loadedOptions.messages = messages;
+  }
+  const i18n = createI18n({
+    legacy: false,
+    globalInjection: true,
+    locale: "en",
+    ...loadedOptions
+  });
+  app2.use(i18n);
+});
 const plugins_navbar_ts_qw38FjZisw = defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook("page:finish", () => {
     const showDrawer = useState("navbar.showDrawer", () => false);
@@ -5356,6 +8587,9 @@ const plugins_navbar_ts_qw38FjZisw = defineNuxtPlugin((nuxtApp) => {
     showOptions.value = false;
   });
 });
+function identity(arg) {
+  return arg;
+}
 const _global = typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 const globalKey = "__vueuse_ssr_handlers__";
 _global[globalKey] = _global[globalKey] || {};
@@ -5376,16 +8610,16 @@ var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a2, b2) => {
-  for (var prop in b2 || (b2 = {}))
-    if (__hasOwnProp.call(b2, prop))
-      __defNormalProp(a2, prop, b2[prop]);
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
   if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b2)) {
-      if (__propIsEnum.call(b2, prop))
-        __defNormalProp(a2, prop, b2[prop]);
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
     }
-  return a2;
+  return a;
 };
 const _TransitionPresets = {
   easeInSine: [0.12, 0, 0.39, 0],
@@ -5418,15 +8652,15 @@ __spreadValues({
 }, _TransitionPresets);
 setSSRHandler("getDefaultStorage", () => {
   const cookieMap = /* @__PURE__ */ new Map();
-  const get = (key) => {
+  const get2 = (key) => {
     if (!cookieMap.get(key))
       cookieMap.set(key, useCookie(key, { maxAge: 2147483646 }));
     return cookieMap.get(key);
   };
   return {
-    getItem: (key) => get(key).value,
-    setItem: (key, value) => get(key).value = value,
-    removeItem: (key) => get(key).value = void 0
+    getItem: (key) => get2(key).value,
+    setItem: (key, value) => get2(key).value = value,
+    removeItem: (key) => get2(key).value = void 0
   };
 });
 {
@@ -5448,22 +8682,25 @@ setSSRHandler("getDefaultStorage", () => {
     }
   });
 }
-const node_modules__64vueuse_nuxt_ssr_plugin_mjs_B4ptqVdIfe = defineNuxtPlugin(() => {
-});
+const node_modules__pnpm__64vueuse_43nuxt_649_2_0_i4g5mk6my23fhhpgm6xhxge4y4_node_modules__64vueuse_nuxt_ssr_plugin_mjs_7MvFn1yaeV = () => {
+};
 const _plugins = [
   _nuxt_components_plugin_mjs_KR1HBZs4kY,
-  node_modules_nuxt_dist_head_runtime_lib_vueuse_head_plugin_mjs_D7WGfuP1A0,
-  node_modules_nuxt_dist_head_runtime_mixin_plugin_mjs_prWV5EzJWI,
-  node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB,
-  node_modules__64pinia_nuxt_dist_runtime_plugin_vue3_mjs_A0OWXRrUgq,
+  node_modules__pnpm_nuxt3_643_0_0_rc_13_27772354_a0a59e2_3qgq5m7bqj7palvvc4uezrk4iq_node_modules_nuxt3_dist_head_runtime_lib_vueuse_head_plugin_mjs_mIOVEwpfTX,
+  node_modules__pnpm_nuxt3_643_0_0_rc_13_27772354_a0a59e2_3qgq5m7bqj7palvvc4uezrk4iq_node_modules_nuxt3_dist_head_runtime_mixin_plugin_mjs_PlNrR5uuVf,
+  node_modules__pnpm_nuxt3_643_0_0_rc_13_27772354_a0a59e2_3qgq5m7bqj7palvvc4uezrk4iq_node_modules_nuxt3_dist_pages_runtime_router_mjs_li16ybVNyb,
+  node_modules__pnpm__64nuxt_43content_642_2_0_node_modules__64nuxt_content_dist_runtime_plugins_documentDriven_mjs_vZGyqQOxUD,
+  node_modules__pnpm__64nuxt_43content_642_2_0_node_modules__64nuxt_content_dist_runtime_plugins_ws_mjs_3W4BH9cvku,
+  node_modules__pnpm__64pinia_43nuxt_640_4_2_ni6iema7j2wg3vv7conib4kacm_node_modules__64pinia_nuxt_dist_runtime_plugin_vue3_mjs_PMAokU7xtF,
+  _nuxt_plugin_mjs_FRmGFsEaPh,
   plugins_navbar_ts_qw38FjZisw,
-  node_modules__64vueuse_nuxt_ssr_plugin_mjs_B4ptqVdIfe
+  node_modules__pnpm__64vueuse_43nuxt_649_2_0_i4g5mk6my23fhhpgm6xhxge4y4_node_modules__64vueuse_nuxt_ssr_plugin_mjs_7MvFn1yaeV
 ];
-const _sfc_main$7 = {
+const _sfc_main$1 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.666d3132.mjs').then((r2) => r2.default || r2));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.aa14a796.mjs').then((r) => r.default || r));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -5490,11 +8727,11 @@ const _sfc_main$7 = {
     };
   }
 };
-const _sfc_setup$7 = _sfc_main$7.setup;
-_sfc_main$7.setup = (props, ctx) => {
+const _sfc_setup$1 = _sfc_main$1.setup;
+_sfc_main$1.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/nuxt/dist/app/components/nuxt-root.vue");
-  return _sfc_setup$7 ? _sfc_setup$7(props, ctx) : void 0;
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("node_modules/.pnpm/nuxt3@3.0.0-rc.13-27772354.a0a59e2_3qgq5m7bqj7palvvc4uezrk4iq/node_modules/nuxt3/dist/app/components/nuxt-root.vue");
+  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
 };
 const removeUndefinedProps = (props) => Object.fromEntries(Object.entries(props).filter(([, value]) => value !== void 0));
 const setupForUseMeta = (metaFactory, renderChild) => (props, ctx) => {
@@ -5549,7 +8786,7 @@ const globalProps = {
   title: String,
   translate: String
 };
-defineComponent({
+const Script = defineComponent({
   name: "Script",
   inheritAttrs: false,
   props: {
@@ -5584,7 +8821,7 @@ defineComponent({
     };
   })
 });
-defineComponent({
+const NoScript = defineComponent({
   name: "NoScript",
   inheritAttrs: false,
   props: {
@@ -5605,7 +8842,7 @@ defineComponent({
     };
   })
 });
-defineComponent({
+const Link = defineComponent({
   name: "Link",
   inheritAttrs: false,
   props: {
@@ -5638,7 +8875,7 @@ defineComponent({
     link: [link]
   }))
 });
-defineComponent({
+const Base = defineComponent({
   name: "Base",
   inheritAttrs: false,
   props: {
@@ -5650,7 +8887,7 @@ defineComponent({
     base
   }))
 });
-defineComponent({
+const Title = defineComponent({
   name: "Title",
   inheritAttrs: false,
   setup: setupForUseMeta((_2, { slots }) => {
@@ -5661,7 +8898,7 @@ defineComponent({
     };
   })
 });
-defineComponent({
+const Meta = defineComponent({
   name: "Meta",
   inheritAttrs: false,
   props: {
@@ -5684,7 +8921,7 @@ defineComponent({
     };
   })
 });
-defineComponent({
+const Style = defineComponent({
   name: "Style",
   inheritAttrs: false,
   props: {
@@ -5712,7 +8949,7 @@ defineComponent({
     };
   })
 });
-defineComponent({
+const Head = defineComponent({
   name: "Head",
   inheritAttrs: false,
   setup: (_props, ctx) => () => {
@@ -5741,729 +8978,217 @@ const Body = defineComponent({
   },
   setup: setupForUseMeta((bodyAttrs) => ({ bodyAttrs }), true)
 });
-const _sfc_main$6 = /* @__PURE__ */ defineComponent({
-  __name: "Anchor",
-  __ssrInlineRender: true,
+const components = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  Script,
+  NoScript,
+  Link,
+  Base,
+  Title,
+  Meta,
+  Style,
+  Head,
+  Html,
+  Body
+}, Symbol.toStringTag, { value: "Module" }));
+const __nuxt_component_3 = defineComponent({
+  name: "NuxtLoadingIndicator",
   props: {
-    text: {
-      type: String,
-      default: ""
+    throttle: {
+      type: Number,
+      default: 200
     },
-    to: {
-      type: [String, Object],
-      default: void 0
+    duration: {
+      type: Number,
+      default: 2e3
     },
-    href: {
+    height: {
+      type: Number,
+      default: 3
+    },
+    color: {
       type: String,
-      default: ""
+      default: "repeating-linear-gradient(to right,#00dc82 0%,#34cdfe 50%,#0047e1 100%)"
     }
   },
-  setup(__props) {
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_NuxtLink = __nuxt_component_0$2;
-      if (__props.to) {
-        _push(ssrRenderComponent(_component_NuxtLink, mergeProps({
-          tag: "a",
-          to: __props.to,
-          class: "transition-colors duration-300 dark:hover:text-white hover:text-gray-900 hover:underline"
-        }, _attrs), {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              ssrRenderSlot(_ctx.$slots, "default", {}, () => {
-                _push2(`${ssrInterpolate(__props.text)}`);
-              }, _push2, _parent2, _scopeId);
-            } else {
-              return [
-                renderSlot(_ctx.$slots, "default", {}, () => [
-                  createTextVNode(toDisplayString(__props.text), 1)
-                ])
-              ];
-            }
-          }),
-          _: 3
-        }, _parent));
-      } else {
-        _push(`<a${ssrRenderAttrs(mergeProps({
-          class: "transition-colors duration-300 dark:hover:text-white hover:text-gray-900 hover:underline",
-          href: __props.href
-        }, _attrs))}>`);
-        ssrRenderSlot(_ctx.$slots, "default", {}, () => {
-          _push(`${ssrInterpolate(__props.text)}`);
-        }, _push, _parent);
-        _push(`</a>`);
-      }
-    };
-  }
-});
-const _sfc_setup$6 = _sfc_main$6.setup;
-_sfc_main$6.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Anchor.vue");
-  return _sfc_setup$6 ? _sfc_setup$6(props, ctx) : void 0;
-};
-const _sfc_main$5 = /* @__PURE__ */ defineComponent({
-  __name: "Button",
-  __ssrInlineRender: true,
-  props: {
-    text: {
-      type: String,
-      default: ""
-    },
-    type: {
-      type: String,
-      default: "primary"
-    },
-    size: {
-      type: String,
-      default: "md"
-    },
-    to: {
-      type: [String, Object],
-      default: void 0
-    },
-    href: {
-      type: String,
-      default: ""
-    }
-  },
-  setup(__props) {
-    const props = __props;
-    const defaultStyle = `
-  cursor-pointer
-  border transition-color duration-300
-  focus:outline-none focus:ring-1 focus:ring-offset-1 focus:dark:ring-offset-gray-50 focus:dark:ring-gray-400 focus:ring-gray-600/[0.6] focus:ring-offset-gray-800/[0.6]
-  flex items-center justify-center
-`;
-    const styles = reactive({
-      primary: "text-white bg-gray-800 hover:bg-white hover:text-gray-800 hover:border-gray-900 dark:text-gray-800 dark:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-100 dark:border-white",
-      secondary: "text-gray-800 bg-white hover:border-gray-900  dark:border-gray-900 dark:text-white dark:bg-gray-800 dark:hover:border-white"
+  setup(props, { slots }) {
+    const indicator = useLoadingIndicator({
+      duration: props.duration,
+      throttle: props.throttle
     });
-    const sizes = reactive({
-      lg: "h-12 px-8 text-lg rounded-lg",
-      md: "h-10 px-6 text-base rounded",
-      sm: "h-8 px-4 text-sm rounded",
-      xs: "h-6 px-3 text-xs rounded"
-    });
-    const selectedStyle = computed(() => styles[props.type] || styles.primary);
-    const selectedSize = computed(() => sizes[props.size] || sizes.lg);
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_NuxtLink = __nuxt_component_0$2;
-      if (__props.to) {
-        _push(ssrRenderComponent(_component_NuxtLink, mergeProps({
-          tag: "a",
-          to: __props.to,
-          class: `${defaultStyle} ${unref(selectedStyle)} ${unref(selectedSize)}`
-        }, _attrs), {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              ssrRenderSlot(_ctx.$slots, "default", {}, () => {
-                _push2(`${ssrInterpolate(__props.text)}`);
-              }, _push2, _parent2, _scopeId);
-            } else {
-              return [
-                renderSlot(_ctx.$slots, "default", {}, () => [
-                  createTextVNode(toDisplayString(__props.text), 1)
-                ])
-              ];
-            }
-          }),
-          _: 3
-        }, _parent));
-      } else {
-        _push(`<a${ssrRenderAttrs(mergeProps({
-          class: `${defaultStyle} ${unref(selectedStyle)} ${unref(selectedSize)}`,
-          href: __props.href
-        }, _attrs))}>`);
-        ssrRenderSlot(_ctx.$slots, "default", {}, () => {
-          _push(`${ssrInterpolate(__props.text)}`);
-        }, _push, _parent);
-        _push(`</a>`);
+    const nuxtApp = useNuxtApp();
+    nuxtApp.hook("page:start", indicator.start);
+    nuxtApp.hook("page:finish", indicator.finish);
+    return () => h("div", {
+      class: "nuxt-loading-indicator",
+      style: {
+        position: "fixed",
+        top: 0,
+        right: 0,
+        left: 0,
+        pointerEvents: "none",
+        width: `${indicator.progress.value}%`,
+        height: `${props.height}px`,
+        opacity: indicator.isLoading.value ? 1 : 0,
+        background: props.color,
+        backgroundSize: `${100 / indicator.progress.value * 100}% auto`,
+        transition: "width 0.1s, height 0.4s, opacity 0.4s",
+        zIndex: 999999
       }
-    };
+    }, slots);
   }
 });
-const _sfc_setup$5 = _sfc_main$5.setup;
-_sfc_main$5.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/UI/Button.vue");
-  return _sfc_setup$5 ? _sfc_setup$5(props, ctx) : void 0;
-};
-const _hoisted_1$6 = {
-  viewBox: "0 0 256 256",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$6 = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M232 128a104 104 0 1 0-174.2 76.7l1.3 1.2a104 104 0 0 0 137.8 0l1.3-1.2A103.7 103.7 0 0 0 232 128Zm-192 0a88 88 0 1 1 153.8 58.4a79.2 79.2 0 0 0-36.1-28.7a48 48 0 1 0-59.4 0a79.2 79.2 0 0 0-36.1 28.7A87.6 87.6 0 0 1 40 128Zm56-8a32 32 0 1 1 32 32a32.1 32.1 0 0 1-32-32Zm-21.9 77.5a64 64 0 0 1 107.8 0a87.8 87.8 0 0 1-107.8 0Z"
-}, null, -1);
-const _hoisted_3$6 = [
-  _hoisted_2$6
-];
-function render$6(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$6, _hoisted_3$6);
-}
-const __unplugin_components_1$1 = { name: "ph-user-circle", render: render$6 };
-const _hoisted_1$5 = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$5 = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M17 9.17a1 1 0 0 0-1.41 0L12 12.71L8.46 9.17a1 1 0 0 0-1.41 0a1 1 0 0 0 0 1.42l4.24 4.24a1 1 0 0 0 1.42 0L17 10.59a1 1 0 0 0 0-1.42Z"
-}, null, -1);
-const _hoisted_3$5 = [
-  _hoisted_2$5
-];
-function render$5(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$5, _hoisted_3$5);
-}
-const __unplugin_components_0$2 = { name: "uil-angle-down", render: render$5 };
-const _sfc_main$4 = /* @__PURE__ */ defineComponent({
-  __name: "User",
-  __ssrInlineRender: true,
-  props: {
-    type: {
-      type: String,
-      default: "dropdown-right-top"
-    }
-  },
-  setup(__props) {
-    const props = __props;
-    const router = useRouter();
-    const { user } = useBaseStore();
-    const { info, isLogin } = storeToRefs(user);
-    const showAuth = useState("showAuth", () => false);
-    const icons = {
-      user: shallowRef(UilUser),
-      fileAlt: shallowRef(UilFileAlt),
-      heart: shallowRef(UilHeart),
-      lightbulbAlt: shallowRef(UilLightbulbAlt),
-      signOutAlt: shallowRef(UilSignOutAlt)
-    };
-    const userMenu = ref([
-      { id: 1, icon: icons.user, label: "\u500B\u4EBA\u8CC7\u6599", path: "/my/account" },
-      { id: 2, icon: icons.fileAlt, label: "\u700F\u89BD\u7D00\u9304", path: "/my/history" },
-      { id: 3, icon: icons.heart, label: "\u6211\u7684\u6536\u85CF", path: "/my/collections" },
-      { id: 4, icon: icons.lightbulbAlt, label: "\u5C0F\u77E5\u8B58", path: "/my/tips" },
-      { id: 5, icon: icons.signOutAlt, label: "\u767B\u51FA", action: () => user.logout() }
-    ]);
-    const clickNav = (id) => {
-      const item = userMenu.value.find((item2) => item2.id === id);
-      if (item == null ? void 0 : item.path)
-        router.push(item.path);
-      else if (item == null ? void 0 : item.action)
-        item.action();
-    };
-    const currentStyle = toRef(props, "type");
-    const sizeSetting = useState("size.setting");
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_IconUil58angle_down = __unplugin_components_0$2;
-      const _component_IconPh58user_circle = __unplugin_components_1$1;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center relative" }, _attrs))}>`);
-      if (unref(currentStyle) === "dropdown-right-top") {
-        _push(ssrRenderComponent(unref(Me), {
-          modelValue: unref(sizeSetting),
-          "onUpdate:modelValue": ($event) => isRef(sizeSetting) ? sizeSetting.value = $event : null,
-          as: "div",
-          class: "flex items-center"
-        }, {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(` \u7528\u6236 `);
-                  } else {
-                    return [
-                      createTextVNode(" \u7528\u6236 ")
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(unref(Ie), {
-                class: "block",
-                type: "button",
-                title: "\u7528\u6236\u4E2D\u5FC3"
-              }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  var _a, _b, _c, _d;
-                  if (_push3) {
-                    if (unref(isLogin)) {
-                      _push3(`<div class="flex items-center justify-center ml-6 cursor-pointer"${_scopeId2}><img class="w-6 h-6 rounded-full"${ssrRenderAttr("src", _imports_0$1)}${_scopeId2}><span class="ml-2 text-sm font-semibold"${_scopeId2}>${ssrInterpolate(`${((_a = unref(info)) == null ? void 0 : _a.firstName) || ""}${((_b = unref(info)) == null ? void 0 : _b.lastName) || ""}`)}</span>`);
-                      _push3(ssrRenderComponent(_component_IconUil58angle_down, null, null, _parent3, _scopeId2));
-                      _push3(`</div>`);
-                    } else {
-                      _push3(`<div class="flex items-center justify-center h-full ml-6 cursor-pointer"${_scopeId2}>`);
-                      _push3(ssrRenderComponent(_component_IconPh58user_circle, { class: "w-6 h-6" }, null, _parent3, _scopeId2));
-                      _push3(`<span class="ml-2 text-sm font-semibold"${_scopeId2}>\u672A\u767B\u5165</span>`);
-                      _push3(ssrRenderComponent(_component_IconUil58angle_down, null, null, _parent3, _scopeId2));
-                      _push3(`</div>`);
-                    }
-                  } else {
-                    return [
-                      unref(isLogin) ? (openBlock(), createBlock("div", {
-                        key: 0,
-                        class: "flex items-center justify-center ml-6 cursor-pointer"
-                      }, [
-                        createVNode("img", {
-                          class: "w-6 h-6 rounded-full",
-                          src: _imports_0$1
-                        }),
-                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, toDisplayString(`${((_c = unref(info)) == null ? void 0 : _c.firstName) || ""}${((_d = unref(info)) == null ? void 0 : _d.lastName) || ""}`), 1),
-                        createVNode(_component_IconUil58angle_down)
-                      ])) : (openBlock(), createBlock("div", {
-                        key: 1,
-                        class: "flex items-center justify-center h-full ml-6 cursor-pointer",
-                        onClick: ($event) => showAuth.value = true
-                      }, [
-                        createVNode(_component_IconPh58user_circle, { class: "w-6 h-6" }),
-                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, "\u672A\u767B\u5165"),
-                        createVNode(_component_IconUil58angle_down)
-                      ], 8, ["onClick"]))
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              if (unref(isLogin)) {
-                _push2(ssrRenderComponent(unref(Ve), { class: "absolute ring-1 ring-black mt-3 ring-opacity-5 top-full right-0 z-[999] mt-2 w-32 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
-                  default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                    if (_push3) {
-                      _push3(`<!--[-->`);
-                      ssrRenderList(userMenu.value, (menu, index) => {
-                        _push3(ssrRenderComponent(unref(Ae), { key: index }, {
-                          default: withCtx((_3, _push4, _parent4, _scopeId3) => {
-                            if (_push4) {
-                              _push4(`<div class="flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30"${_scopeId3}>`);
-                              ssrRenderVNode(_push4, createVNode(resolveDynamicComponent(menu.icon), { class: "mr-3" }, null), _parent4, _scopeId3);
-                              _push4(`<span class="truncate"${_scopeId3}>${ssrInterpolate(menu.label)}</span></div>`);
-                            } else {
-                              return [
-                                createVNode("div", {
-                                  class: "flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30",
-                                  onClick: ($event) => clickNav(menu.id)
-                                }, [
-                                  (openBlock(), createBlock(resolveDynamicComponent(menu.icon), { class: "mr-3" })),
-                                  createVNode("span", { class: "truncate" }, toDisplayString(menu.label), 1)
-                                ], 8, ["onClick"])
-                              ];
-                            }
-                          }),
-                          _: 2
-                        }, _parent3, _scopeId2));
-                      });
-                      _push3(`<!--]-->`);
-                    } else {
-                      return [
-                        (openBlock(true), createBlock(Fragment$1, null, renderList(userMenu.value, (menu, index) => {
-                          return openBlock(), createBlock(unref(Ae), { key: index }, {
-                            default: withCtx(() => [
-                              createVNode("div", {
-                                class: "flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30",
-                                onClick: ($event) => clickNav(menu.id)
-                              }, [
-                                (openBlock(), createBlock(resolveDynamicComponent(menu.icon), { class: "mr-3" })),
-                                createVNode("span", { class: "truncate" }, toDisplayString(menu.label), 1)
-                              ], 8, ["onClick"])
-                            ]),
-                            _: 2
-                          }, 1024);
-                        }), 128))
-                      ];
-                    }
-                  }),
-                  _: 1
-                }, _parent2, _scopeId));
-              } else {
-                _push2(`<!---->`);
-              }
-            } else {
-              return [
-                createVNode(unref(Pe), { class: "sr-only" }, {
-                  default: withCtx(() => [
-                    createTextVNode(" \u7528\u6236 ")
-                  ]),
-                  _: 1
-                }),
-                createVNode(unref(Ie), {
-                  class: "block",
-                  type: "button",
-                  title: "\u7528\u6236\u4E2D\u5FC3"
-                }, {
-                  default: withCtx(() => {
-                    var _a, _b;
-                    return [
-                      unref(isLogin) ? (openBlock(), createBlock("div", {
-                        key: 0,
-                        class: "flex items-center justify-center ml-6 cursor-pointer"
-                      }, [
-                        createVNode("img", {
-                          class: "w-6 h-6 rounded-full",
-                          src: _imports_0$1
-                        }),
-                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, toDisplayString(`${((_a = unref(info)) == null ? void 0 : _a.firstName) || ""}${((_b = unref(info)) == null ? void 0 : _b.lastName) || ""}`), 1),
-                        createVNode(_component_IconUil58angle_down)
-                      ])) : (openBlock(), createBlock("div", {
-                        key: 1,
-                        class: "flex items-center justify-center h-full ml-6 cursor-pointer",
-                        onClick: ($event) => showAuth.value = true
-                      }, [
-                        createVNode(_component_IconPh58user_circle, { class: "w-6 h-6" }),
-                        createVNode("span", { class: "ml-2 text-sm font-semibold" }, "\u672A\u767B\u5165"),
-                        createVNode(_component_IconUil58angle_down)
-                      ], 8, ["onClick"]))
-                    ];
-                  }),
-                  _: 1
-                }),
-                unref(isLogin) ? (openBlock(), createBlock(unref(Ve), {
-                  key: 0,
-                  class: "absolute ring-1 ring-black mt-3 ring-opacity-5 top-full right-0 z-[999] mt-2 w-32 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0"
-                }, {
-                  default: withCtx(() => [
-                    (openBlock(true), createBlock(Fragment$1, null, renderList(userMenu.value, (menu, index) => {
-                      return openBlock(), createBlock(unref(Ae), { key: index }, {
-                        default: withCtx(() => [
-                          createVNode("div", {
-                            class: "flex items-center w-full cursor-pointer items-center py-2 px-3 hover:bg-gray-200 dark:hover:bg-gray-700/30",
-                            onClick: ($event) => clickNav(menu.id)
-                          }, [
-                            (openBlock(), createBlock(resolveDynamicComponent(menu.icon), { class: "mr-3" })),
-                            createVNode("span", { class: "truncate" }, toDisplayString(menu.label), 1)
-                          ], 8, ["onClick"])
-                        ]),
-                        _: 2
-                      }, 1024);
-                    }), 128))
-                  ]),
-                  _: 1
-                })) : createCommentVNode("", true)
-              ];
-            }
-          }),
-          _: 1
-        }, _parent));
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div>`);
-    };
+function useLoadingIndicator(opts) {
+  const progress = ref(0);
+  const isLoading = ref(false);
+  computed(() => 1e4 / opts.duration);
+  let _timer = null;
+  let _throttle = null;
+  function start() {
+    clear();
+    progress.value = 0;
+    isLoading.value = true;
+    if (opts.throttle)
+      ;
   }
-});
-const _sfc_setup$4 = _sfc_main$4.setup;
-_sfc_main$4.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Navbar/User.vue");
-  return _sfc_setup$4 ? _sfc_setup$4(props, ctx) : void 0;
-};
-const _hoisted_1$4 = {
-  viewBox: "0 0 18 16",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$4 = /* @__PURE__ */ createElementVNode("path", {
-  "fill-rule": "evenodd",
-  d: "M13.62 9.08L12.1 3.66h-.06l-1.5 5.42h3.08zM5.7 10.13S4.68 6.52 4.53 6.02h-.08l-1.13 4.11H5.7zM17.31 14h-2.25l-.95-3.25h-4.07L9.09 14H6.84l-.69-2.33H2.87L2.17 14H0l3.3-9.59h2.5l2.17 6.34L10.86 2h2.52l3.94 12h-.01z",
-  fill: "currentColor"
-}, null, -1);
-const _hoisted_3$4 = [
-  _hoisted_2$4
-];
-function render$4(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$4, _hoisted_3$4);
-}
-const __unplugin_components_0$1 = { name: "octicon-text-size", render: render$4 };
-const availableSizes = {
-  sm: {
-    name: "\u5C0F",
-    iso: "14px"
-  },
-  md: {
-    name: "\u4E2D",
-    iso: "16px"
-  },
-  lg: {
-    name: "\u5927",
-    iso: "18px"
-  },
-  xl: {
-    name: "\u8D85\u5927",
-    iso: "20px"
+  function finish() {
+    progress.value = 100;
+    _hide();
   }
-};
-function sizeController() {
-  const sizeUserSetting = useCookie("size");
-  if (!sizeUserSetting.value)
-    sizeUserSetting.value = "16px";
-  const getUserSize = () => sizeUserSetting.value;
-  const sizeSetting = useState("size.setting", () => getUserSize());
-  watch(sizeSetting, (val) => {
-    sizeUserSetting.value = val;
-    document.documentElement.style.fontSize = sizeSetting.value;
-  });
-  const init = () => {
-    sizeSetting.value = getUserSize();
-    if (sizeSetting.value)
-      document.documentElement.style.fontSize = sizeSetting.value;
-  };
+  function clear() {
+    clearInterval(_timer);
+    clearTimeout(_throttle);
+    _timer = null;
+    _throttle = null;
+  }
+  function _hide() {
+    clear();
+  }
   return {
-    sizeSetting,
-    init
+    progress,
+    isLoading,
+    start,
+    finish,
+    clear
   };
 }
-const _sfc_main$3 = /* @__PURE__ */ defineComponent({
-  __name: "Size",
-  __ssrInlineRender: true,
+const nuxtLoadingIndicator = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_3
+}, Symbol.toStringTag, { value: "Module" }));
+const interpolatePath = (route, match) => {
+  return match.path.replace(/(:\w+)\([^)]+\)/g, "$1").replace(/(:\w+)[?+*]/g, "$1").replace(/:\w+/g, (r) => {
+    var _a;
+    return ((_a = route.params[r.slice(1)]) == null ? void 0 : _a.toString()) || "";
+  });
+};
+const generateRouteKey = (override, routeProps) => {
+  var _a;
+  const matchedRoute = routeProps.route.matched.find((m2) => {
+    var _a2;
+    return ((_a2 = m2.components) == null ? void 0 : _a2.default) === routeProps.Component.type;
+  });
+  const source = (_a = override != null ? override : matchedRoute == null ? void 0 : matchedRoute.meta.key) != null ? _a : matchedRoute && interpolatePath(routeProps.route, matchedRoute);
+  return typeof source === "function" ? source(routeProps.route) : source;
+};
+const wrapInKeepAlive = (props, children) => {
+  return { default: () => children };
+};
+const __nuxt_component_4 = defineComponent({
+  name: "NuxtPage",
+  inheritAttrs: false,
   props: {
-    type: {
-      type: String,
-      default: "dropdown-right-top"
+    name: {
+      type: String
+    },
+    transition: {
+      type: [Boolean, Object],
+      default: void 0
+    },
+    keepalive: {
+      type: [Boolean, Object],
+      default: void 0
+    },
+    route: {
+      type: Object
+    },
+    pageKey: {
+      type: [Function, String],
+      default: null
     }
   },
-  setup(__props) {
-    const props = __props;
-    const currentStyle = toRef(props, "type");
-    const sizeSetting = useState("size.setting");
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_IconOcticon58text_size = __unplugin_components_0$1;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center" }, _attrs))}>`);
-      if (unref(currentStyle) === "dropdown-right-top") {
-        _push(ssrRenderComponent(unref(Me), {
-          modelValue: unref(sizeSetting),
-          "onUpdate:modelValue": ($event) => isRef(sizeSetting) ? sizeSetting.value = $event : null,
-          as: "div",
-          class: "relative flex items-center"
-        }, {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(` Theme `);
-                  } else {
-                    return [
-                      createTextVNode(" Theme ")
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(unref(Ie), {
-                type: "button",
-                class: "flex w-7 h-7 items-center justify-center",
-                title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
-              }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`<span class="flex items-center justify-center"${_scopeId2}>`);
-                    _push3(ssrRenderComponent(_component_IconOcticon58text_size, null, null, _parent3, _scopeId2));
-                    _push3(`</span>`);
-                  } else {
-                    return [
-                      createVNode("span", { class: "flex items-center justify-center" }, [
-                        createVNode(_component_IconOcticon58text_size)
-                      ])
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`<!--[-->`);
-                    ssrRenderList(unref(availableSizes), (size) => {
-                      _push3(ssrRenderComponent(unref(Ae), {
-                        key: size.iso,
-                        value: size.iso,
-                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
-                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
-                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
-                        }]
-                      }, {
-                        default: withCtx((_3, _push4, _parent4, _scopeId3) => {
-                          if (_push4) {
-                            _push4(`<span class="flex-1 truncate flex w-full items-center justify-between"${_scopeId3}><p${_scopeId3}>${ssrInterpolate(size.name)}</p><span class="text-xs"${_scopeId3}>(${ssrInterpolate(size.iso)})</span></span>`);
-                          } else {
-                            return [
-                              createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
-                                createVNode("p", null, toDisplayString(size.name), 1),
-                                createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
-                              ])
-                            ];
-                          }
-                        }),
-                        _: 2
-                      }, _parent3, _scopeId2));
-                    });
-                    _push3(`<!--]-->`);
-                  } else {
-                    return [
-                      (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
-                        return openBlock(), createBlock(unref(Ae), {
-                          key: size.iso,
-                          value: size.iso,
-                          class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
-                            "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
-                            "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
-                          }]
-                        }, {
-                          default: withCtx(() => [
-                            createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
-                              createVNode("p", null, toDisplayString(size.name), 1),
-                              createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
-                            ])
-                          ]),
-                          _: 2
-                        }, 1032, ["value", "class"]);
-                      }), 128))
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-            } else {
-              return [
-                createVNode(unref(Pe), { class: "sr-only" }, {
-                  default: withCtx(() => [
-                    createTextVNode(" Theme ")
-                  ]),
-                  _: 1
-                }),
-                createVNode(unref(Ie), {
-                  type: "button",
-                  class: "flex w-7 h-7 items-center justify-center",
-                  title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
-                }, {
-                  default: withCtx(() => [
-                    createVNode("span", { class: "flex items-center justify-center" }, [
-                      createVNode(_component_IconOcticon58text_size)
-                    ])
-                  ]),
-                  _: 1
-                }),
-                createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
-                  default: withCtx(() => [
-                    (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
-                      return openBlock(), createBlock(unref(Ae), {
-                        key: size.iso,
-                        value: size.iso,
-                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
-                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
-                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
-                        }]
-                      }, {
-                        default: withCtx(() => [
-                          createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
-                            createVNode("p", null, toDisplayString(size.name), 1),
-                            createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
-                          ])
-                        ]),
-                        _: 2
-                      }, 1032, ["value", "class"]);
-                    }), 128))
-                  ]),
-                  _: 1
-                })
-              ];
-            }
-          }),
-          _: 1
-        }, _parent));
-      } else {
-        _push(`<!---->`);
-      }
-      if (unref(currentStyle) === "select-box") {
-        _push(`<select class="w-full px-2 pr-3 py-1 outline-none rounded border bg-transparent text-gray-700 dark:text-gray-300 border-gray-900/10 dark:border-gray-50/[0.2]"><!--[-->`);
-        ssrRenderList(unref(availableSizes), (size) => {
-          _push(`<option${ssrRenderAttr("value", size.iso)} class="flex items-center space-x-2">${ssrInterpolate(size.name)} (${ssrInterpolate(size.iso)}) </option>`);
-        });
-        _push(`<!--]--></select>`);
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div>`);
+  setup(props, { attrs }) {
+    const nuxtApp = useNuxtApp();
+    return () => {
+      return h(RouterView, { name: props.name, route: props.route, ...attrs }, {
+        default: (routeProps) => {
+          var _a, _b, _c, _d;
+          if (!routeProps.Component) {
+            return;
+          }
+          const key = generateRouteKey(props.pageKey, routeProps);
+          const done = nuxtApp.deferHydration();
+          const hasTransition = !!((_b = (_a = props.transition) != null ? _a : routeProps.route.meta.pageTransition) != null ? _b : appPageTransition);
+          const transitionProps = hasTransition && _mergeTransitionProps([
+            props.transition,
+            routeProps.route.meta.pageTransition,
+            appPageTransition,
+            { onAfterLeave: () => {
+              nuxtApp.callHook("page:transition:finish", routeProps.Component);
+            } }
+          ].filter(Boolean));
+          return _wrapIf(
+            Transition,
+            hasTransition && transitionProps,
+            wrapInKeepAlive(
+              (_d = (_c = props.keepalive) != null ? _c : routeProps.route.meta.keepalive) != null ? _d : appKeepalive,
+              h(Suspense, {
+                onPending: () => nuxtApp.callHook("page:start", routeProps.Component),
+                onResolve: () => {
+                  nextTick(() => nuxtApp.callHook("page:finish", routeProps.Component).finally(done));
+                }
+              }, { default: () => h(Component, { key, routeProps, pageKey: key, hasTransition }) })
+            )
+          ).default();
+        }
+      });
     };
   }
 });
-const _sfc_setup$3 = _sfc_main$3.setup;
-_sfc_main$3.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Navbar/Size.vue");
-  return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
-};
-const _hoisted_1$3 = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$3 = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M15.098 12.634L13 11.423V7a1 1 0 0 0-2 0v5a1 1 0 0 0 .5.866l2.598 1.5a1 1 0 1 0 1-1.732ZM12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8a8.01 8.01 0 0 1-8 8Z"
-}, null, -1);
-const _hoisted_3$3 = [
-  _hoisted_2$3
-];
-function render$3(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$3, _hoisted_3$3);
+function _toArray(val) {
+  return Array.isArray(val) ? val : val ? [val] : [];
 }
-const __unplugin_components_3 = { name: "uil-clock", render: render$3 };
-const _hoisted_1$2 = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$2 = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16Z"
-}, null, -1);
-const _hoisted_3$2 = [
-  _hoisted_2$2
-];
-function render$2(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$2, _hoisted_3$2);
+function _mergeTransitionProps(routeProps) {
+  const _props = routeProps.map((prop) => ({
+    ...prop,
+    onAfterLeave: _toArray(prop.onAfterLeave)
+  }));
+  return defu(..._props);
 }
-const __unplugin_components_2 = { name: "uil-laptop", render: render$2 };
-const _hoisted_1$1 = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2$1 = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "M21.64 13a1 1 0 0 0-1.05-.14a8.05 8.05 0 0 1-3.37.73a8.15 8.15 0 0 1-8.14-8.1a8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69a1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14a9.79 9.79 0 0 0 2.1-.22a8.11 8.11 0 0 1-7.18 4.32Z"
-}, null, -1);
-const _hoisted_3$1 = [
-  _hoisted_2$1
-];
-function render$1(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1$1, _hoisted_3$1);
-}
-const __unplugin_components_1 = { name: "uil-moon", render: render$1 };
-const _hoisted_1 = {
-  viewBox: "0 0 24 24",
-  width: "1.2em",
-  height: "1.2em"
-};
-const _hoisted_2 = /* @__PURE__ */ createElementVNode("path", {
-  fill: "currentColor",
-  d: "m5.64 17l-.71.71a1 1 0 0 0 0 1.41a1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm7-7a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1ZM5.64 7.05a1 1 0 0 0 .7.29a1 1 0 0 0 .71-.29a1 1 0 0 0 0-1.41l-.71-.71a1 1 0 0 0-1.41 1.41Zm12 .29a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.64.71a1 1 0 0 0 0 1.41a1 1 0 0 0 .66.29ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-9 8a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Zm6.36-2A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0a1 1 0 0 0 0-1.41ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 3.5-3.5a3.5 3.5 0 0 1-3.5 3.5Z"
-}, null, -1);
-const _hoisted_3 = [
-  _hoisted_2
-];
-function render(_ctx, _cache) {
-  return openBlock(), createElementBlock("svg", _hoisted_1, _hoisted_3);
-}
-const __unplugin_components_0 = { name: "uil-sun", render };
+const Component = defineComponent({
+  props: ["routeProps", "pageKey", "hasTransition"],
+  setup(props) {
+    const previousKey = props.pageKey;
+    const previousRoute = props.routeProps.route;
+    const route = {};
+    for (const key in props.routeProps.route) {
+      route[key] = computed(() => previousKey === props.pageKey ? props.routeProps.route[key] : previousRoute[key]);
+    }
+    provide("_route", reactive(route));
+    return () => {
+      return h(props.routeProps.Component);
+    };
+  }
+});
+const page = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  default: __nuxt_component_4
+}, Symbol.toStringTag, { value: "Module" }));
 const availableThemes = [
-  { key: "light", text: "\u65E5\u9593\u6A21\u5F0F" },
-  { key: "dark", text: "\u591C\u9593\u6A21\u5F0F" },
-  { key: "system", text: "\u7CFB\u7D71\u9810\u8A2D" },
-  { key: "realtime", text: "\u5BE6\u969B\u6642\u9593" }
+  { key: "light", text: "Light" },
+  { key: "dark", text: "Dark" },
+  { key: "system", text: "System" },
+  { key: "realtime", text: "Realtime" }
 ];
 function ThemeManager() {
   const themeUserSetting = useCookie("theme");
@@ -6476,8 +9201,8 @@ function ThemeManager() {
     }
   };
   const getRealtimeTheme = () => {
-    const now = new Date();
-    const hour = now.getHours();
+    const now2 = new Date();
+    const hour = now2.getHours();
     const isNight = hour >= 17 || hour <= 5;
     return isNight ? "dark" : "light";
   };
@@ -6509,409 +9234,77 @@ function ThemeManager() {
     getRealtimeTheme
   };
 }
-const _sfc_main$2 = /* @__PURE__ */ defineComponent({
-  __name: "ThemeSwitcher",
-  __ssrInlineRender: true,
-  props: {
-    type: {
-      type: String,
-      default: "dropdown-right-top"
+const availableLocales = {
+  en: {
+    name: "English",
+    iso: "en",
+    flag: "\u{1F1FA}\u{1F1F8}"
+  },
+  id: {
+    name: "Bahasa",
+    iso: "id",
+    flag: "\u{1F1EE}\u{1F1E9}"
+  },
+  ja: {
+    name: "\u65E5\u672C\u8A9E",
+    iso: "ja",
+    flag: "\u{1F1EF}\u{1F1F5}"
+  },
+  ko: {
+    name: "\uD55C\uAD6D\uC5B4",
+    iso: "ko",
+    flag: "\u{1F1F0}\u{1F1F7}"
+  },
+  zh: {
+    name: "\u7B80\u4F53\u4E2D\u6587",
+    iso: "zh",
+    flag: "\u{1F1E8}\u{1F1F3}"
+  }
+};
+function LanguageManager() {
+  const { locale } = useI18n();
+  const localeUserSetting = useCookie("locale");
+  const getSystemLocale = () => {
+    try {
+      const foundLang = window ? window.navigator.language.substring(0, 2) : "en";
+      return availableLocales[foundLang] ? foundLang : "en";
+    } catch (error) {
+      return "en";
     }
-  },
-  setup(__props) {
-    const props = __props;
-    const themeSetting = useState("theme.setting");
-    const currentStyle = toRef(props, "type");
-    const t2 = (e2) => e2;
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_IconUil58sun = __unplugin_components_0;
-      const _component_IconUil58moon = __unplugin_components_1;
-      const _component_IconUil58laptop = __unplugin_components_2;
-      const _component_IconUil58clock = __unplugin_components_3;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center" }, _attrs))}>`);
-      if (unref(currentStyle) === "dropdown-right-top") {
-        _push(ssrRenderComponent(unref(Me), {
-          modelValue: unref(themeSetting),
-          "onUpdate:modelValue": ($event) => isRef(themeSetting) ? themeSetting.value = $event : null,
-          as: "div",
-          class: "relative flex items-center"
-        }, {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`${ssrInterpolate(t2("components.theme_switcher.theme"))}`);
-                  } else {
-                    return [
-                      createTextVNode(toDisplayString(t2("components.theme_switcher.theme")), 1)
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(unref(Ie), {
-                type: "button",
-                title: t2("components.theme_switcher.change_theme"),
-                class: "transition-colors"
-              }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`<span class="flex justify-center items-center dark:hidden"${_scopeId2}>`);
-                    _push3(ssrRenderComponent(_component_IconUil58sun, null, null, _parent3, _scopeId2));
-                    _push3(`</span><span class="justify-center items-center hidden dark:flex"${_scopeId2}>`);
-                    _push3(ssrRenderComponent(_component_IconUil58moon, null, null, _parent3, _scopeId2));
-                    _push3(`</span>`);
-                  } else {
-                    return [
-                      createVNode("span", { class: "flex justify-center items-center dark:hidden" }, [
-                        createVNode(_component_IconUil58sun)
-                      ]),
-                      createVNode("span", { class: "justify-center items-center hidden dark:flex" }, [
-                        createVNode(_component_IconUil58moon)
-                      ])
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(unref(Ve), { class: "p-1 absolute z-50 top-full right-0 outline-none bg-white rounded-lg ring-1 ring-gray-900/10 shadow-lg overflow-hidden w-36 py-1 text-sm text-gray-700 font-semibold dark:bg-gray-800 dark:ring-0 dark:highlight-white/5 dark:text-gray-300" }, {
-                default: withCtx((_22, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`<!--[-->`);
-                    ssrRenderList(unref(availableThemes), (theme) => {
-                      _push3(ssrRenderComponent(unref(Ae), {
-                        key: theme.key,
-                        value: theme.key,
-                        class: {
-                          "py-2 px-2 flex items-center cursor-pointer": true,
-                          "text-sky-500 bg-gray-100 dark:bg-gray-600/30": unref(themeSetting) === theme.key,
-                          "hover:bg-gray-50 dark:hover:bg-gray-700/30": unref(themeSetting) !== theme.key
-                        }
-                      }, {
-                        default: withCtx((_3, _push4, _parent4, _scopeId3) => {
-                          if (_push4) {
-                            _push4(`<span class="text-sm mr-2 flex items-center"${_scopeId3}>`);
-                            if (theme.key === "light") {
-                              _push4(ssrRenderComponent(_component_IconUil58sun, null, null, _parent4, _scopeId3));
-                            } else if (theme.key === "dark") {
-                              _push4(ssrRenderComponent(_component_IconUil58moon, null, null, _parent4, _scopeId3));
-                            } else if (theme.key === "system") {
-                              _push4(ssrRenderComponent(_component_IconUil58laptop, null, null, _parent4, _scopeId3));
-                            } else if (theme.key === "realtime") {
-                              _push4(ssrRenderComponent(_component_IconUil58clock, null, null, _parent4, _scopeId3));
-                            } else {
-                              _push4(`<!---->`);
-                            }
-                            _push4(`</span> ${ssrInterpolate(theme.text)}`);
-                          } else {
-                            return [
-                              createVNode("span", { class: "text-sm mr-2 flex items-center" }, [
-                                theme.key === "light" ? (openBlock(), createBlock(_component_IconUil58sun, { key: 0 })) : theme.key === "dark" ? (openBlock(), createBlock(_component_IconUil58moon, { key: 1 })) : theme.key === "system" ? (openBlock(), createBlock(_component_IconUil58laptop, { key: 2 })) : theme.key === "realtime" ? (openBlock(), createBlock(_component_IconUil58clock, { key: 3 })) : createCommentVNode("", true)
-                              ]),
-                              createTextVNode(" " + toDisplayString(theme.text), 1)
-                            ];
-                          }
-                        }),
-                        _: 2
-                      }, _parent3, _scopeId2));
-                    });
-                    _push3(`<!--]-->`);
-                  } else {
-                    return [
-                      (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableThemes), (theme) => {
-                        return openBlock(), createBlock(unref(Ae), {
-                          key: theme.key,
-                          value: theme.key,
-                          class: {
-                            "py-2 px-2 flex items-center cursor-pointer": true,
-                            "text-sky-500 bg-gray-100 dark:bg-gray-600/30": unref(themeSetting) === theme.key,
-                            "hover:bg-gray-50 dark:hover:bg-gray-700/30": unref(themeSetting) !== theme.key
-                          }
-                        }, {
-                          default: withCtx(() => [
-                            createVNode("span", { class: "text-sm mr-2 flex items-center" }, [
-                              theme.key === "light" ? (openBlock(), createBlock(_component_IconUil58sun, { key: 0 })) : theme.key === "dark" ? (openBlock(), createBlock(_component_IconUil58moon, { key: 1 })) : theme.key === "system" ? (openBlock(), createBlock(_component_IconUil58laptop, { key: 2 })) : theme.key === "realtime" ? (openBlock(), createBlock(_component_IconUil58clock, { key: 3 })) : createCommentVNode("", true)
-                            ]),
-                            createTextVNode(" " + toDisplayString(theme.text), 1)
-                          ]),
-                          _: 2
-                        }, 1032, ["value", "class"]);
-                      }), 128))
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-            } else {
-              return [
-                createVNode(unref(Pe), { class: "sr-only" }, {
-                  default: withCtx(() => [
-                    createTextVNode(toDisplayString(t2("components.theme_switcher.theme")), 1)
-                  ]),
-                  _: 1
-                }),
-                createVNode(unref(Ie), {
-                  type: "button",
-                  title: t2("components.theme_switcher.change_theme"),
-                  class: "transition-colors"
-                }, {
-                  default: withCtx(() => [
-                    createVNode("span", { class: "flex justify-center items-center dark:hidden" }, [
-                      createVNode(_component_IconUil58sun)
-                    ]),
-                    createVNode("span", { class: "justify-center items-center hidden dark:flex" }, [
-                      createVNode(_component_IconUil58moon)
-                    ])
-                  ]),
-                  _: 1
-                }, 8, ["title"]),
-                createVNode(unref(Ve), { class: "p-1 absolute z-50 top-full right-0 outline-none bg-white rounded-lg ring-1 ring-gray-900/10 shadow-lg overflow-hidden w-36 py-1 text-sm text-gray-700 font-semibold dark:bg-gray-800 dark:ring-0 dark:highlight-white/5 dark:text-gray-300" }, {
-                  default: withCtx(() => [
-                    (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableThemes), (theme) => {
-                      return openBlock(), createBlock(unref(Ae), {
-                        key: theme.key,
-                        value: theme.key,
-                        class: {
-                          "py-2 px-2 flex items-center cursor-pointer": true,
-                          "text-sky-500 bg-gray-100 dark:bg-gray-600/30": unref(themeSetting) === theme.key,
-                          "hover:bg-gray-50 dark:hover:bg-gray-700/30": unref(themeSetting) !== theme.key
-                        }
-                      }, {
-                        default: withCtx(() => [
-                          createVNode("span", { class: "text-sm mr-2 flex items-center" }, [
-                            theme.key === "light" ? (openBlock(), createBlock(_component_IconUil58sun, { key: 0 })) : theme.key === "dark" ? (openBlock(), createBlock(_component_IconUil58moon, { key: 1 })) : theme.key === "system" ? (openBlock(), createBlock(_component_IconUil58laptop, { key: 2 })) : theme.key === "realtime" ? (openBlock(), createBlock(_component_IconUil58clock, { key: 3 })) : createCommentVNode("", true)
-                          ]),
-                          createTextVNode(" " + toDisplayString(theme.text), 1)
-                        ]),
-                        _: 2
-                      }, 1032, ["value", "class"]);
-                    }), 128))
-                  ]),
-                  _: 1
-                })
-              ];
-            }
-          }),
-          _: 1
-        }, _parent));
-      } else {
-        _push(`<!---->`);
-      }
-      if (unref(currentStyle) === "select-box") {
-        _push(`<select class="w-full px-2 pr-3 py-1 outline-none rounded border bg-transparent text-gray-700 dark:text-gray-300 border-gray-900/10 dark:border-gray-50/[0.2]"><!--[-->`);
-        ssrRenderList(unref(availableThemes), (theme) => {
-          _push(`<option${ssrRenderAttr("value", theme.key)}>${ssrInterpolate(theme.text)}</option>`);
-        });
-        _push(`<!--]--></select>`);
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div>`);
-    };
-  }
-});
-const _sfc_setup$2 = _sfc_main$2.setup;
-_sfc_main$2.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/ThemeSwitcher.vue");
-  return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
-};
-const _imports_0 = "" + globalThis.__publicAssetsURL("logo.png");
-const _sfc_main$1 = /* @__PURE__ */ defineComponent({
-  __name: "Navbar",
-  __ssrInlineRender: true,
-  setup(__props) {
-    const app2 = useState("app");
-    const menus = ref([
-      { type: "link", text: "\u65B0\u805E", route: "/" }
-    ]);
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_NuxtLink = __nuxt_component_0$2;
-      const _component_UIAnchor = _sfc_main$6;
-      const _component_UIButton = _sfc_main$5;
-      const _component_LayoutNavbarUser = _sfc_main$4;
-      const _component_LayoutNavbarSize = _sfc_main$3;
-      const _component_ThemeSwitcher = _sfc_main$2;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "h-12" }, _attrs))}><div class="h-12 fixed flex items-center w-screen top-0 left-0 backdrop-filter backdrop-blur top-0 flex-none transition-colors duration-300 lg:z-20 border-b border-gray-900/10 dark:border-gray-50/[0.2] bg-white dark:bg-slate-900/[0.7]"><div class="cma"><div class="mx-4 lg:px-8 lg:mx-0"><div class="relative flex items-center">`);
-      ssrRenderSlot(_ctx.$slots, "title", {}, () => {
-        _push(ssrRenderComponent(_component_NuxtLink, {
-          tag: "a",
-          class: "flex-none mr-3 overflow-hidden font-bold text-gray-900 md:w-auto text-md dark:text-gray-200",
-          to: "/"
-        }, {
-          default: withCtx((_2, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(`<span class="sr-only"${_scopeId}>home</span><span class="flex items-center"${_scopeId}><img class="w-12 mr-2"${ssrRenderAttr("src", _imports_0)}${_scopeId}><span class="leading-7 mt-[1px]"${_scopeId}>${ssrInterpolate(unref(app2).name)}</span></span>`);
-            } else {
-              return [
-                createVNode("span", { class: "sr-only" }, "home"),
-                createVNode("span", { class: "flex items-center" }, [
-                  createVNode("img", {
-                    class: "w-12 mr-2",
-                    src: _imports_0
-                  }),
-                  createVNode("span", { class: "leading-7 mt-[1px]" }, toDisplayString(unref(app2).name), 1)
-                ])
-              ];
-            }
-          }),
-          _: 1
-        }, _parent));
-      }, _push, _parent);
-      _push(`<div class="relative ml-auto flex lt-lg:hidden"><nav class="flex items-center text-sm font-semibold leading-6 text-gray-600 dark:text-gray-300" role="navigation"><ul class="flex items-center space-x-8"><!--[-->`);
-      ssrRenderList(menus.value, (item, i) => {
-        _push(`<li>`);
-        if (item.type === "link") {
-          _push(ssrRenderComponent(_component_UIAnchor, {
-            to: item.route ? item.route : void 0,
-            href: item.href ? item.href : void 0,
-            class: "capitalize hover:no-underline hover:text-slate-900 hover:dark:text-white"
-          }, {
-            default: withCtx((_2, _push2, _parent2, _scopeId) => {
-              if (_push2) {
-                _push2(`${ssrInterpolate(item.text)}`);
-              } else {
-                return [
-                  createTextVNode(toDisplayString(item.text), 1)
-                ];
-              }
-            }),
-            _: 2
-          }, _parent));
-        } else if (item.type === "button") {
-          _push(ssrRenderComponent(_component_UIButton, {
-            text: item.text,
-            size: "xs",
-            class: "font-extrabold capitalize",
-            to: item.route ? item.route : void 0,
-            href: item.href ? item.href : void 0
-          }, null, _parent));
-        } else {
-          _push(`<!---->`);
-        }
-        _push(`</li>`);
-      });
-      _push(`<!--]--></ul></nav>`);
-      _push(ssrRenderComponent(_component_LayoutNavbarUser, null, null, _parent));
-      _push(`<div class="flex space-x-4 border-l ml-4 pl-6 border-gray-900/10 dark:border-gray-50/[0.2]">`);
-      _push(ssrRenderComponent(_component_LayoutNavbarSize, null, null, _parent));
-      _push(ssrRenderComponent(_component_ThemeSwitcher, null, null, _parent));
-      _push(`</div></div>`);
-      {
-        _push(`<!---->`);
-      }
-      _push(`</div></div></div></div></div>`);
-    };
-  }
-});
-const _sfc_setup$1 = _sfc_main$1.setup;
-_sfc_main$1.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Navbar.vue");
-  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
-};
-const layouts = {
-  blog: () => import('./_nuxt/blog.d8e461db.mjs').then((m2) => m2.default || m2)
-};
-const LayoutLoader = defineComponent({
-  props: {
-    name: String,
-    ...{}
-  },
-  async setup(props, context) {
-    const LayoutComponent = await layouts[props.name]().then((r2) => r2.default || r2);
-    return () => {
-      return h$1(LayoutComponent, {}, context.slots);
-    };
-  }
-});
-const __nuxt_component_3 = defineComponent({
-  props: {
-    name: {
-      type: [String, Boolean, Object],
-      default: null
-    }
-  },
-  setup(props, context) {
-    const injectedRoute = inject("_route");
-    const route = injectedRoute === useRoute() ? useRoute$1() : injectedRoute;
-    const layout = computed(() => {
-      var _a, _b;
-      return (_b = (_a = unref(props.name)) != null ? _a : route.meta.layout) != null ? _b : "default";
-    });
-    return () => {
-      var _a;
-      const hasLayout = layout.value && layout.value in layouts;
-      const transitionProps = (_a = route.meta.layoutTransition) != null ? _a : appLayoutTransition;
-      return _wrapIf(Transition, hasLayout && transitionProps, {
-        default: () => _wrapIf(LayoutLoader, hasLayout && { key: layout.value, name: layout.value, hasTransition: !!transitionProps }, context.slots).default()
-      }).default();
-    };
-  }
-});
+  };
+  const getUserLocale = () => localeUserSetting.value || getSystemLocale();
+  const localeSetting = useState(
+    "locale.setting",
+    () => getUserLocale()
+  );
+  watch(localeSetting, (localeSetting2) => {
+    localeUserSetting.value = localeSetting2;
+    locale.value = localeSetting2;
+  });
+  const init = () => {
+    localeSetting.value = getUserLocale();
+  };
+  locale.value = localeSetting.value;
+  return {
+    localeSetting,
+    init
+  };
+}
 function AppSetup() {
   const themeManager = ThemeManager();
+  const languageManager = LanguageManager();
   return {
-    themeManager
-  };
-}
-async function userController() {
-  const isLogin = useState("isLogin", () => false);
-  const route = useRoute();
-  const router = useRouter();
-  isLogin.value = false;
-  const token = storage.get("token");
-  if (token) {
-    const { user, tip } = useBaseStore();
-    const { token: userToken } = storeToRefs(user);
-    userToken.value = token;
-    const userInfo = await user.get();
-    isLogin.value = true;
-    tip.get();
-    return {
-      token,
-      info: userInfo
-    };
-  }
-  const $alert = useState("alert");
-  if (route.meta.middleware && route.meta.middleware.includes("auth") && !isLogin.value) {
-    setTimeout(() => {
-      $alert.value = {
-        type: "info",
-        title: "\u8ACB\u91CD\u65B0\u767B\u5165",
-        action: () => {
-          router.push("/");
-        }
-      };
-    }, 500);
-  }
-  return { token };
-}
-function InitApp() {
-  const app2 = {
-    name: "Bonding Tech.",
-    author: {
-      name: "\u9375\u7D50\u79D1\u6280",
-      link: "https://bondingtech.co"
-    }
-  };
-  useState("app", () => app2);
-  const size = sizeController();
-  const user = userController();
-  return {
-    app: app2,
-    size,
-    user
+    themeManager,
+    languageManager
   };
 }
 const _sfc_main = /* @__PURE__ */ defineComponent({
   __name: "app",
   __ssrInlineRender: true,
   setup(__props) {
-    InitApp();
     AppSetup();
     const theme = useState("theme.current");
+    const locale = useState("locale.setting");
     const app2 = useAppConfig();
     useHead({
       title: app2.name,
@@ -6926,49 +9319,56 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       ],
       link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
     });
-    const $bodyLock = useState("body.lock", () => false);
     return (_ctx, _push, _parent, _attrs) => {
       const _component_Html = Html;
       const _component_Body = Body;
-      const _component_LayoutNavbar = _sfc_main$1;
-      const _component_NuxtLayout = __nuxt_component_3;
-      const _component_NuxtPage = __nuxt_component_1$1;
-      const _component_ClientOnly = __nuxt_component_5$1;
+      const _component_NuxtLayout = __nuxt_component_0$1;
+      const _component_NuxtLoadingIndicator = __nuxt_component_3;
+      const _component_NuxtPage = __nuxt_component_4;
       _push(ssrRenderComponent(_component_Html, mergeProps({
         class: `${unref(theme) === "dark" ? "dark" : ""}`,
-        lang: "zh-TW"
+        lang: unref(locale)
       }, _attrs), {
         default: withCtx((_2, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(ssrRenderComponent(_component_Body, {
-              class: [unref($bodyLock) ? "overflow-hidden" : "", "w-screen overflow-x-hidden antialiased text-gray-800 transition-colors duration-300 bg-white dark:text-gray-200 dark:bg-gray-900"]
-            }, {
+            _push2(ssrRenderComponent(_component_Body, { class: "antialiased duration-300 transition-colors text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-900" }, {
               default: withCtx((_22, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
-                  _push3(ssrRenderComponent(_component_LayoutNavbar, null, null, _parent3, _scopeId2));
                   _push3(ssrRenderComponent(_component_NuxtLayout, null, {
                     default: withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
+                        _push4(ssrRenderComponent(_component_NuxtLoadingIndicator, {
+                          height: 5,
+                          duration: 3e3,
+                          throttle: 400
+                        }, null, _parent4, _scopeId3));
                         _push4(ssrRenderComponent(_component_NuxtPage, null, null, _parent4, _scopeId3));
                       } else {
                         return [
+                          createVNode(_component_NuxtLoadingIndicator, {
+                            height: 5,
+                            duration: 3e3,
+                            throttle: 400
+                          }),
                           createVNode(_component_NuxtPage)
                         ];
                       }
                     }),
                     _: 1
                   }, _parent3, _scopeId2));
-                  _push3(ssrRenderComponent(_component_ClientOnly, null, null, _parent3, _scopeId2));
                 } else {
                   return [
-                    createVNode(_component_LayoutNavbar),
                     createVNode(_component_NuxtLayout, null, {
                       default: withCtx(() => [
+                        createVNode(_component_NuxtLoadingIndicator, {
+                          height: 5,
+                          duration: 3e3,
+                          throttle: 400
+                        }),
                         createVNode(_component_NuxtPage)
                       ]),
                       _: 1
-                    }),
-                    createVNode(_component_ClientOnly)
+                    })
                   ];
                 }
               }),
@@ -6976,21 +9376,22 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             }, _parent2, _scopeId));
           } else {
             return [
-              createVNode(_component_Body, {
-                class: [unref($bodyLock) ? "overflow-hidden" : "", "w-screen overflow-x-hidden antialiased text-gray-800 transition-colors duration-300 bg-white dark:text-gray-200 dark:bg-gray-900"]
-              }, {
+              createVNode(_component_Body, { class: "antialiased duration-300 transition-colors text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-900" }, {
                 default: withCtx(() => [
-                  createVNode(_component_LayoutNavbar),
                   createVNode(_component_NuxtLayout, null, {
                     default: withCtx(() => [
+                      createVNode(_component_NuxtLoadingIndicator, {
+                        height: 5,
+                        duration: 3e3,
+                        throttle: 400
+                      }),
                       createVNode(_component_NuxtPage)
                     ]),
                     _: 1
-                  }),
-                  createVNode(_component_ClientOnly)
+                  })
                 ]),
                 _: 1
-              }, 8, ["class"])
+              })
             ];
           }
         }),
@@ -7014,7 +9415,7 @@ let entry;
 const plugins = normalizePlugins(_plugins);
 {
   entry = async function createNuxtAppServer(ssrContext) {
-    const vueApp = createApp(_sfc_main$7);
+    const vueApp = createApp(_sfc_main$1);
     vueApp.component("App", _sfc_main);
     const nuxt = createNuxtApp({ vueApp, ssrContext });
     try {
@@ -7029,5 +9430,5 @@ const plugins = normalizePlugins(_plugins);
 }
 const entry$1 = (ctx) => entry(ctx);
 
-export { __nuxt_component_3$1 as A, __nuxt_component_4 as B, __nuxt_component_5 as C, _sfc_main$j as D, EosIconsLoading as E, _sfc_main$i as F, UilFileAlt as G, UilHeart as H, UilLightbulbAlt as I, UilSignOutAlt as J, __nuxt_component_1$1 as K, __nuxt_component_1 as L, __unplugin_components_0$5 as M, __unplugin_components_1$3 as N, __unplugin_components_2$2 as O, __unplugin_components_3$2 as P, _sfc_main$g as Q, __nuxt_component_6 as R, __nuxt_component_7 as S, _sfc_main$d as T, UilUser as U, _sfc_main$c as V, _sfc_main$8 as W, defineNuxtRouteMiddleware as X, _export_sfc as _, __unplugin_components_0$4 as a, useHead as b, __nuxt_component_0$1 as c, _sfc_main$B as d, entry$1 as default, useHttpPost as e, fe as f, __nuxt_component_0 as g, __nuxt_component_4$2 as h, __nuxt_component_5$2 as i, _sfc_main$x as j, __nuxt_component_4$1 as k, _sfc_main$v as l, __nuxt_component_6$1 as m, __nuxt_component_0$2 as n, oe as o, _sfc_main$r as p, useRouter as q, useHttpFetchPost as r, useBaseStore as s, _sfc_main$q as t, useState as u, _sfc_main$p as v, _sfc_main$o as w, storeToRefs as x, useRoute as y, __nuxt_component_2 as z };
+export { _sfc_main$2 as $, __nuxt_component_0$1 as A, _sfc_main$q as B, _sfc_main$p as C, _sfc_main$o as D, __nuxt_component_0 as E, _sfc_main$l as F, __nuxt_component_1$1 as G, _sfc_main$j as H, __nuxt_component_3$1 as I, __nuxt_component_4$2 as J, _sfc_main$g as K, __nuxt_component_4$1 as L, __nuxt_component_1 as M, _sfc_main$b as N, _sfc_main$9 as O, P, _sfc_main$8 as Q, R, __nuxt_component_7 as S, _sfc_main$6 as T, _sfc_main$5 as U, V, __nuxt_component_10 as W, _sfc_main$3 as X, useCounter as Y, useIdentity as Z, _export_sfc as _, useNuxtApp as a, get as a0, assertArray as a1, ensureArray as a2, sortList as a3, apply as a4, withoutKeys as a5, withKeys as a6, useCookie as a7, createQuery as a8, nuxtLink as a9, Title$1 as aA, components as aB, nuxtLoadingIndicator as aC, page as aD, layout as aa, ContentRendererMarkdown as ab, ContentRenderer as ac, DocumentDrivenEmpty as ad, DocumentDrivenNotFound as ae, Wrapper as af, Button as ag, Error$1 as ah, Header as ai, Title$3 as aj, Body$1 as ak, index$1 as al, Renderer as am, Gem as an, ContentQuery as ao, ContentDoc as ap, Doc as aq, ContentList as ar, Anchor as as, Alert as at, index as au, Content as av, Title$2 as aw, TextInput as ax, Footer as ay, Switch as az, useState as b, useContent as c, useAsyncData as d, entry$1 as default, __nuxt_component_0$2 as e, fetchContentNavigation as f, u as g, c as h, fe as i, oe as j, useAppConfig as k, l$1 as l, availableLocales as m, availableThemes as n, o, p, _sfc_main$a as q, _sfc_main$m as r, useUnwrap as s, t, useHead as u, useRuntimeConfig as v, w$1 as w, useI18n as x, useRequestEvent as y, useContentHead as z };
 //# sourceMappingURL=server.mjs.map
