@@ -1,4 +1,4 @@
-import { toRef, isRef, getCurrentInstance, inject, defineAsyncComponent, version, h as h$1, onUnmounted, toRaw, isReactive, defineComponent, mergeProps, withCtx, renderSlot, createTextVNode, toDisplayString, useSSRContext, cloneVNode, Fragment as Fragment$1, provide, ref, computed, onMounted, watch, watchEffect, nextTick, unref, Suspense, Transition, reactive, createElementBlock, resolveComponent, shallowRef, openBlock, createBlock, createVNode, renderList, createCommentVNode, createApp, onServerPrefetch, effectScope, markRaw, onErrorCaptured, Text, toRefs } from 'vue';
+import { toRef, isRef, getCurrentInstance, inject, reactive, defineAsyncComponent, version, h as h$1, onUnmounted, toRaw, isReactive, defineComponent, mergeProps, withCtx, renderSlot, createTextVNode, toDisplayString, useSSRContext, cloneVNode, Fragment as Fragment$1, provide, ref, computed, onMounted, watch, watchEffect, nextTick, unref, Suspense, Transition, createElementBlock, resolveComponent, shallowRef, createVNode, openBlock, createBlock, renderList, createCommentVNode, createApp, onServerPrefetch, effectScope, markRaw, onErrorCaptured, Text, toRefs } from 'vue';
 import { $fetch as $fetch$1 } from 'ohmyfetch';
 import { createHooks } from 'hookable';
 import { getContext, executeAsync } from 'unctx';
@@ -9,9 +9,9 @@ import { useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter }
 import { parse, serialize } from 'cookie-es';
 import isHTTPS from 'is-https';
 import { CoreWarnCodes, CompileErrorCodes, registerMessageResolver, resolveValue, registerLocaleFallbacker, fallbackWithLocaleChain, setDevToolsHook, createCompileError, DEFAULT_LOCALE as DEFAULT_LOCALE$1, updateFallbackLocale, NUMBER_FORMAT_OPTIONS_KEYS, DATETIME_FORMAT_OPTIONS_KEYS, setFallbackContext, createCoreContext, clearDateTimeFormat, clearNumberFormat, setAdditionalMeta, getFallbackContext, NOT_REOSLVED, parseTranslateArgs, translate, MISSING_RESOLVE_VALUE, parseDateTimeArgs, datetime, parseNumberArgs, number } from '@intlify/core-base';
-import { ssrRenderComponent, ssrRenderSlot, ssrInterpolate, ssrRenderAttrs, ssrRenderAttr, ssrRenderList, ssrRenderSuspense } from 'vue/server-renderer';
-import store from 'store';
+import { ssrRenderComponent, ssrRenderSlot, ssrInterpolate, ssrRenderAttrs, ssrRenderList, ssrRenderAttr, ssrRenderSuspense } from 'vue/server-renderer';
 import { isEqual as isEqual$1 } from 'ohash';
+import store from 'store';
 import { defu } from 'defu';
 import { a as useRuntimeConfig$1 } from '../nitro/node-server.mjs';
 import 'node-fetch-native/polyfill';
@@ -26,7 +26,7 @@ import 'node:url';
 import 'pathe';
 import 'axios';
 
-var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S, _T, _U, _V, _W, _X, _Y, _Z, __, _$, _aa, _ba, _ca, _da, _ea, _fa, _ga, _ha, _ia, _ja, _ka, _la, _ma, _na;
+var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P, _Q, _R, _S, _T, _U, _V, _W, _X, _Y, _Z, __, _$, _aa, _ba, _ca, _da, _ea, _fa, _ga, _ha, _ia, _ja, _ka, _la, _ma, _na, _oa, _pa, _qa, _ra;
 const appConfig = useRuntimeConfig$1().app;
 const baseURL = () => appConfig.baseURL;
 const nuxtAppCtx = getContext("nuxt-app");
@@ -647,10 +647,7 @@ const defuFn = createDefu((obj, key, currentValue, _namespace) => {
 });
 const cfg0 = defineAppConfig({
   name: "\u9375\u7D50\u79D1\u6280",
-  author: {
-    name: "Bonding Tech",
-    link: "https://github.com/viandwi24"
-  }
+  link: "https://bondingtech.co"
 });
 const inlineConfig = {};
 const __appConfig = defuFn(cfg0, inlineConfig);
@@ -665,9 +662,9 @@ function useHead(meta) {
   useNuxtApp()._useHead(meta);
 }
 const components = {
-  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.5c47c617.mjs').then((c2) => c2.default || c2)),
-  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.b4cfa9f7.mjs').then((c2) => c2.default || c2)),
-  Message: defineAsyncComponent(() => import('./_nuxt/Message.5d8c72cd.mjs').then((c2) => c2.default || c2))
+  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.a54fcdae.mjs').then((c2) => c2.default || c2)),
+  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.60d9cc44.mjs').then((c2) => c2.default || c2)),
+  Message: defineAsyncComponent(() => import('./_nuxt/Message.af4c65ae.mjs').then((c2) => c2.default || c2))
 };
 const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
   for (const name in components) {
@@ -1218,375 +1215,400 @@ const metaMixin = {
 const node_modules_nuxt_dist_head_runtime_mixin_plugin_mjs_prWV5EzJWI = defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.mixin(metaMixin);
 });
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta = {};
-const __nuxt_page_meta$4 = {
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta = {};
+const __nuxt_page_meta$6 = {
   layout: "blog"
 };
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta = {};
+const __nuxt_page_meta$5 = {
+  middleware: ["auth"]
+};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta = {};
+const __nuxt_page_meta$4 = {
+  middleware: ["auth"]
+};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta = {};
 const __nuxt_page_meta$3 = {
-  middleware: ["auth"]
+  layout: "blog"
 };
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta = {};
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta = {};
 const __nuxt_page_meta$2 = {
-  middleware: ["auth"]
+  layout: "blog"
 };
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta = {};
 const __nuxt_page_meta$1 = {
   layout: "blog"
 };
 const __nuxt_page_meta = {
   layout: "blog"
 };
-const _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta = {};
 const _routes = [
   {
-    name: (_a = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.name) != null ? _a : "404___en",
-    path: (_b = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.path) != null ? _b : "/en/:catchAll(.*)*",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/404.vue",
+    name: (_a = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.name) != null ? _a : "404___en",
+    path: (_b = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.path) != null ? _b : "/en/:catchAll(.*)*",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/404.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/404.05acaeed.mjs').then((m2) => m2.default || m2)
+    meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta,
+    alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/404.e7ec651b.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_c = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.name) != null ? _c : "404___tr",
-    path: (_d = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.path) != null ? _d : "/:catchAll(.*)*",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/404.vue",
+    name: (_c = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.name) != null ? _c : "404___tr",
+    path: (_d = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.path) != null ? _d : "/:catchAll(.*)*",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/404.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47404_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/404.05acaeed.mjs').then((m2) => m2.default || m2)
+    meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta,
+    alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/404.e7ec651b.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_e = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _e : "index___en",
-    path: (_f = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.path) != null ? _f : "/en",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/index.vue",
+    name: (_e = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.name) != null ? _e : "index___en",
+    path: (_f = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.path) != null ? _f : "/en",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/index.vue",
     children: [],
-    meta: __nuxt_page_meta$4,
-    alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
-    redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
-    component: () => import('./_nuxt/index.d4afa42d.mjs').then((m2) => m2.default || m2)
+    meta: __nuxt_page_meta$6,
+    alias: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.alias) || [],
+    redirect: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.redirect) || void 0,
+    component: () => import('./_nuxt/index.caa25814.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_g = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _g : "index___tr",
-    path: (_h = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.path) != null ? _h : "/",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/index.vue",
+    name: (_g = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.name) != null ? _g : "index___tr",
+    path: (_h = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.path) != null ? _h : "/",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/index.vue",
     children: [],
-    meta: __nuxt_page_meta$4,
-    alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
-    redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
-    component: () => import('./_nuxt/index.d4afa42d.mjs').then((m2) => m2.default || m2)
+    meta: __nuxt_page_meta$6,
+    alias: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.alias) || [],
+    redirect: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.redirect) || void 0,
+    component: () => import('./_nuxt/index.caa25814.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_i = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.name) != null ? _i : "member-rule___en",
-    path: (_j = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.path) != null ? _j : "/en/member-rule",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/member-rule.vue",
+    name: (_i = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.name) != null ? _i : "member-rule___en",
+    path: (_j = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.path) != null ? _j : "/en/member-rule",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/member-rule.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/member-rule.3aa608a9.mjs').then((m2) => m2.default || m2)
+    meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta,
+    alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/member-rule.f7983a3e.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_k = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.name) != null ? _k : "member-rule___tr",
-    path: (_l = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.path) != null ? _l : "/member-rule",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/member-rule.vue",
+    name: (_k = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.name) != null ? _k : "member-rule___tr",
+    path: (_l = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.path) != null ? _l : "/member-rule",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/member-rule.vue",
     children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/member-rule.3aa608a9.mjs').then((m2) => m2.default || m2)
+    meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta,
+    alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.alias) || [],
+    redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
+    component: () => import('./_nuxt/member-rule.f7983a3e.mjs').then((m2) => m2.default || m2)
   },
   {
-    path: (_m = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.path) != null ? _m : "/en/my",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my.vue",
+    path: (_m = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.path) != null ? _m : "/en/my",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/my.vue",
     children: [
       {
-        name: (_n = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.name) != null ? _n : "my-account-change-phone___en",
-        path: (_o = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.path) != null ? _o : "account/change-phone",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/change-phone.vue",
+        name: (_n = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.name) != null ? _n : "my-account-change-phone___en",
+        path: (_o = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.path) != null ? _o : "account/change-phone",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/change-phone.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/change-phone.53f643da.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/change-phone.f94267df.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_p = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _p : "my-account-email-binding___en",
-        path: (_q = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.path) != null ? _q : "account/email-binding",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-binding.vue",
+        name: (_p = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _p : "my-account-email-binding___en",
+        path: (_q = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.path) != null ? _q : "account/email-binding",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/email-binding.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-binding.4728e637.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-binding.81d131cb.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_r = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _r : "my-account-email-verify___en",
-        path: (_s = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.path) != null ? _s : "account/email-verify",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-verify.vue",
+        name: (_r = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _r : "my-account-email-verify___en",
+        path: (_s = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.path) != null ? _s : "account/email-verify",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/email-verify.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-verify.2cf2d46e.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-verify.c7d046fb.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_t = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _t : "my-account-identify-verify___en",
-        path: (_u = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _u : "account/identify-verify",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/identify-verify.vue",
+        name: (_t = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _t : "my-account-identify-verify___en",
+        path: (_u = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _u : "account/identify-verify",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/identify-verify.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/identify-verify.e6d242a3.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/identify-verify.05b8def7.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_v = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _v : "my-account___en",
-        path: (_w = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.path) != null ? _w : "account",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/index.vue",
+        name: (_v = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _v : "my-account___en",
+        path: (_w = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.path) != null ? _w : "account",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/index.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/index.9efcdd6f.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/index.6f7bb5d6.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_x = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _x : "my-account-reset-password___en",
-        path: (_y = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.path) != null ? _y : "account/reset-password",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/reset-password.vue",
+        name: (_x = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _x : "my-account-reset-password___en",
+        path: (_y = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.path) != null ? _y : "account/reset-password",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/reset-password.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/reset-password.6c47db2a.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/reset-password.a494cc54.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_z = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.name) != null ? _z : "my-collections___en",
-        path: (_A = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.path) != null ? _A : "collections",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/collections.vue",
+        name: (_z = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.name) != null ? _z : "my-collections___en",
+        path: (_A = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.path) != null ? _A : "collections",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/collections.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/collections.526d2eb9.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/collections.8f179b71.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_B = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.name) != null ? _B : "my-history___en",
-        path: (_C = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.path) != null ? _C : "history",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/history.vue",
+        name: (_B = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.name) != null ? _B : "my-history___en",
+        path: (_C = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.path) != null ? _C : "history",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/history.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/history.dadffdb6.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/history.33a391d8.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_D = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _D : "my___en",
-        path: (_E = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.path) != null ? _E : "",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/index.vue",
+        name: (_D = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _D : "my___en",
+        path: (_E = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.path) != null ? _E : "",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/index.vue",
         children: [],
-        meta: __nuxt_page_meta$2,
-        alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
-        redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
-        component: () => import('./_nuxt/index.79d8e930.mjs').then((m2) => m2.default || m2)
+        meta: __nuxt_page_meta$4,
+        alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
+        redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
+        component: () => import('./_nuxt/index.8ecdf55d.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_F = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.name) != null ? _F : "my-tips___en",
-        path: (_G = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.path) != null ? _G : "tips",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/tips.vue",
+        name: (_F = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.name) != null ? _F : "my-tips___en",
+        path: (_G = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.path) != null ? _G : "tips",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/tips.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/tips.066a2f6f.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/tips.acb61cb5.mjs').then((m2) => m2.default || m2)
       }
     ],
-    name: (_H = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _H : void 0,
+    name: (_H = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.name) != null ? _H : void 0,
+    meta: __nuxt_page_meta$5,
+    alias: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.alias) || [],
+    redirect: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.redirect) || void 0,
+    component: () => import('./_nuxt/my.2f85927c.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    path: (_I = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.path) != null ? _I : "/my",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/my.vue",
+    children: [
+      {
+        name: (_J = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.name) != null ? _J : "my-account-change-phone___tr",
+        path: (_K = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.path) != null ? _K : "account/change-phone",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/change-phone.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/change-phone.f94267df.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_L = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _L : "my-account-email-binding___tr",
+        path: (_M = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.path) != null ? _M : "account/email-binding",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/email-binding.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-binding.81d131cb.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_N = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _N : "my-account-email-verify___tr",
+        path: (_O = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.path) != null ? _O : "account/email-verify",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/email-verify.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/email-verify.c7d046fb.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_P = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _P : "my-account-identify-verify___tr",
+        path: (_Q = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _Q : "account/identify-verify",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/identify-verify.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/identify-verify.05b8def7.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_R = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _R : "my-account___tr",
+        path: (_S = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.path) != null ? _S : "account",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/index.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/index.6f7bb5d6.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_T = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _T : "my-account-reset-password___tr",
+        path: (_U = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.path) != null ? _U : "account/reset-password",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/reset-password.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/reset-password.a494cc54.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_V = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.name) != null ? _V : "my-collections___tr",
+        path: (_W = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.path) != null ? _W : "collections",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/collections.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/collections.8f179b71.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_X = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.name) != null ? _X : "my-history___tr",
+        path: (_Y = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.path) != null ? _Y : "history",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/history.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/history.33a391d8.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_Z = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _Z : "my___tr",
+        path: (__ = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.path) != null ? __ : "",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/index.vue",
+        children: [],
+        meta: __nuxt_page_meta$4,
+        alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
+        redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
+        component: () => import('./_nuxt/index.8ecdf55d.mjs').then((m2) => m2.default || m2)
+      },
+      {
+        name: (_$ = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.name) != null ? _$ : "my-tips___tr",
+        path: (_aa = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.path) != null ? _aa : "tips",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/tips.vue",
+        children: [],
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/tips.acb61cb5.mjs').then((m2) => m2.default || m2)
+      }
+    ],
+    name: (_ba = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.name) != null ? _ba : void 0,
+    meta: __nuxt_page_meta$5,
+    alias: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.alias) || [],
+    redirect: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.redirect) || void 0,
+    component: () => import('./_nuxt/my.2f85927c.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: (_ca = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ca : "news-article-articleSlug___en",
+    path: (_da = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.path) != null ? _da : "/en/news/article/:articleSlug",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/article/[articleSlug].vue",
+    children: [],
     meta: __nuxt_page_meta$3,
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
-    component: () => import('./_nuxt/my.17aa1a85.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_articleSlug_.fb9e9e7a.mjs').then((m2) => m2.default || m2)
   },
   {
-    path: (_I = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.path) != null ? _I : "/my",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my.vue",
-    children: [
-      {
-        name: (_J = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.name) != null ? _J : "my-account-change-phone___tr",
-        path: (_K = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.path) != null ? _K : "account/change-phone",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/change-phone.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/change-phone.53f643da.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_L = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _L : "my-account-email-binding___tr",
-        path: (_M = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.path) != null ? _M : "account/email-binding",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-binding.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-binding.4728e637.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_N = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _N : "my-account-email-verify___tr",
-        path: (_O = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.path) != null ? _O : "account/email-verify",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/email-verify.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-verify.2cf2d46e.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_P = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _P : "my-account-identify-verify___tr",
-        path: (_Q = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _Q : "account/identify-verify",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/identify-verify.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/identify-verify.e6d242a3.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_R = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _R : "my-account___tr",
-        path: (_S = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.path) != null ? _S : "account",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/index.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/index.9efcdd6f.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_T = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _T : "my-account-reset-password___tr",
-        path: (_U = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.path) != null ? _U : "account/reset-password",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/account/reset-password.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/reset-password.6c47db2a.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_V = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.name) != null ? _V : "my-collections___tr",
-        path: (_W = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.path) != null ? _W : "collections",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/collections.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/collections.526d2eb9.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_X = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.name) != null ? _X : "my-history___tr",
-        path: (_Y = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.path) != null ? _Y : "history",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/history.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/history.dadffdb6.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_Z = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _Z : "my___tr",
-        path: (__ = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.path) != null ? __ : "",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/index.vue",
-        children: [],
-        meta: __nuxt_page_meta$2,
-        alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
-        redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
-        component: () => import('./_nuxt/index.79d8e930.mjs').then((m2) => m2.default || m2)
-      },
-      {
-        name: (_$ = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.name) != null ? _$ : "my-tips___tr",
-        path: (_aa = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.path) != null ? _aa : "tips",
-        file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/my/tips.vue",
-        children: [],
-        meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta,
-        alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/tips.066a2f6f.mjs').then((m2) => m2.default || m2)
-      }
-    ],
-    name: (_ba = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ba : void 0,
+    name: (_ea = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ea : "news-article-articleSlug___tr",
+    path: (_fa = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.path) != null ? _fa : "/news/article/:articleSlug",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/article/[articleSlug].vue",
+    children: [],
     meta: __nuxt_page_meta$3,
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
-    component: () => import('./_nuxt/my.17aa1a85.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_articleSlug_.fb9e9e7a.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_ca = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ca : "news-article-articleSlug___en",
-    path: (_da = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.path) != null ? _da : "/en/news/article/:articleSlug",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/article/[articleSlug].vue",
+    name: (_ga = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _ga : "news-category-categorySlug___en",
+    path: (_ha = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.path) != null ? _ha : "/en/news/category/:categorySlug",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/category/[categorySlug].vue",
+    children: [],
+    meta: __nuxt_page_meta$2,
+    alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
+    redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
+    component: () => import('./_nuxt/_categorySlug_.eff6a37f.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: (_ia = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _ia : "news-category-categorySlug___tr",
+    path: (_ja = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.path) != null ? _ja : "/news/category/:categorySlug",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/category/[categorySlug].vue",
+    children: [],
+    meta: __nuxt_page_meta$2,
+    alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
+    redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
+    component: () => import('./_nuxt/_categorySlug_.eff6a37f.mjs').then((m2) => m2.default || m2)
+  },
+  {
+    name: (_ka = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ka : "news-video-categorySlug___en",
+    path: (_la = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.path) != null ? _la : "/en/news/video/:categorySlug",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/video/[categorySlug].vue",
     children: [],
     meta: __nuxt_page_meta$1,
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.a6c6ce35.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.3f17cbd8.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_ea = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ea : "news-article-articleSlug___tr",
-    path: (_fa = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.path) != null ? _fa : "/news/article/:articleSlug",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/article/[articleSlug].vue",
+    name: (_ma = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ma : "news-video-categorySlug___tr",
+    path: (_na = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.path) != null ? _na : "/news/video/:categorySlug",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/video/[categorySlug].vue",
     children: [],
     meta: __nuxt_page_meta$1,
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.a6c6ce35.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.3f17cbd8.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_ga = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _ga : "news-category-categorySlug___en",
-    path: (_ha = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.path) != null ? _ha : "/en/news/category/:categorySlug",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/category/[categorySlug].vue",
+    name: (_oa = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _oa : "news-video___en",
+    path: (_pa = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.path) != null ? _pa : "/en/news/video",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/video/index.vue",
     children: [],
     meta: __nuxt_page_meta,
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.f110f3dc.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.50312ed0.mjs').then((m2) => m2.default || m2)
   },
   {
-    name: (_ia = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _ia : "news-category-categorySlug___tr",
-    path: (_ja = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.path) != null ? _ja : "/news/category/:categorySlug",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/category/[categorySlug].vue",
+    name: (_qa = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _qa : "news-video___tr",
+    path: (_ra = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.path) != null ? _ra : "/news/video",
+    file: "/Users/kurou/project/bonding/project/web/src/pages/news/video/index.vue",
     children: [],
     meta: __nuxt_page_meta,
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.f110f3dc.mjs').then((m2) => m2.default || m2)
-  },
-  {
-    name: (_ka = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.name) != null ? _ka : "news-type-video___en",
-    path: (_la = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.path) != null ? _la : "/en/news/type/video",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/type/video.vue",
-    children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/video.f89cd5c9.mjs').then((m2) => m2.default || m2)
-  },
-  {
-    name: (_ma = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.name) != null ? _ma : "news-type-video___tr",
-    path: (_na = _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.path) != null ? _na : "/news/type/video",
-    file: "/Users/kurou/project/nuxt3/oku-nuxt3-template/src/pages/news/type/video.vue",
-    children: [],
-    meta: _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta,
-    alias: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.alias) || [],
-    redirect: (_47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47nuxt3_47oku_45nuxt3_45template_47src_47pages_47news_47type_47video_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/video.f89cd5c9.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.50312ed0.mjs').then((m2) => m2.default || m2)
   }
 ];
 const routerOptions0 = {
@@ -1671,7 +1693,7 @@ const globalMiddleware = [
   validate
 ];
 const namedMiddleware = {
-  auth: () => import('./_nuxt/auth.7733863d.mjs')
+  auth: () => import('./_nuxt/auth.e3971c51.mjs')
 };
 const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlugin(async (nuxtApp) => {
   var _a2, _b2, _c2, _d2;
@@ -4656,7 +4678,7 @@ const _sfc_main$9 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.fdcfa216.mjs').then((r2) => r2.default || r2));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.a84a6e04.mjs').then((r2) => r2.default || r2));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -5099,7 +5121,6 @@ _sfc_main$6.setup = (props, ctx) => {
   return _sfc_setup$6 ? _sfc_setup$6(props, ctx) : void 0;
 };
 const __nuxt_component_1 = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["ssrRender", _sfc_ssrRender]]);
-const _imports_0$1 = "" + globalThis.__publicAssetsURL("user.png");
 function u(r2, n2, ...a2) {
   if (r2 in n2) {
     let e2 = n2[r2];
@@ -5537,6 +5558,408 @@ let Me = defineComponent({ name: "Listbox", emits: { "update:modelValue": (o2) =
     return P({ ourProps: a2, theirProps: w(o$12, ["value", "disabled"]), slot: f2, attrs: l2, slots: m2, name: "ListboxOption" });
   };
 } });
+const availableSizes = {
+  sm: {
+    name: "\u5C0F",
+    iso: "14px"
+  },
+  md: {
+    name: "\u4E2D",
+    iso: "16px"
+  },
+  lg: {
+    name: "\u5927",
+    iso: "18px"
+  },
+  xl: {
+    name: "\u8D85\u5927",
+    iso: "20px"
+  }
+};
+function sizeController() {
+  const sizeUserSetting = useCookie("size");
+  if (!sizeUserSetting.value)
+    sizeUserSetting.value = "16px";
+  const getUserSize = () => sizeUserSetting.value;
+  const sizeSetting = useState("size.setting", () => getUserSize());
+  watch(sizeSetting, (val) => {
+    sizeUserSetting.value = val;
+    document.documentElement.style.fontSize = sizeSetting.value;
+  });
+  const init = () => {
+    sizeSetting.value = getUserSize();
+    if (sizeSetting.value)
+      document.documentElement.style.fontSize = sizeSetting.value;
+  };
+  return {
+    sizeSetting,
+    init
+  };
+}
+const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+  __name: "SizeChange",
+  __ssrInlineRender: true,
+  props: {
+    type: {
+      type: String,
+      default: "dropdown-right-top"
+    }
+  },
+  setup(__props) {
+    const props = __props;
+    const currentStyle = toRef(props, "type");
+    const sizeSetting = useState("size.setting");
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UnoIcon = __nuxt_component_1;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center" }, _attrs))}>`);
+      if (unref(currentStyle) === "dropdown-right-top") {
+        _push(ssrRenderComponent(unref(Me), {
+          modelValue: unref(sizeSetting),
+          "onUpdate:modelValue": ($event) => isRef(sizeSetting) ? sizeSetting.value = $event : null,
+          as: "div",
+          class: "relative flex items-center"
+        }, {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(` Theme `);
+                  } else {
+                    return [
+                      createTextVNode(" Theme ")
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+              _push2(ssrRenderComponent(unref(Ie), {
+                type: "button",
+                class: "flex w-7 h-7 items-center justify-center",
+                title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
+              }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(`<span class="flex items-center justify-center"${_scopeId2}>`);
+                    _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-octicon-text-size" }, null, _parent3, _scopeId2));
+                    _push3(`</span>`);
+                  } else {
+                    return [
+                      createVNode("span", { class: "flex items-center justify-center" }, [
+                        createVNode(_component_UnoIcon, { class: "i-octicon-text-size" })
+                      ])
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+              _push2(ssrRenderComponent(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(`<!--[-->`);
+                    ssrRenderList(unref(availableSizes), (size) => {
+                      _push3(ssrRenderComponent(unref(Ae), {
+                        key: size.iso,
+                        value: size.iso,
+                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
+                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
+                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
+                        }]
+                      }, {
+                        default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                          if (_push4) {
+                            _push4(`<span class="flex-1 truncate flex w-full items-center justify-between"${_scopeId3}><p${_scopeId3}>${ssrInterpolate(size.name)}</p><span class="text-xs"${_scopeId3}>(${ssrInterpolate(size.iso)})</span></span>`);
+                          } else {
+                            return [
+                              createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
+                                createVNode("p", null, toDisplayString(size.name), 1),
+                                createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
+                              ])
+                            ];
+                          }
+                        }),
+                        _: 2
+                      }, _parent3, _scopeId2));
+                    });
+                    _push3(`<!--]-->`);
+                  } else {
+                    return [
+                      (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
+                        return openBlock(), createBlock(unref(Ae), {
+                          key: size.iso,
+                          value: size.iso,
+                          class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
+                            "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
+                            "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
+                          }]
+                        }, {
+                          default: withCtx(() => [
+                            createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
+                              createVNode("p", null, toDisplayString(size.name), 1),
+                              createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
+                            ])
+                          ]),
+                          _: 2
+                        }, 1032, ["value", "class"]);
+                      }), 128))
+                    ];
+                  }
+                }),
+                _: 1
+              }, _parent2, _scopeId));
+            } else {
+              return [
+                createVNode(unref(Pe), { class: "sr-only" }, {
+                  default: withCtx(() => [
+                    createTextVNode(" Theme ")
+                  ]),
+                  _: 1
+                }),
+                createVNode(unref(Ie), {
+                  type: "button",
+                  class: "flex w-7 h-7 items-center justify-center",
+                  title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
+                }, {
+                  default: withCtx(() => [
+                    createVNode("span", { class: "flex items-center justify-center" }, [
+                      createVNode(_component_UnoIcon, { class: "i-octicon-text-size" })
+                    ])
+                  ]),
+                  _: 1
+                }),
+                createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+                  default: withCtx(() => [
+                    (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
+                      return openBlock(), createBlock(unref(Ae), {
+                        key: size.iso,
+                        value: size.iso,
+                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
+                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
+                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
+                        }]
+                      }, {
+                        default: withCtx(() => [
+                          createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
+                            createVNode("p", null, toDisplayString(size.name), 1),
+                            createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
+                          ])
+                        ]),
+                        _: 2
+                      }, 1032, ["value", "class"]);
+                    }), 128))
+                  ]),
+                  _: 1
+                })
+              ];
+            }
+          }),
+          _: 1
+        }, _parent));
+      } else {
+        _push(`<!---->`);
+      }
+      if (unref(currentStyle) === "select-box") {
+        _push(`<select class="w-full px-2 pr-3 py-1 outline-none rounded border bg-transparent text-gray-700 dark:text-gray-300 border-gray-900/10 dark:border-gray-50/[0.2]"><!--[-->`);
+        ssrRenderList(unref(availableSizes), (size) => {
+          _push(`<option${ssrRenderAttr("value", size.iso)} class="flex items-center space-x-2">${ssrInterpolate(size.name)} (${ssrInterpolate(size.iso)}) </option>`);
+        });
+        _push(`<!--]--></select>`);
+      } else {
+        _push(`<!---->`);
+      }
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$5 = _sfc_main$5.setup;
+_sfc_main$5.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/tem/SizeChange.vue");
+  return _sfc_setup$5 ? _sfc_setup$5(props, ctx) : void 0;
+};
+const useColorMode = () => {
+  return useState("color-mode").value;
+};
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+  __name: "ThemeChange",
+  __ssrInlineRender: true,
+  setup(__props) {
+    useColorMode();
+    const availableColor = ref([
+      {
+        id: 1,
+        name: "dark",
+        text: "\u6DF1\u8272\u6A21\u5F0F",
+        icon: "i-ph-moon-stars-duotone"
+      },
+      {
+        id: 2,
+        name: "light",
+        text: "\u6DFA\u8272\u6A21\u5F0F",
+        icon: "i-ph-sun-dim-duotone"
+      },
+      {
+        id: 4,
+        name: "system",
+        text: "\u6839\u64DA\u7CFB\u7D71\u8A2D\u5B9A",
+        icon: "i-ph-laptop-duotone"
+      }
+    ]);
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UnoIcon = __nuxt_component_1;
+      _push(`<div${ssrRenderAttrs(_attrs)}>`);
+      _push(ssrRenderComponent(unref(Me), {
+        modelValue: _ctx.$colorMode.preference,
+        "onUpdate:modelValue": ($event) => _ctx.$colorMode.preference = $event,
+        as: "div",
+        class: "relative flex items-center"
+      }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(` Theme `);
+                } else {
+                  return [
+                    createTextVNode(" Theme ")
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+            _push2(ssrRenderComponent(unref(Ie), {
+              type: "button",
+              title: "Change Color"
+            }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(`<div class="flex w-7 h-7 items-center justify-center"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" }, null, _parent3, _scopeId2));
+                  _push3(`</div>`);
+                } else {
+                  return [
+                    createVNode("div", { class: "flex w-7 h-7 items-center justify-center" }, [
+                      createVNode(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" })
+                    ])
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+            _push2(ssrRenderComponent(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(`<!--[-->`);
+                  ssrRenderList(availableColor.value, (color) => {
+                    _push3(ssrRenderComponent(unref(Ae), {
+                      key: color.id,
+                      value: color.name,
+                      class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
+                    }, {
+                      default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                        if (_push4) {
+                          _push4(`<span class="truncate"${_scopeId3}>${ssrInterpolate(color.text)}</span><span class="flex items-center justify-center text-sm"${_scopeId3}>`);
+                          _push4(ssrRenderComponent(_component_UnoIcon, {
+                            class: [color.icon, "text-base"]
+                          }, null, _parent4, _scopeId3));
+                          _push4(`</span>`);
+                        } else {
+                          return [
+                            createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
+                            createVNode("span", { class: "flex items-center justify-center text-sm" }, [
+                              createVNode(_component_UnoIcon, {
+                                class: [color.icon, "text-base"]
+                              }, null, 8, ["class"])
+                            ])
+                          ];
+                        }
+                      }),
+                      _: 2
+                    }, _parent3, _scopeId2));
+                  });
+                  _push3(`<!--]-->`);
+                } else {
+                  return [
+                    (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
+                      return openBlock(), createBlock(unref(Ae), {
+                        key: color.id,
+                        value: color.name,
+                        class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
+                      }, {
+                        default: withCtx(() => [
+                          createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
+                          createVNode("span", { class: "flex items-center justify-center text-sm" }, [
+                            createVNode(_component_UnoIcon, {
+                              class: [color.icon, "text-base"]
+                            }, null, 8, ["class"])
+                          ])
+                        ]),
+                        _: 2
+                      }, 1032, ["value"]);
+                    }), 128))
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(unref(Pe), { class: "sr-only" }, {
+                default: withCtx(() => [
+                  createTextVNode(" Theme ")
+                ]),
+                _: 1
+              }),
+              createVNode(unref(Ie), {
+                type: "button",
+                title: "Change Color"
+              }, {
+                default: withCtx(() => [
+                  createVNode("div", { class: "flex w-7 h-7 items-center justify-center" }, [
+                    createVNode(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" })
+                  ])
+                ]),
+                _: 1
+              }),
+              createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
+                default: withCtx(() => [
+                  (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
+                    return openBlock(), createBlock(unref(Ae), {
+                      key: color.id,
+                      value: color.name,
+                      class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
+                    }, {
+                      default: withCtx(() => [
+                        createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
+                        createVNode("span", { class: "flex items-center justify-center text-sm" }, [
+                          createVNode(_component_UnoIcon, {
+                            class: [color.icon, "text-base"]
+                          }, null, 8, ["class"])
+                        ])
+                      ]),
+                      _: 2
+                    }, 1032, ["value"]);
+                  }), 128))
+                ]),
+                _: 1
+              })
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$4 = _sfc_main$4.setup;
+_sfc_main$4.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/tem/ThemeChange.vue");
+  return _sfc_setup$4 ? _sfc_setup$4(props, ctx) : void 0;
+};
+const _imports_0$1 = "" + globalThis.__publicAssetsURL("user.png");
 const storage = {
   suffix: "_deadtime",
   get(key) {
@@ -5720,7 +6143,9 @@ const useUserStore = defineStore("user", () => {
       birthday,
       gender,
       intro
-    }))(form);
+    }))(info.value);
+    console.log(updatePick);
+    console.log(form);
     if (JSON.stringify(form) === JSON.stringify(updatePick)) {
       return $alert.value = {
         type: "info",
@@ -5958,7 +6383,7 @@ function useBaseStore() {
     tip
   };
 }
-const _sfc_main$5 = /* @__PURE__ */ defineComponent({
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
   __name: "User",
   __ssrInlineRender: true,
   props: {
@@ -6022,11 +6447,11 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
                   var _a2, _b2, _c2, _d2;
                   if (_push3) {
                     if (unref(isLogin)) {
-                      _push3(`<div class="flex items-center justify-center ml-6 cursor-pointer"${_scopeId2}><img class="w-6 h-6 rounded-full"${ssrRenderAttr("src", _imports_0$1)}${_scopeId2}><span class="ml-2 text-sm font-semibold"${_scopeId2}>${ssrInterpolate(`${((_a2 = unref(info)) == null ? void 0 : _a2.firstName) || ""}${((_b2 = unref(info)) == null ? void 0 : _b2.lastName) || ""}`)}</span>`);
+                      _push3(`<div class="flex items-center justify-center cursor-pointer"${_scopeId2}><img class="w-6 h-6 rounded-full"${ssrRenderAttr("src", _imports_0$1)}${_scopeId2}><span class="ml-2 text-sm font-semibold"${_scopeId2}>${ssrInterpolate(`${((_a2 = unref(info)) == null ? void 0 : _a2.firstName) || ""}${((_b2 = unref(info)) == null ? void 0 : _b2.lastName) || ""}`)}</span>`);
                       _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-uil-angle-down" }, null, _parent3, _scopeId2));
                       _push3(`</div>`);
                     } else {
-                      _push3(`<div class="flex items-center justify-center h-full ml-6 cursor-pointer"${_scopeId2}>`);
+                      _push3(`<div class="flex items-center justify-center h-full cursor-pointer"${_scopeId2}>`);
                       _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-ph-user-circle w-6 h-6" }, null, _parent3, _scopeId2));
                       _push3(`<span class="ml-2 text-sm font-semibold"${_scopeId2}>\u672A\u767B\u5165</span>`);
                       _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-uil-angle-down" }, null, _parent3, _scopeId2));
@@ -6036,7 +6461,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
                     return [
                       unref(isLogin) ? (openBlock(), createBlock("div", {
                         key: 0,
-                        class: "flex items-center justify-center ml-6 cursor-pointer"
+                        class: "flex items-center justify-center cursor-pointer"
                       }, [
                         createVNode("img", {
                           class: "w-6 h-6 rounded-full",
@@ -6046,7 +6471,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
                         createVNode(_component_UnoIcon, { class: "i-uil-angle-down" })
                       ])) : (openBlock(), createBlock("div", {
                         key: 1,
-                        class: "flex items-center justify-center h-full ml-6 cursor-pointer",
+                        class: "flex items-center justify-center h-full cursor-pointer",
                         onClick: ($event) => showAuth.value = true
                       }, [
                         createVNode(_component_UnoIcon, { class: "i-ph-user-circle w-6 h-6" }),
@@ -6134,7 +6559,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
                     return [
                       unref(isLogin) ? (openBlock(), createBlock("div", {
                         key: 0,
-                        class: "flex items-center justify-center ml-6 cursor-pointer"
+                        class: "flex items-center justify-center cursor-pointer"
                       }, [
                         createVNode("img", {
                           class: "w-6 h-6 rounded-full",
@@ -6144,7 +6569,7 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
                         createVNode(_component_UnoIcon, { class: "i-uil-angle-down" })
                       ])) : (openBlock(), createBlock("div", {
                         key: 1,
-                        class: "flex items-center justify-center h-full ml-6 cursor-pointer",
+                        class: "flex items-center justify-center h-full cursor-pointer",
                         onClick: ($event) => showAuth.value = true
                       }, [
                         createVNode(_component_UnoIcon, { class: "i-ph-user-circle w-6 h-6" }),
@@ -6191,417 +6616,10 @@ const _sfc_main$5 = /* @__PURE__ */ defineComponent({
     };
   }
 });
-const _sfc_setup$5 = _sfc_main$5.setup;
-_sfc_main$5.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Navbar/User.vue");
-  return _sfc_setup$5 ? _sfc_setup$5(props, ctx) : void 0;
-};
-const availableSizes = {
-  sm: {
-    name: "\u5C0F",
-    iso: "14px"
-  },
-  md: {
-    name: "\u4E2D",
-    iso: "16px"
-  },
-  lg: {
-    name: "\u5927",
-    iso: "18px"
-  },
-  xl: {
-    name: "\u8D85\u5927",
-    iso: "20px"
-  }
-};
-function sizeController() {
-  const sizeUserSetting = useCookie("size");
-  if (!sizeUserSetting.value)
-    sizeUserSetting.value = "16px";
-  const getUserSize = () => sizeUserSetting.value;
-  const sizeSetting = useState("size.setting", () => getUserSize());
-  watch(sizeSetting, (val) => {
-    sizeUserSetting.value = val;
-    document.documentElement.style.fontSize = sizeSetting.value;
-  });
-  const init = () => {
-    sizeSetting.value = getUserSize();
-    if (sizeSetting.value)
-      document.documentElement.style.fontSize = sizeSetting.value;
-  };
-  return {
-    sizeSetting,
-    init
-  };
-}
-const _sfc_main$4 = /* @__PURE__ */ defineComponent({
-  __name: "SizeChange",
-  __ssrInlineRender: true,
-  props: {
-    type: {
-      type: String,
-      default: "dropdown-right-top"
-    }
-  },
-  setup(__props) {
-    const props = __props;
-    const currentStyle = toRef(props, "type");
-    const sizeSetting = useState("size.setting");
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_UnoIcon = __nuxt_component_1;
-      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center" }, _attrs))}>`);
-      if (unref(currentStyle) === "dropdown-right-top") {
-        _push(ssrRenderComponent(unref(Me), {
-          modelValue: unref(sizeSetting),
-          "onUpdate:modelValue": ($event) => isRef(sizeSetting) ? sizeSetting.value = $event : null,
-          as: "div",
-          class: "relative flex items-center"
-        }, {
-          default: withCtx((_, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(` Theme `);
-                  } else {
-                    return [
-                      createTextVNode(" Theme ")
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(unref(Ie), {
-                type: "button",
-                class: "flex w-7 h-7 items-center justify-center",
-                title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
-              }, {
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`<span class="flex items-center justify-center"${_scopeId2}>`);
-                    _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-octicon-text-size" }, null, _parent3, _scopeId2));
-                    _push3(`</span>`);
-                  } else {
-                    return [
-                      createVNode("span", { class: "flex items-center justify-center" }, [
-                        createVNode(_component_UnoIcon, { class: "i-octicon-text-size" })
-                      ])
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-              _push2(ssrRenderComponent(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
-                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
-                  if (_push3) {
-                    _push3(`<!--[-->`);
-                    ssrRenderList(unref(availableSizes), (size) => {
-                      _push3(ssrRenderComponent(unref(Ae), {
-                        key: size.iso,
-                        value: size.iso,
-                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
-                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
-                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
-                        }]
-                      }, {
-                        default: withCtx((_3, _push4, _parent4, _scopeId3) => {
-                          if (_push4) {
-                            _push4(`<span class="flex-1 truncate flex w-full items-center justify-between"${_scopeId3}><p${_scopeId3}>${ssrInterpolate(size.name)}</p><span class="text-xs"${_scopeId3}>(${ssrInterpolate(size.iso)})</span></span>`);
-                          } else {
-                            return [
-                              createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
-                                createVNode("p", null, toDisplayString(size.name), 1),
-                                createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
-                              ])
-                            ];
-                          }
-                        }),
-                        _: 2
-                      }, _parent3, _scopeId2));
-                    });
-                    _push3(`<!--]-->`);
-                  } else {
-                    return [
-                      (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
-                        return openBlock(), createBlock(unref(Ae), {
-                          key: size.iso,
-                          value: size.iso,
-                          class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
-                            "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
-                            "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
-                          }]
-                        }, {
-                          default: withCtx(() => [
-                            createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
-                              createVNode("p", null, toDisplayString(size.name), 1),
-                              createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
-                            ])
-                          ]),
-                          _: 2
-                        }, 1032, ["value", "class"]);
-                      }), 128))
-                    ];
-                  }
-                }),
-                _: 1
-              }, _parent2, _scopeId));
-            } else {
-              return [
-                createVNode(unref(Pe), { class: "sr-only" }, {
-                  default: withCtx(() => [
-                    createTextVNode(" Theme ")
-                  ]),
-                  _: 1
-                }),
-                createVNode(unref(Ie), {
-                  type: "button",
-                  class: "flex w-7 h-7 items-center justify-center",
-                  title: "\u66F4\u6539\u6587\u5B57\u5927\u5C0F"
-                }, {
-                  default: withCtx(() => [
-                    createVNode("span", { class: "flex items-center justify-center" }, [
-                      createVNode(_component_UnoIcon, { class: "i-octicon-text-size" })
-                    ])
-                  ]),
-                  _: 1
-                }),
-                createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
-                  default: withCtx(() => [
-                    (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableSizes), (size) => {
-                      return openBlock(), createBlock(unref(Ae), {
-                        key: size.iso,
-                        value: size.iso,
-                        class: ["flex w-full cursor-pointer items-center justify-between py-2 px-3", {
-                          "text-white-500 bg-gray-200 dark:bg-gray-500/50": unref(sizeSetting) === size.iso,
-                          "hover:bg-gray-200 dark:hover:bg-gray-700/30": unref(sizeSetting) !== size.iso
-                        }]
-                      }, {
-                        default: withCtx(() => [
-                          createVNode("span", { class: "flex-1 truncate flex w-full items-center justify-between" }, [
-                            createVNode("p", null, toDisplayString(size.name), 1),
-                            createVNode("span", { class: "text-xs" }, "(" + toDisplayString(size.iso) + ")", 1)
-                          ])
-                        ]),
-                        _: 2
-                      }, 1032, ["value", "class"]);
-                    }), 128))
-                  ]),
-                  _: 1
-                })
-              ];
-            }
-          }),
-          _: 1
-        }, _parent));
-      } else {
-        _push(`<!---->`);
-      }
-      if (unref(currentStyle) === "select-box") {
-        _push(`<select class="w-full px-2 pr-3 py-1 outline-none rounded border bg-transparent text-gray-700 dark:text-gray-300 border-gray-900/10 dark:border-gray-50/[0.2]"><!--[-->`);
-        ssrRenderList(unref(availableSizes), (size) => {
-          _push(`<option${ssrRenderAttr("value", size.iso)} class="flex items-center space-x-2">${ssrInterpolate(size.name)} (${ssrInterpolate(size.iso)}) </option>`);
-        });
-        _push(`<!--]--></select>`);
-      } else {
-        _push(`<!---->`);
-      }
-      _push(`</div>`);
-    };
-  }
-});
-const _sfc_setup$4 = _sfc_main$4.setup;
-_sfc_main$4.setup = (props, ctx) => {
-  const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/tem/SizeChange.vue");
-  return _sfc_setup$4 ? _sfc_setup$4(props, ctx) : void 0;
-};
-const useColorMode = () => {
-  return useState("color-mode").value;
-};
-const _sfc_main$3 = /* @__PURE__ */ defineComponent({
-  __name: "ThemeChange",
-  __ssrInlineRender: true,
-  setup(__props) {
-    useColorMode();
-    const availableColor = ref([
-      {
-        id: 1,
-        name: "dark",
-        text: "\u6DF1\u8272\u6A21\u5F0F",
-        icon: "i-ph-moon-stars-duotone"
-      },
-      {
-        id: 2,
-        name: "light",
-        text: "\u6DFA\u8272\u6A21\u5F0F",
-        icon: "i-ph-sun-dim-duotone"
-      },
-      {
-        id: 3,
-        name: "sepia",
-        text: "\u8B77\u773C\u6A21\u5F0F",
-        icon: "i-ph-coffee"
-      },
-      {
-        id: 3,
-        name: "system",
-        text: "\u6839\u64DA\u7CFB\u7D71\u8A2D\u5B9A",
-        icon: "i-ph-laptop-duotone"
-      }
-    ]);
-    return (_ctx, _push, _parent, _attrs) => {
-      const _component_UnoIcon = __nuxt_component_1;
-      _push(`<div${ssrRenderAttrs(_attrs)}>`);
-      _push(ssrRenderComponent(unref(Me), {
-        modelValue: _ctx.$colorMode.preference,
-        "onUpdate:modelValue": ($event) => _ctx.$colorMode.preference = $event,
-        as: "div",
-        class: "relative flex items-center"
-      }, {
-        default: withCtx((_, _push2, _parent2, _scopeId) => {
-          if (_push2) {
-            _push2(ssrRenderComponent(unref(Pe), { class: "sr-only" }, {
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
-                if (_push3) {
-                  _push3(` Theme `);
-                } else {
-                  return [
-                    createTextVNode(" Theme ")
-                  ];
-                }
-              }),
-              _: 1
-            }, _parent2, _scopeId));
-            _push2(ssrRenderComponent(unref(Ie), {
-              type: "button",
-              title: "Change Color"
-            }, {
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
-                if (_push3) {
-                  _push3(`<div class="flex w-7 h-7 items-center justify-center"${_scopeId2}>`);
-                  _push3(ssrRenderComponent(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" }, null, _parent3, _scopeId2));
-                  _push3(`</div>`);
-                } else {
-                  return [
-                    createVNode("div", { class: "flex w-7 h-7 items-center justify-center" }, [
-                      createVNode(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" })
-                    ])
-                  ];
-                }
-              }),
-              _: 1
-            }, _parent2, _scopeId));
-            _push2(ssrRenderComponent(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
-              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
-                if (_push3) {
-                  _push3(`<!--[-->`);
-                  ssrRenderList(availableColor.value, (color) => {
-                    _push3(ssrRenderComponent(unref(Ae), {
-                      key: color.id,
-                      value: color.name,
-                      class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
-                    }, {
-                      default: withCtx((_3, _push4, _parent4, _scopeId3) => {
-                        if (_push4) {
-                          _push4(`<span class="truncate"${_scopeId3}>${ssrInterpolate(color.text)}</span><span class="flex items-center justify-center text-sm"${_scopeId3}>`);
-                          _push4(ssrRenderComponent(_component_UnoIcon, {
-                            class: [color.icon, "text-base"]
-                          }, null, _parent4, _scopeId3));
-                          _push4(`</span>`);
-                        } else {
-                          return [
-                            createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
-                            createVNode("span", { class: "flex items-center justify-center text-sm" }, [
-                              createVNode(_component_UnoIcon, {
-                                class: [color.icon, "text-base"]
-                              }, null, 8, ["class"])
-                            ])
-                          ];
-                        }
-                      }),
-                      _: 2
-                    }, _parent3, _scopeId2));
-                  });
-                  _push3(`<!--]-->`);
-                } else {
-                  return [
-                    (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
-                      return openBlock(), createBlock(unref(Ae), {
-                        key: color.id,
-                        value: color.name,
-                        class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
-                      }, {
-                        default: withCtx(() => [
-                          createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
-                          createVNode("span", { class: "flex items-center justify-center text-sm" }, [
-                            createVNode(_component_UnoIcon, {
-                              class: [color.icon, "text-base"]
-                            }, null, 8, ["class"])
-                          ])
-                        ]),
-                        _: 2
-                      }, 1032, ["value"]);
-                    }), 128))
-                  ];
-                }
-              }),
-              _: 1
-            }, _parent2, _scopeId));
-          } else {
-            return [
-              createVNode(unref(Pe), { class: "sr-only" }, {
-                default: withCtx(() => [
-                  createTextVNode(" Theme ")
-                ]),
-                _: 1
-              }),
-              createVNode(unref(Ie), {
-                type: "button",
-                title: "Change Color"
-              }, {
-                default: withCtx(() => [
-                  createVNode("div", { class: "flex w-7 h-7 items-center justify-center" }, [
-                    createVNode(_component_UnoIcon, { class: "i-ph-palette-duotone text-lg dark:text-white" })
-                  ])
-                ]),
-                _: 1
-              }),
-              createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
-                default: withCtx(() => [
-                  (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
-                    return openBlock(), createBlock(unref(Ae), {
-                      key: color.id,
-                      value: color.name,
-                      class: "flex w-full cursor-pointer items-center justify-between py-2 px-3"
-                    }, {
-                      default: withCtx(() => [
-                        createVNode("span", { class: "truncate" }, toDisplayString(color.text), 1),
-                        createVNode("span", { class: "flex items-center justify-center text-sm" }, [
-                          createVNode(_component_UnoIcon, {
-                            class: [color.icon, "text-base"]
-                          }, null, 8, ["class"])
-                        ])
-                      ]),
-                      _: 2
-                    }, 1032, ["value"]);
-                  }), 128))
-                ]),
-                _: 1
-              })
-            ];
-          }
-        }),
-        _: 1
-      }, _parent));
-      _push(`</div>`);
-    };
-  }
-});
 const _sfc_setup$3 = _sfc_main$3.setup;
 _sfc_main$3.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
-  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/tem/ThemeChange.vue");
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/Layout/Navbar/User.vue");
   return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
 };
 const _imports_0 = "" + globalThis.__publicAssetsURL("logo.png");
@@ -6617,9 +6635,9 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       const _component_NuxtLink = __nuxt_component_0$1;
       const _component_UIAnchor = _sfc_main$8;
       const _component_UIButton = _sfc_main$7;
-      const _component_LayoutNavbarUser = _sfc_main$5;
-      const _component_TemSizeChange = _sfc_main$4;
-      const _component_TemThemeChange = _sfc_main$3;
+      const _component_TemSizeChange = _sfc_main$5;
+      const _component_TemThemeChange = _sfc_main$4;
+      const _component_LayoutNavbarUser = _sfc_main$3;
       _push(`<div${ssrRenderAttrs(mergeProps({ class: "h-12" }, _attrs))}><div class="h-12 fixed flex items-center w-screen top-0 left-0 backdrop-filter backdrop-blur top-0 flex-none transition-colors duration-300 z-20 border-b border-gray-900/10 dark:border-gray-50/[0.2] bg-white dark:bg-slate-900/[0.7]"><div class="cma"><div class="lg:px-8 lg:mx-0"><div class="relative flex items-center">`);
       ssrRenderSlot(_ctx.$slots, "title", {}, () => {
         _push(ssrRenderComponent(_component_NuxtLink, {
@@ -6629,13 +6647,13 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         }, {
           default: withCtx((_, _push2, _parent2, _scopeId) => {
             if (_push2) {
-              _push2(`<span class="sr-only"${_scopeId}>home</span><span class="flex items-center"${_scopeId}><img class="w-12 mr-2"${ssrRenderAttr("src", _imports_0)}${_scopeId}><span class="leading-7 mt-[1px]"${_scopeId}>${ssrInterpolate(unref(app2).name)}</span></span>`);
+              _push2(`<span class="sr-only"${_scopeId}>home</span><span class="flex items-center"${_scopeId}><img class="w-20 mr-2"${ssrRenderAttr("src", _imports_0)}${_scopeId}><span class="leading-7 mt-[1px]"${_scopeId}>${ssrInterpolate(unref(app2).name)}</span></span>`);
             } else {
               return [
                 createVNode("span", { class: "sr-only" }, "home"),
                 createVNode("span", { class: "flex items-center" }, [
                   createVNode("img", {
-                    class: "w-12 mr-2",
+                    class: "w-20 mr-2",
                     src: _imports_0
                   }),
                   createVNode("span", { class: "leading-7 mt-[1px]" }, toDisplayString(unref(app2).name), 1)
@@ -6679,11 +6697,10 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         }
         _push(`</li>`);
       });
-      _push(`<!--]--></ul></nav>`);
-      _push(ssrRenderComponent(_component_LayoutNavbarUser, null, null, _parent));
-      _push(`<div class="flex space-x-4 border-l ml-4 pl-6 border-gray-900/10 dark:border-gray-50/[0.2]">`);
+      _push(`<!--]--></ul></nav><div class="flex space-x-4 border-l ml-6 pl-6 border-gray-900/10 dark:border-gray-50/[0.2]">`);
       _push(ssrRenderComponent(_component_TemSizeChange, null, null, _parent));
       _push(ssrRenderComponent(_component_TemThemeChange, null, null, _parent));
+      _push(ssrRenderComponent(_component_LayoutNavbarUser, null, null, _parent));
       _push(`</div></div><div class="lg:hidden ml-auto"><div class="text-sm md:text-base flex space-x-2 md:space-x-4 border-l pl-4 md:pl-6 border-gray-900/10 dark:border-gray-50/[0.2]">`);
       _push(ssrRenderComponent(_component_TemSizeChange, null, null, _parent));
       _push(ssrRenderComponent(_component_TemThemeChange, null, null, _parent));
@@ -6709,8 +6726,8 @@ const _wrapIf = (component, props, slots) => {
   return { default: () => props ? h$1(component, props === true ? {} : props, slots) : h$1(Fragment, {}, slots) };
 };
 const layouts = {
-  blog: () => import('./_nuxt/blog.b87e3d6a.mjs').then((m2) => m2.default || m2),
-  default: () => import('./_nuxt/default.2ae3704c.mjs').then((m2) => m2.default || m2)
+  blog: () => import('./_nuxt/blog.66ae367d.mjs').then((m2) => m2.default || m2),
+  default: () => import('./_nuxt/default.c209fd3a.mjs').then((m2) => m2.default || m2)
 };
 const LayoutLoader = defineComponent({
   props: {
@@ -6748,6 +6765,87 @@ const __nuxt_component_3 = defineComponent({
     };
   }
 });
+const __nuxt_component_4 = defineComponent({
+  name: "NuxtLoadingIndicator",
+  props: {
+    throttle: {
+      type: Number,
+      default: 200
+    },
+    duration: {
+      type: Number,
+      default: 2e3
+    },
+    height: {
+      type: Number,
+      default: 3
+    },
+    color: {
+      type: String,
+      default: "repeating-linear-gradient(to right,#00dc82 0%,#34cdfe 50%,#0047e1 100%)"
+    }
+  },
+  setup(props, { slots }) {
+    const indicator = useLoadingIndicator({
+      duration: props.duration,
+      throttle: props.throttle
+    });
+    const nuxtApp = useNuxtApp();
+    nuxtApp.hook("page:start", indicator.start);
+    nuxtApp.hook("page:finish", indicator.finish);
+    return () => h$1("div", {
+      class: "nuxt-loading-indicator",
+      style: {
+        position: "fixed",
+        top: 0,
+        right: 0,
+        left: 0,
+        pointerEvents: "none",
+        width: `${indicator.progress.value}%`,
+        height: `${props.height}px`,
+        opacity: indicator.isLoading.value ? 1 : 0,
+        background: props.color,
+        backgroundSize: `${100 / indicator.progress.value * 100}% auto`,
+        transition: "width 0.1s, height 0.4s, opacity 0.4s",
+        zIndex: 999999
+      }
+    }, slots);
+  }
+});
+function useLoadingIndicator(opts) {
+  const progress = ref(0);
+  const isLoading = ref(false);
+  computed(() => 1e4 / opts.duration);
+  let _timer = null;
+  let _throttle = null;
+  function start() {
+    clear();
+    progress.value = 0;
+    isLoading.value = true;
+    if (opts.throttle)
+      ;
+  }
+  function finish() {
+    progress.value = 100;
+    _hide();
+  }
+  function clear() {
+    clearInterval(_timer);
+    clearTimeout(_throttle);
+    _timer = null;
+    _throttle = null;
+  }
+  function _hide() {
+    clear();
+  }
+  return {
+    progress,
+    isLoading,
+    start,
+    finish,
+    clear
+  };
+}
 const interpolatePath = (route, match) => {
   return match.path.replace(/(:\w+)\([^)]+\)/g, "$1").replace(/(:\w+)[?+*]/g, "$1").replace(/:\w+/g, (r2) => {
     var _a2;
@@ -6995,6 +7093,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       const _component_Body = Body;
       const _component_LayoutNavbar = _sfc_main$2;
       const _component_NuxtLayout = __nuxt_component_3;
+      const _component_NuxtLoadingIndicator = __nuxt_component_4;
       const _component_NuxtPage = __nuxt_component_2;
       const _component_LayoutNavbarMobile = _sfc_main$1;
       const _component_ClientOnly = __nuxt_component_0;
@@ -7008,10 +7107,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   _push3(ssrRenderComponent(_component_NuxtLayout, { class: "lt-lg:pb-14" }, {
                     default: withCtx((_3, _push4, _parent4, _scopeId3) => {
                       if (_push4) {
+                        _push4(ssrRenderComponent(_component_NuxtLoadingIndicator, null, null, _parent4, _scopeId3));
+                        _push4(`<div class="relative"${_scopeId3}>`);
                         _push4(ssrRenderComponent(_component_NuxtPage, null, null, _parent4, _scopeId3));
+                        _push4(`</div>`);
                       } else {
                         return [
-                          createVNode(_component_NuxtPage)
+                          createVNode(_component_NuxtLoadingIndicator),
+                          createVNode("div", { class: "relative" }, [
+                            createVNode(_component_NuxtPage)
+                          ])
                         ];
                       }
                     }),
@@ -7024,7 +7129,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                     createVNode(_component_LayoutNavbar),
                     createVNode(_component_NuxtLayout, { class: "lt-lg:pb-14" }, {
                       default: withCtx(() => [
-                        createVNode(_component_NuxtPage)
+                        createVNode(_component_NuxtLoadingIndicator),
+                        createVNode("div", { class: "relative" }, [
+                          createVNode(_component_NuxtPage)
+                        ])
                       ]),
                       _: 1
                     }),
@@ -7042,7 +7150,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
                   createVNode(_component_LayoutNavbar),
                   createVNode(_component_NuxtLayout, { class: "lt-lg:pb-14" }, {
                     default: withCtx(() => [
-                      createVNode(_component_NuxtPage)
+                      createVNode(_component_NuxtLoadingIndicator),
+                      createVNode("div", { class: "relative" }, [
+                        createVNode(_component_NuxtPage)
+                      ])
                     ]),
                     _: 1
                   }),
@@ -7089,5 +7200,5 @@ const plugins = normalizePlugins(_plugins);
 }
 const entry$1 = (ctx) => entry(ctx);
 
-export { O$1 as O, P, R, _export_sfc as _, u as a, __nuxt_component_1 as b, c, __nuxt_component_0$1 as d, entry$1 as default, useHead as e, f$2 as f, useHttpPost as g, useRouter as h, useHttpFetchPost as i, useBaseStore as j, useRoute as k, l, __nuxt_component_0 as m, __nuxt_component_2 as n, o, p, _imports_0$1 as q, defineNuxtRouteMiddleware as r, storeToRefs as s, t, useState as u, _sfc_main$8 as v, w };
+export { O$1 as O, P, R, _export_sfc as _, u as a, __nuxt_component_1 as b, c, __nuxt_component_0$1 as d, entry$1 as default, useHead as e, f$2 as f, useHttpPost as g, useRouter as h, useHttpFetchPost as i, useBaseStore as j, useRoute as k, l, __nuxt_component_0 as m, __nuxt_component_2 as n, o, p, _imports_0$1 as q, defineNuxtRouteMiddleware as r, storeToRefs as s, t, useState as u, _sfc_main$8 as v, w, useAppConfig as x };
 //# sourceMappingURL=server.mjs.map
