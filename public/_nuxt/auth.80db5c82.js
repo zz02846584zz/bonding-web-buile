@@ -1,0 +1,1 @@
+import{bW as u,V as r,$ as i,b as l,bX as n}from"./entry.47b02695.js";const h=u((t,e)=>{{const{user:s}=r(),{isLogin:a}=i(s),o=l("showAuth");if(!a.value&&t.fullPath!==e.fullPath)return o.value=!0,n()}});export{h as default};
