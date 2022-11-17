@@ -647,7 +647,7 @@ const defuFn = createDefu((obj, key, currentValue, _namespace) => {
 });
 const cfg0 = defineAppConfig({
   name: "\u9375\u7D50\u79D1\u6280",
-  link: "https://bondingtech.co"
+  link: "https://bondingtechs.com"
 });
 const inlineConfig = {};
 const __appConfig = defuFn(cfg0, inlineConfig);
@@ -662,9 +662,9 @@ function useHead(meta) {
   useNuxtApp()._useHead(meta);
 }
 const components = {
-  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.a54fcdae.mjs').then((c2) => c2.default || c2)),
-  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.60d9cc44.mjs').then((c2) => c2.default || c2)),
-  Message: defineAsyncComponent(() => import('./_nuxt/Message.af4c65ae.mjs').then((c2) => c2.default || c2))
+  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.c19643f1.mjs').then((c2) => c2.default || c2)),
+  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.d969f688.mjs').then((c2) => c2.default || c2)),
+  Message: defineAsyncComponent(() => import('./_nuxt/Message.64e7814d.mjs').then((c2) => c2.default || c2))
 };
 const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
   for (const name in components) {
@@ -1256,7 +1256,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/404.e7ec651b.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/404.3cbac3a3.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_c = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.name) != null ? _c : "404___tr",
@@ -1266,7 +1266,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/404.e7ec651b.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/404.3cbac3a3.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_e = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.name) != null ? _e : "index___en",
@@ -1276,7 +1276,7 @@ const _routes = [
     meta: __nuxt_page_meta$6,
     alias: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.alias) || [],
     redirect: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.redirect) || void 0,
-    component: () => import('./_nuxt/index.caa25814.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.6a4854ba.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_g = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.name) != null ? _g : "index___tr",
@@ -1286,7 +1286,7 @@ const _routes = [
     meta: __nuxt_page_meta$6,
     alias: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.alias) || [],
     redirect: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.redirect) || void 0,
-    component: () => import('./_nuxt/index.caa25814.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.6a4854ba.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_i = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.name) != null ? _i : "member-rule___en",
@@ -1296,7 +1296,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/member-rule.f7983a3e.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/member-rule.f5c8d803.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_k = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.name) != null ? _k : "member-rule___tr",
@@ -1306,7 +1306,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/member-rule.f7983a3e.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/member-rule.f5c8d803.mjs').then((m2) => m2.default || m2)
   },
   {
     path: (_m = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.path) != null ? _m : "/en/my",
@@ -1320,7 +1320,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/change-phone.f94267df.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/change-phone.15ff9550.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_p = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _p : "my-account-email-binding___en",
@@ -1330,7 +1330,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-binding.81d131cb.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-binding.af633d7e.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_r = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _r : "my-account-email-verify___en",
@@ -1340,7 +1340,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-verify.c7d046fb.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-verify.1b80843f.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_t = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _t : "my-account-identify-verify___en",
@@ -1350,7 +1350,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/identify-verify.05b8def7.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/identify-verify.81026d98.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_v = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _v : "my-account___en",
@@ -1360,7 +1360,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/index.6f7bb5d6.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.5704a6ff.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_x = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _x : "my-account-reset-password___en",
@@ -1370,7 +1370,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/reset-password.a494cc54.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/reset-password.6f4f0b32.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_z = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.name) != null ? _z : "my-collections___en",
@@ -1380,7 +1380,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/collections.8f179b71.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/collections.a1faf844.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_B = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.name) != null ? _B : "my-history___en",
@@ -1390,7 +1390,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/history.33a391d8.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/history.0f59cd43.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_D = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _D : "my___en",
@@ -1400,7 +1400,7 @@ const _routes = [
         meta: __nuxt_page_meta$4,
         alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
         redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
-        component: () => import('./_nuxt/index.8ecdf55d.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.55c7c1c5.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_F = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.name) != null ? _F : "my-tips___en",
@@ -1410,14 +1410,14 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/tips.acb61cb5.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/tips.605995c2.mjs').then((m2) => m2.default || m2)
       }
     ],
     name: (_H = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.name) != null ? _H : void 0,
     meta: __nuxt_page_meta$5,
     alias: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.alias) || [],
     redirect: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.redirect) || void 0,
-    component: () => import('./_nuxt/my.2f85927c.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/my.ff76406e.mjs').then((m2) => m2.default || m2)
   },
   {
     path: (_I = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.path) != null ? _I : "/my",
@@ -1431,7 +1431,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/change-phone.f94267df.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/change-phone.15ff9550.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_L = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _L : "my-account-email-binding___tr",
@@ -1441,7 +1441,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-binding.81d131cb.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-binding.af633d7e.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_N = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _N : "my-account-email-verify___tr",
@@ -1451,7 +1451,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-verify.c7d046fb.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-verify.1b80843f.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_P = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _P : "my-account-identify-verify___tr",
@@ -1461,7 +1461,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/identify-verify.05b8def7.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/identify-verify.81026d98.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_R = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _R : "my-account___tr",
@@ -1471,7 +1471,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/index.6f7bb5d6.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.5704a6ff.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_T = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _T : "my-account-reset-password___tr",
@@ -1481,7 +1481,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/reset-password.a494cc54.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/reset-password.6f4f0b32.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_V = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.name) != null ? _V : "my-collections___tr",
@@ -1491,7 +1491,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/collections.8f179b71.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/collections.a1faf844.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_X = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.name) != null ? _X : "my-history___tr",
@@ -1501,7 +1501,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/history.33a391d8.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/history.0f59cd43.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_Z = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _Z : "my___tr",
@@ -1511,7 +1511,7 @@ const _routes = [
         meta: __nuxt_page_meta$4,
         alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
         redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
-        component: () => import('./_nuxt/index.8ecdf55d.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.55c7c1c5.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_$ = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.name) != null ? _$ : "my-tips___tr",
@@ -1521,14 +1521,14 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/tips.acb61cb5.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/tips.605995c2.mjs').then((m2) => m2.default || m2)
       }
     ],
     name: (_ba = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.name) != null ? _ba : void 0,
     meta: __nuxt_page_meta$5,
     alias: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.alias) || [],
     redirect: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.redirect) || void 0,
-    component: () => import('./_nuxt/my.2f85927c.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/my.ff76406e.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ca = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ca : "news-article-articleSlug___en",
@@ -1538,7 +1538,7 @@ const _routes = [
     meta: __nuxt_page_meta$3,
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.fb9e9e7a.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_articleSlug_.21535499.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ea = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ea : "news-article-articleSlug___tr",
@@ -1548,7 +1548,7 @@ const _routes = [
     meta: __nuxt_page_meta$3,
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.fb9e9e7a.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_articleSlug_.21535499.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ga = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _ga : "news-category-categorySlug___en",
@@ -1558,7 +1558,7 @@ const _routes = [
     meta: __nuxt_page_meta$2,
     alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
     redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.eff6a37f.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.7882cca0.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ia = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _ia : "news-category-categorySlug___tr",
@@ -1568,7 +1568,7 @@ const _routes = [
     meta: __nuxt_page_meta$2,
     alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
     redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.eff6a37f.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.7882cca0.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ka = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ka : "news-video-categorySlug___en",
@@ -1578,7 +1578,7 @@ const _routes = [
     meta: __nuxt_page_meta$1,
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.3f17cbd8.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.1e41ddb7.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ma = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _ma : "news-video-categorySlug___tr",
@@ -1588,7 +1588,7 @@ const _routes = [
     meta: __nuxt_page_meta$1,
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.3f17cbd8.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.1e41ddb7.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_oa = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _oa : "news-video___en",
@@ -1598,7 +1598,7 @@ const _routes = [
     meta: __nuxt_page_meta,
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
-    component: () => import('./_nuxt/index.50312ed0.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.34771865.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_qa = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _qa : "news-video___tr",
@@ -1608,7 +1608,7 @@ const _routes = [
     meta: __nuxt_page_meta,
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
-    component: () => import('./_nuxt/index.50312ed0.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.34771865.mjs').then((m2) => m2.default || m2)
   }
 ];
 const routerOptions0 = {
@@ -1693,7 +1693,7 @@ const globalMiddleware = [
   validate
 ];
 const namedMiddleware = {
-  auth: () => import('./_nuxt/auth.e3971c51.mjs')
+  auth: () => import('./_nuxt/auth.0901c285.mjs')
 };
 const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlugin(async (nuxtApp) => {
   var _a2, _b2, _c2, _d2;
@@ -4678,7 +4678,7 @@ const _sfc_main$9 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.a84a6e04.mjs').then((r2) => r2.default || r2));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.459390e3.mjs').then((r2) => r2.default || r2));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -6726,8 +6726,8 @@ const _wrapIf = (component, props, slots) => {
   return { default: () => props ? h$1(component, props === true ? {} : props, slots) : h$1(Fragment, {}, slots) };
 };
 const layouts = {
-  blog: () => import('./_nuxt/blog.66ae367d.mjs').then((m2) => m2.default || m2),
-  default: () => import('./_nuxt/default.c209fd3a.mjs').then((m2) => m2.default || m2)
+  blog: () => import('./_nuxt/blog.111b687c.mjs').then((m2) => m2.default || m2),
+  default: () => import('./_nuxt/default.ce7c1e20.mjs').then((m2) => m2.default || m2)
 };
 const LayoutLoader = defineComponent({
   props: {
