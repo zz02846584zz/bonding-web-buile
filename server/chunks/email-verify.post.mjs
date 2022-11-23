@@ -25,7 +25,7 @@ const emailVerify_post = defineEventHandler(async (event) => {
       code,
       message = "",
       data = {}
-    } = await request.post("/user/email-verify", { token });
+    } = await request.post("/auth/email-verify", { token });
     return { error: code !== 1e3, code, message, data };
   } catch (err) {
     const { code, message = "" } = err;
