@@ -5,6 +5,9 @@ import { getContext, executeAsync } from 'unctx';
 import destr from 'destr';
 import { hasProtocol, isEqual, joinURL, parseURL } from 'ufo';
 import { createError as createError$1, sendRedirect, appendHeader } from 'h3';
+import { createHead as createHead$1, useHead as useHead$1 } from '@unhead/vue';
+import { renderDOMHead, debouncedRenderDOMHead } from '@unhead/dom';
+import { renderSSRHead } from '@unhead/ssr';
 import { useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter } from 'vue-router';
 import { parse, serialize } from 'cookie-es';
 import isHTTPS from 'is-https';
@@ -228,9 +231,9 @@ function useAsyncData(...args) {
     }
     asyncData.pending.value = true;
     const promise = new Promise(
-      (resolve, reject) => {
+      (resolve2, reject) => {
         try {
-          resolve(handler(nuxt));
+          resolve2(handler(nuxt));
         } catch (err) {
           reject(err);
         }
@@ -607,41 +610,41 @@ function defineNuxtLink(options) {
   });
 }
 const __nuxt_component_0$1 = defineNuxtLink({ componentName: "NuxtLink" });
-function isObject$2(val) {
-  return val !== null && typeof val === "object";
+function isObject$2(value) {
+  return value !== null && typeof value === "object";
 }
-function _defu(baseObj, defaults, namespace = ".", merger) {
+function _defu(baseObject, defaults, namespace = ".", merger) {
   if (!isObject$2(defaults)) {
-    return _defu(baseObj, {}, namespace, merger);
+    return _defu(baseObject, {}, namespace, merger);
   }
-  const obj = Object.assign({}, defaults);
-  for (const key in baseObj) {
+  const object = Object.assign({}, defaults);
+  for (const key in baseObject) {
     if (key === "__proto__" || key === "constructor") {
       continue;
     }
-    const val = baseObj[key];
-    if (val === null || val === void 0) {
+    const value = baseObject[key];
+    if (value === null || value === void 0) {
       continue;
     }
-    if (merger && merger(obj, key, val, namespace)) {
+    if (merger && merger(object, key, value, namespace)) {
       continue;
     }
-    if (Array.isArray(val) && Array.isArray(obj[key])) {
-      obj[key] = val.concat(obj[key]);
-    } else if (isObject$2(val) && isObject$2(obj[key])) {
-      obj[key] = _defu(val, obj[key], (namespace ? `${namespace}.` : "") + key.toString(), merger);
+    if (Array.isArray(value) && Array.isArray(object[key])) {
+      object[key] = [...value, ...object[key]];
+    } else if (isObject$2(value) && isObject$2(object[key])) {
+      object[key] = _defu(value, object[key], (namespace ? `${namespace}.` : "") + key.toString(), merger);
     } else {
-      obj[key] = val;
+      object[key] = value;
     }
   }
-  return obj;
+  return object;
 }
 function createDefu(merger) {
-  return (...args) => args.reduce((p2, c2) => _defu(p2, c2, "", merger), {});
+  return (...arguments_) => arguments_.reduce((p2, c2) => _defu(p2, c2, "", merger), {});
 }
-const defuFn = createDefu((obj, key, currentValue, _namespace) => {
-  if (typeof obj[key] !== "undefined" && typeof currentValue === "function") {
-    obj[key] = currentValue(obj[key]);
+const defuFn = createDefu((object, key, currentValue, _namespace) => {
+  if (typeof object[key] !== "undefined" && typeof currentValue === "function") {
+    object[key] = currentValue(object[key]);
     return true;
   }
 });
@@ -662,9 +665,18 @@ function useHead(meta) {
   useNuxtApp()._useHead(meta);
 }
 const components = {
-  Alert: defineAsyncComponent(() => import('./_nuxt/Alert.0273167e.mjs').then((c2) => c2.default || c2)),
-  Loading: defineAsyncComponent(() => import('./_nuxt/Loading.f214a11b.mjs').then((c2) => c2.default || c2)),
-  Message: defineAsyncComponent(() => import('./_nuxt/Message.8bd92afd.mjs').then((c2) => c2.default || c2))
+  Alert: defineAsyncComponent(() => import(
+    /* webpackChunkName: "components/alert" */
+    './_nuxt/Alert.787e93fb.mjs'
+  ).then((c2) => c2.default || c2)),
+  Loading: defineAsyncComponent(() => import(
+    /* webpackChunkName: "components/loading" */
+    './_nuxt/Loading.e757d0e1.mjs'
+  ).then((c2) => c2.default || c2)),
+  Message: defineAsyncComponent(() => import(
+    /* webpackChunkName: "components/message" */
+    './_nuxt/Message.bd6a2ccd.mjs'
+  ).then((c2) => c2.default || c2))
 };
 const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
   for (const name in components) {
@@ -672,507 +684,73 @@ const _nuxt_components_plugin_mjs_KR1HBZs4kY = defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.component("Lazy" + name, components[name]);
   }
 });
-const isVue2 = false;
-const isVue3 = true;
-function resolveUnref(r2) {
-  return typeof r2 === "function" ? r2() : unref(r2);
-}
-var PROVIDE_KEY = "usehead";
-var HEAD_COUNT_KEY = "head:count";
-var HEAD_ATTRS_KEY = "data-head-attrs";
-var SELF_CLOSING_TAGS = ["meta", "link", "base"];
-var BODY_TAG_ATTR_NAME = "data-meta-body";
-var propsToString = (props) => {
-  const handledAttributes = [];
-  for (const [key, value] of Object.entries(props)) {
-    if (value === false || value == null)
-      continue;
-    let attribute = key;
-    if (value !== true)
-      attribute += `="${String(value).replace(/"/g, "&quot;")}"`;
-    handledAttributes.push(attribute);
-  }
-  return handledAttributes.length > 0 ? ` ${handledAttributes.join(" ")}` : "";
-};
-var tagToString = (tag) => {
-  const attrs = propsToString(tag.props);
-  const openTag = `<${tag.tag}${attrs}>`;
-  return SELF_CLOSING_TAGS.includes(tag.tag) ? openTag : `${openTag}${tag.children || ""}</${tag.tag}>`;
-};
-var resolveHeadEntries = (entries, force) => {
-  return entries.map((e2) => {
-    if (e2.input && (force || !e2.resolved))
-      e2.input = resolveUnrefHeadInput(e2.input);
-    return e2;
-  });
-};
-var renderHeadToString = async (head) => {
-  var _a2, _b2;
-  const headHtml = [];
-  const bodyHtml = [];
-  let titleHtml = "";
-  const attrs = { htmlAttrs: {}, bodyAttrs: {} };
-  const resolvedEntries = resolveHeadEntries(head.headEntries);
-  for (const h2 in head.hooks["resolved:entries"])
-    await head.hooks["resolved:entries"][h2](resolvedEntries);
-  const headTags = resolveHeadEntriesToTags(resolvedEntries);
-  for (const h2 in head.hooks["resolved:tags"])
-    await head.hooks["resolved:tags"][h2](headTags);
-  for (const tag of headTags) {
-    if ((_a2 = tag.options) == null ? void 0 : _a2.beforeTagRender)
-      tag.options.beforeTagRender(tag);
-    if (tag.tag === "title")
-      titleHtml = tagToString(tag);
-    else if (tag.tag === "htmlAttrs" || tag.tag === "bodyAttrs")
-      attrs[tag.tag] = { ...attrs[tag.tag], ...tag.props };
-    else if ((_b2 = tag.options) == null ? void 0 : _b2.body)
-      bodyHtml.push(tagToString(tag));
-    else
-      headHtml.push(tagToString(tag));
-  }
-  headHtml.push(`<meta name="${HEAD_COUNT_KEY}" content="${headHtml.length}">`);
-  return {
-    get headTags() {
-      return titleHtml + headHtml.join("");
-    },
-    get htmlAttrs() {
-      return propsToString({
-        ...attrs.htmlAttrs,
-        [HEAD_ATTRS_KEY]: Object.keys(attrs.htmlAttrs).join(",")
-      });
-    },
-    get bodyAttrs() {
-      return propsToString({
-        ...attrs.bodyAttrs,
-        [HEAD_ATTRS_KEY]: Object.keys(attrs.bodyAttrs).join(",")
-      });
-    },
-    get bodyTags() {
-      return bodyHtml.join("");
-    }
-  };
-};
-var sortTags = (aTag, bTag) => {
-  const tagWeight = (tag) => {
-    var _a2;
-    if ((_a2 = tag.options) == null ? void 0 : _a2.renderPriority)
-      return tag.options.renderPriority;
-    switch (tag.tag) {
-      case "base":
-        return -1;
-      case "meta":
-        if (tag.props.charset)
-          return -2;
-        if (tag.props["http-equiv"] === "content-security-policy")
-          return 0;
-        return 10;
-      default:
-        return 10;
-    }
-  };
-  return tagWeight(aTag) - tagWeight(bTag);
-};
-var tagDedupeKey = (tag) => {
-  const { props, tag: tagName, options } = tag;
-  if (["base", "title", "titleTemplate", "bodyAttrs", "htmlAttrs"].includes(tagName))
-    return tagName;
-  if (tagName === "link" && props.rel === "canonical")
-    return "canonical";
-  if (props.charset)
-    return "charset";
-  if (options == null ? void 0 : options.key)
-    return `${tagName}:${options.key}`;
-  const name = ["id"];
-  if (tagName === "meta")
-    name.push(...["name", "property", "http-equiv"]);
-  for (const n2 of name) {
-    if (typeof props[n2] !== "undefined") {
-      return `${tagName}:${n2}:${props[n2]}`;
-    }
-  }
-  return tag.runtime.position;
-};
-function resolveUnrefHeadInput(ref2) {
-  const root = resolveUnref(ref2);
-  if (!ref2 || !root) {
-    return root;
-  }
-  if (Array.isArray(root)) {
-    return root.map(resolveUnrefHeadInput);
-  }
-  if (typeof root === "object") {
-    return Object.fromEntries(
-      Object.entries(root).map(([key, value]) => {
-        if (key === "titleTemplate")
-          return [key, unref(value)];
-        return [
-          key,
-          resolveUnrefHeadInput(value)
-        ];
-      })
-    );
-  }
-  return root;
-}
-var resolveTag = (name, input, e2) => {
-  var _a2;
-  input = { ...input };
-  const tag = {
-    tag: name,
-    props: {},
-    runtime: {
-      entryId: e2.id
-    },
-    options: {
-      ...e2.options
-    }
-  };
-  ["hid", "vmid", "key"].forEach((key) => {
-    if (input[key]) {
-      tag.options.key = input[key];
-      delete input[key];
-    }
-  });
-  ["children", "innerHTML", "textContent"].forEach((key) => {
-    if (typeof input[key] !== "undefined") {
-      tag.children = input[key];
-      delete input[key];
-    }
-  });
-  ["body", "renderPriority"].forEach((key) => {
-    if (typeof input[key] !== "undefined") {
-      tag.options[key] = input[key];
-      delete input[key];
-    }
-  });
-  if ((_a2 = tag.options) == null ? void 0 : _a2.body)
-    input[BODY_TAG_ATTR_NAME] = true;
-  tag.props = input;
-  return tag;
-};
-var headInputToTags = (e2) => {
-  return Object.entries(e2.input).filter(([, v2]) => typeof v2 !== "undefined").map(([key, value]) => {
-    return (Array.isArray(value) ? value : [value]).map((props) => {
-      switch (key) {
-        case "title":
-        case "titleTemplate":
-          return {
-            tag: key,
-            children: props,
-            props: {},
-            runtime: { entryId: e2.id },
-            options: e2.options
-          };
-        case "base":
-        case "meta":
-        case "link":
-        case "style":
-        case "script":
-        case "noscript":
-        case "htmlAttrs":
-        case "bodyAttrs":
-          return resolveTag(key, props, e2);
-        default:
-          return false;
-      }
-    });
-  }).flat().filter((v2) => !!v2);
-};
-var renderTitleTemplate = (template, title) => {
-  if (template == null)
-    return title || null;
-  if (typeof template === "function")
-    return template(title);
-  return template.replace("%s", title != null ? title : "");
-};
-var resolveHeadEntriesToTags = (entries) => {
-  const deduping = {};
-  const resolvedEntries = resolveHeadEntries(entries);
-  resolvedEntries.forEach((entry2, entryIndex) => {
-    const tags = headInputToTags(entry2);
-    tags.forEach((tag, tagIdx) => {
-      tag.runtime = tag.runtime || {};
-      tag.runtime.position = entryIndex * 1e4 + tagIdx;
-      deduping[tagDedupeKey(tag)] = tag;
-    });
-  });
-  let resolvedTags = Object.values(deduping).sort((a2, b2) => a2.runtime.position - b2.runtime.position).sort(sortTags);
-  const titleTemplateIdx = resolvedTags.findIndex((i) => i.tag === "titleTemplate");
-  const titleIdx = resolvedTags.findIndex((i) => i.tag === "title");
-  if (titleIdx !== -1 && titleTemplateIdx !== -1) {
-    const newTitle = renderTitleTemplate(
-      resolvedTags[titleTemplateIdx].children,
-      resolvedTags[titleIdx].children
-    );
-    if (newTitle !== null) {
-      resolvedTags[titleIdx].children = newTitle || resolvedTags[titleIdx].children;
-    } else {
-      resolvedTags = resolvedTags.filter((_, i) => i !== titleIdx);
-    }
-    resolvedTags = resolvedTags.filter((_, i) => i !== titleTemplateIdx);
-  } else if (titleTemplateIdx !== -1) {
-    const newTitle = renderTitleTemplate(
-      resolvedTags[titleTemplateIdx].children
-    );
-    if (newTitle !== null) {
-      resolvedTags[titleTemplateIdx].children = newTitle;
-      resolvedTags[titleTemplateIdx].tag = "title";
-    } else {
-      resolvedTags = resolvedTags.filter((_, i) => i !== titleTemplateIdx);
-    }
-  }
-  return resolvedTags;
-};
-function isEqualNode(oldTag, newTag) {
-  if (oldTag instanceof HTMLElement && newTag instanceof HTMLElement) {
-    const nonce = newTag.getAttribute("nonce");
-    if (nonce && !oldTag.getAttribute("nonce")) {
-      const cloneTag = newTag.cloneNode(true);
-      cloneTag.setAttribute("nonce", "");
-      cloneTag.nonce = nonce;
-      return nonce === oldTag.nonce && oldTag.isEqualNode(cloneTag);
-    }
-  }
-  return oldTag.isEqualNode(newTag);
-}
-var setAttrs = (el, attrs) => {
-  const existingAttrs = el.getAttribute(HEAD_ATTRS_KEY);
-  if (existingAttrs) {
-    for (const key of existingAttrs.split(",")) {
-      if (!(key in attrs))
-        el.removeAttribute(key);
-    }
-  }
-  const keys = [];
-  for (const key in attrs) {
-    const value = attrs[key];
-    if (value == null)
-      continue;
-    if (value === false)
-      el.removeAttribute(key);
-    else
-      el.setAttribute(key, value);
-    keys.push(key);
-  }
-  if (keys.length)
-    el.setAttribute(HEAD_ATTRS_KEY, keys.join(","));
-  else
-    el.removeAttribute(HEAD_ATTRS_KEY);
-};
-var createElement = (tag, document2) => {
-  var _a2;
-  const $el = document2.createElement(tag.tag);
-  Object.entries(tag.props).forEach(([k2, v2]) => {
-    if (v2 !== false) {
-      $el.setAttribute(k2, v2 === true ? "" : String(v2));
-    }
-  });
-  if (tag.children) {
-    if ((_a2 = tag.options) == null ? void 0 : _a2.safe) {
-      if (tag.tag !== "script")
-        $el.textContent = tag.children;
-    } else {
-      $el.innerHTML = tag.children;
-    }
-  }
-  return $el;
-};
-var updateElements = (document2 = window.document, type, tags) => {
-  var _a2, _b2;
-  const head = document2.head;
-  const body = document2.body;
-  let headCountEl = head.querySelector(`meta[name="${HEAD_COUNT_KEY}"]`);
-  const bodyMetaElements = body.querySelectorAll(`[${BODY_TAG_ATTR_NAME}]`);
-  const headCount = headCountEl ? Number(headCountEl.getAttribute("content")) : 0;
-  const oldHeadElements = [];
-  const oldBodyElements = [];
-  if (bodyMetaElements) {
-    for (let i = 0; i < bodyMetaElements.length; i++) {
-      if (bodyMetaElements[i] && ((_a2 = bodyMetaElements[i].tagName) == null ? void 0 : _a2.toLowerCase()) === type)
-        oldBodyElements.push(bodyMetaElements[i]);
-    }
-  }
-  if (headCountEl) {
-    for (let i = 0, j = headCountEl.previousElementSibling; i < headCount; i++, j = (j == null ? void 0 : j.previousElementSibling) || null) {
-      if (((_b2 = j == null ? void 0 : j.tagName) == null ? void 0 : _b2.toLowerCase()) === type)
-        oldHeadElements.push(j);
-    }
-  } else {
-    headCountEl = document2.createElement("meta");
-    headCountEl.setAttribute("name", HEAD_COUNT_KEY);
-    headCountEl.setAttribute("content", "0");
-    head.append(headCountEl);
-  }
-  let newElements = tags.map((tag) => {
-    var _a3;
-    var _a22;
-    return {
-      element: createElement(tag, document2),
-      body: (_a3 = (_a22 = tag.options) == null ? void 0 : _a22.body) != null ? _a3 : false
-    };
-  });
-  newElements = newElements.filter((newEl) => {
-    for (let i = 0; i < oldHeadElements.length; i++) {
-      const oldEl = oldHeadElements[i];
-      if (isEqualNode(oldEl, newEl.element)) {
-        oldHeadElements.splice(i, 1);
-        return false;
-      }
-    }
-    for (let i = 0; i < oldBodyElements.length; i++) {
-      const oldEl = oldBodyElements[i];
-      if (isEqualNode(oldEl, newEl.element)) {
-        oldBodyElements.splice(i, 1);
-        return false;
-      }
-    }
-    return true;
-  });
-  oldBodyElements.forEach((t2) => {
-    var _a22;
-    return (_a22 = t2.parentNode) == null ? void 0 : _a22.removeChild(t2);
-  });
-  oldHeadElements.forEach((t2) => {
-    var _a22;
-    return (_a22 = t2.parentNode) == null ? void 0 : _a22.removeChild(t2);
-  });
-  newElements.forEach((t2) => {
-    if (t2.body)
-      body.insertAdjacentElement("beforeend", t2.element);
-    else
-      head.insertBefore(t2.element, headCountEl);
-  });
-  headCountEl.setAttribute(
-    "content",
-    `${headCount - oldHeadElements.length + newElements.filter((t2) => !t2.body).length}`
-  );
-};
-var updateDOM = async (head, previousTags, document2) => {
-  var _a2, _b2;
-  const tags = {};
-  if (!document2)
-    document2 = window.document;
-  for (const k2 in head.hooks["before:dom"]) {
-    if (await head.hooks["before:dom"][k2]() === false)
-      return;
-  }
-  const resolvedEntries = resolveHeadEntries(head.headEntries);
-  for (const h2 in head.hooks["resolved:entries"])
-    await head.hooks["resolved:entries"][h2](resolvedEntries);
-  const headTags = resolveHeadEntriesToTags(resolvedEntries);
-  for (const h2 in head.hooks["resolved:tags"])
-    await head.hooks["resolved:tags"][h2](headTags);
-  for (const tag of headTags) {
-    switch (tag.tag) {
-      case "title":
-        if (typeof tag.children !== "undefined")
-          document2.title = tag.children;
-        break;
-      case "base":
-      case "meta":
-      case "link":
-      case "style":
-      case "script":
-      case "noscript":
-        tags[tag.tag] = tags[tag.tag] || [];
-        tags[tag.tag].push(tag);
-        break;
-    }
-  }
-  setAttrs(document2.documentElement, ((_a2 = headTags.find((t2) => t2.tag === "htmlAttrs")) == null ? void 0 : _a2.props) || {});
-  setAttrs(document2.body, ((_b2 = headTags.find((t2) => t2.tag === "bodyAttrs")) == null ? void 0 : _b2.props) || {});
-  const tagKeys = /* @__PURE__ */ new Set([...Object.keys(tags), ...previousTags]);
-  for (const tag of tagKeys)
-    updateElements(document2, tag, tags[tag] || []);
-  previousTags.clear();
-  Object.keys(tags).forEach((i) => previousTags.add(i));
-};
-version.startsWith("2.");
-var createHead = (initHeadObject) => {
-  let entries = [];
-  let entryId = 0;
-  const previousTags = /* @__PURE__ */ new Set();
-  let domUpdateTick = null;
-  const head = {
+function createHead(initHeadObject) {
+  const unhead = createHead$1();
+  const legacyHead = {
+    unhead,
     install(app2) {
-      if (app2.config.globalProperties)
-        app2.config.globalProperties.$head = head;
-      app2.provide(PROVIDE_KEY, head);
+      if (version.startsWith("3")) {
+        app2.config.globalProperties.$head = unhead;
+        app2.provide("usehead", unhead);
+      }
     },
+    use(plugin2) {
+      unhead.use(plugin2);
+    },
+    resolveTags() {
+      return unhead.resolveTags();
+    },
+    headEntries() {
+      return unhead.headEntries();
+    },
+    headTags() {
+      return unhead.resolveTags();
+    },
+    push(input, options) {
+      return unhead.push(input, options);
+    },
+    addEntry(input, options) {
+      return unhead.push(input, options);
+    },
+    addHeadObjs(input, options) {
+      return unhead.push(input, options);
+    },
+    addReactiveEntry(input, options) {
+      const api = useHead$1(input, options);
+      if (typeof api !== "undefined")
+        return api.dispose;
+      return () => {
+      };
+    },
+    removeHeadObjs() {
+    },
+    updateDOM(document2, force) {
+      if (force)
+        renderDOMHead(unhead, { document: document2 });
+      else
+        debouncedRenderDOMHead(unhead, { delayFn: (fn) => setTimeout(() => fn(), 50), document: document2 });
+    },
+    internalHooks: unhead.hooks,
     hooks: {
       "before:dom": [],
       "resolved:tags": [],
       "resolved:entries": []
-    },
-    get headEntries() {
-      return entries;
-    },
-    get headTags() {
-      const resolvedEntries = resolveHeadEntries(head.headEntries);
-      return resolveHeadEntriesToTags(resolvedEntries);
-    },
-    addHeadObjs(input, options) {
-      return head.addEntry(input, options);
-    },
-    addEntry(input, options = {}) {
-      let resolved = false;
-      if (options == null ? void 0 : options.resolved) {
-        resolved = true;
-        delete options.resolved;
-      }
-      const entry2 = {
-        id: entryId++,
-        options,
-        resolved,
-        input
-      };
-      entries.push(entry2);
-      return {
-        remove() {
-          entries = entries.filter((_objs) => _objs.id !== entry2.id);
-        },
-        update(updatedInput) {
-          entries = entries.map((e2) => {
-            if (e2.id === entry2.id)
-              e2.input = updatedInput;
-            return e2;
-          });
-        }
-      };
-    },
-    async updateDOM(document2, force) {
-      const doDomUpdate = () => {
-        domUpdateTick = null;
-        return updateDOM(head, previousTags, document2);
-      };
-      if (force)
-        return doDomUpdate();
-      return domUpdateTick = domUpdateTick || new Promise((resolve) => nextTick(() => resolve(doDomUpdate())));
-    },
-    addReactiveEntry(input, options = {}) {
-      let entrySideEffect = null;
-      const cleanUpWatch = watchEffect(() => {
-        const resolvedInput = resolveUnrefHeadInput(input);
-        if (entrySideEffect === null) {
-          entrySideEffect = head.addEntry(
-            resolvedInput,
-            { ...options, resolved: true }
-          );
-        } else {
-          entrySideEffect.update(resolvedInput);
-        }
-      });
-      return () => {
-        cleanUpWatch();
-        if (entrySideEffect)
-          entrySideEffect.remove();
-      };
     }
   };
+  unhead.addHeadObjs = legacyHead.addHeadObjs;
+  unhead.updateDOM = legacyHead.updateDOM;
+  unhead.hooks.hook("dom:beforeRender", (ctx) => {
+    for (const hook of legacyHead.hooks["before:dom"]) {
+      if (hook() === false)
+        ctx.shouldRender = false;
+    }
+  });
   if (initHeadObject)
-    head.addEntry(initHeadObject);
-  return head;
-};
+    legacyHead.addHeadObjs(initHeadObject);
+  return legacyHead;
+}
+const renderHeadToString = (head) => renderSSRHead(head.unhead);
+version.startsWith("2.");
 const appPageTransition = { "name": "page" };
 const appLayoutTransition = { "name": "layout" };
 const appHead = { "meta": [{ "name": "viewport", "content": "width=device-width, initial-scale=1" }, { "charset": "utf-8" }], "link": [], "style": [], "script": [], "noscript": [] };
@@ -1226,7 +804,7 @@ const __nuxt_page_meta$5 = {
 const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta = {};
 const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta = {};
 const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta = {};
-const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta = {};
+const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta = {};
 const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta = {};
 const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta = {};
 const _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta = {};
@@ -1257,7 +835,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/404.5e97f7f5.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/404.7c6b3cbf.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_c = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.name) != null ? _c : "404___tr",
@@ -1267,7 +845,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47404_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/404.5e97f7f5.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/404.7c6b3cbf.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_e = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.name) != null ? _e : "index___en",
@@ -1277,7 +855,7 @@ const _routes = [
     meta: __nuxt_page_meta$6,
     alias: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.alias) || [],
     redirect: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.redirect) || void 0,
-    component: () => import('./_nuxt/index.f6a70c80.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.e2572682.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_g = __nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.name) != null ? _g : "index___tr",
@@ -1287,7 +865,7 @@ const _routes = [
     meta: __nuxt_page_meta$6,
     alias: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.alias) || [],
     redirect: (__nuxt_page_meta$6 == null ? void 0 : __nuxt_page_meta$6.redirect) || void 0,
-    component: () => import('./_nuxt/index.f6a70c80.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.e2572682.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_i = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.name) != null ? _i : "member-rule___en",
@@ -1297,7 +875,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/member-rule.7c576c07.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/member-rule.279b90a7.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_k = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.name) != null ? _k : "member-rule___tr",
@@ -1307,7 +885,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47member_45rule_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/member-rule.7c576c07.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/member-rule.279b90a7.mjs').then((m2) => m2.default || m2)
   },
   {
     path: (_m = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.path) != null ? _m : "/en/my",
@@ -1321,7 +899,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/change-phone.feae0868.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/change-phone.cbb58745.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_p = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _p : "my-account-email-binding___en",
@@ -1331,7 +909,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-binding.bb741c42.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-binding.aa8c9058.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_r = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _r : "my-account-email-verify___en",
@@ -1341,17 +919,17 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-verify.c6850a2f.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-verify.3818fecc.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_t = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _t : "my-account-identify-verify___en",
-        path: (_u = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _u : "account/identify-verify",
-        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/identify-verify.vue",
+        name: (_t = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.name) != null ? _t : "my-account-identity-verify___en",
+        path: (_u = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.path) != null ? _u : "account/identity-verify",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/identity-verify.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
-        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/identify-verify.cfbdd6e2.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/identity-verify.5a426b3d.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_v = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _v : "my-account___en",
@@ -1361,7 +939,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/index.4594d773.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.90706268.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_x = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _x : "my-account-reset-password___en",
@@ -1371,7 +949,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/reset-password.3b445a0e.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/reset-password.05b910dc.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_z = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.name) != null ? _z : "my-collections___en",
@@ -1381,7 +959,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/collections.add13dfe.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/collections.621c4965.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_B = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.name) != null ? _B : "my-history___en",
@@ -1391,7 +969,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/history.eaf4e333.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/history.5a64e883.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_D = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _D : "my___en",
@@ -1401,7 +979,7 @@ const _routes = [
         meta: __nuxt_page_meta$4,
         alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
         redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
-        component: () => import('./_nuxt/index.dd0b4960.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.3aae4903.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_F = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.name) != null ? _F : "my-tips___en",
@@ -1411,14 +989,14 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/tips.1d2f5960.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/tips.c41a79bd.mjs').then((m2) => m2.default || m2)
       }
     ],
     name: (_H = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.name) != null ? _H : void 0,
     meta: __nuxt_page_meta$5,
     alias: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.alias) || [],
     redirect: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.redirect) || void 0,
-    component: () => import('./_nuxt/my.9d289afc.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/my.7f57e505.mjs').then((m2) => m2.default || m2)
   },
   {
     path: (_I = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.path) != null ? _I : "/my",
@@ -1432,7 +1010,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47change_45phone_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/change-phone.feae0868.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/change-phone.cbb58745.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_L = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.name) != null ? _L : "my-account-email-binding___tr",
@@ -1442,7 +1020,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45binding_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-binding.bb741c42.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-binding.aa8c9058.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_N = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.name) != null ? _N : "my-account-email-verify___tr",
@@ -1452,17 +1030,17 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47email_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/email-verify.c6850a2f.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/email-verify.3818fecc.mjs').then((m2) => m2.default || m2)
       },
       {
-        name: (_P = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.name) != null ? _P : "my-account-identify-verify___tr",
-        path: (_Q = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.path) != null ? _Q : "account/identify-verify",
-        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/identify-verify.vue",
+        name: (_P = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.name) != null ? _P : "my-account-identity-verify___tr",
+        path: (_Q = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.path) != null ? _Q : "account/identity-verify",
+        file: "/Users/kurou/project/bonding/project/web/src/pages/my/account/identity-verify.vue",
         children: [],
-        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta,
-        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.alias) || [],
-        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identify_45verify_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/identify-verify.cfbdd6e2.mjs').then((m2) => m2.default || m2)
+        meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta,
+        alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.alias) || [],
+        redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47identity_45verify_46vueMeta.redirect) || void 0,
+        component: () => import('./_nuxt/identity-verify.5a426b3d.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_R = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.name) != null ? _R : "my-account___tr",
@@ -1472,7 +1050,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47index_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/index.4594d773.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.90706268.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_T = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.name) != null ? _T : "my-account-reset-password___tr",
@@ -1482,7 +1060,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47account_47reset_45password_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/reset-password.3b445a0e.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/reset-password.05b910dc.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_V = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.name) != null ? _V : "my-collections___tr",
@@ -1492,7 +1070,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47collections_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/collections.add13dfe.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/collections.621c4965.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_X = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.name) != null ? _X : "my-history___tr",
@@ -1502,7 +1080,7 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47history_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/history.eaf4e333.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/history.5a64e883.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_Z = __nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.name) != null ? _Z : "my___tr",
@@ -1512,7 +1090,7 @@ const _routes = [
         meta: __nuxt_page_meta$4,
         alias: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.alias) || [],
         redirect: (__nuxt_page_meta$4 == null ? void 0 : __nuxt_page_meta$4.redirect) || void 0,
-        component: () => import('./_nuxt/index.dd0b4960.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/index.3aae4903.mjs').then((m2) => m2.default || m2)
       },
       {
         name: (_$ = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.name) != null ? _$ : "my-tips___tr",
@@ -1522,14 +1100,14 @@ const _routes = [
         meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta,
         alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.alias) || [],
         redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47my_47tips_46vueMeta.redirect) || void 0,
-        component: () => import('./_nuxt/tips.1d2f5960.mjs').then((m2) => m2.default || m2)
+        component: () => import('./_nuxt/tips.c41a79bd.mjs').then((m2) => m2.default || m2)
       }
     ],
     name: (_ba = __nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.name) != null ? _ba : void 0,
     meta: __nuxt_page_meta$5,
     alias: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.alias) || [],
     redirect: (__nuxt_page_meta$5 == null ? void 0 : __nuxt_page_meta$5.redirect) || void 0,
-    component: () => import('./_nuxt/my.9d289afc.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/my.7f57e505.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ca = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ca : "news-article-articleSlug___en",
@@ -1539,7 +1117,7 @@ const _routes = [
     meta: __nuxt_page_meta$3,
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.4afad2f6.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_articleSlug_.b6d55896.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ea = __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.name) != null ? _ea : "news-article-articleSlug___tr",
@@ -1549,7 +1127,7 @@ const _routes = [
     meta: __nuxt_page_meta$3,
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect) || void 0,
-    component: () => import('./_nuxt/_articleSlug_.4afad2f6.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_articleSlug_.b6d55896.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ga = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta.name) != null ? _ga : "news-categories___en",
@@ -1559,7 +1137,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/categories.29cdf3bb.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/categories.8cbe62bd.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ia = _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta.name) != null ? _ia : "news-categories___tr",
@@ -1569,7 +1147,7 @@ const _routes = [
     meta: _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta,
     alias: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta.alias) || [],
     redirect: (_47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta == null ? void 0 : _47Users_47kurou_47project_47bonding_47project_47web_47src_47pages_47news_47categories_46vueMeta.redirect) || void 0,
-    component: () => import('./_nuxt/categories.29cdf3bb.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/categories.8cbe62bd.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ka = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _ka : "news-category-categorySlug___en",
@@ -1579,7 +1157,7 @@ const _routes = [
     meta: __nuxt_page_meta$2,
     alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
     redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.9dc6c867.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.a1e804e3.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ma = __nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) != null ? _ma : "news-category-categorySlug___tr",
@@ -1589,7 +1167,7 @@ const _routes = [
     meta: __nuxt_page_meta$2,
     alias: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.alias) || [],
     redirect: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.9dc6c867.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.a1e804e3.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_oa = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _oa : "news-video-categorySlug___en",
@@ -1599,7 +1177,7 @@ const _routes = [
     meta: __nuxt_page_meta$1,
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.7a2b39b8.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.3ec9f543.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_qa = __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.name) != null ? _qa : "news-video-categorySlug___tr",
@@ -1609,7 +1187,7 @@ const _routes = [
     meta: __nuxt_page_meta$1,
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect) || void 0,
-    component: () => import('./_nuxt/_categorySlug_.7a2b39b8.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/_categorySlug_.3ec9f543.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_sa = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _sa : "news-video___en",
@@ -1619,7 +1197,7 @@ const _routes = [
     meta: __nuxt_page_meta,
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
-    component: () => import('./_nuxt/index.291891de.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.f413099d.mjs').then((m2) => m2.default || m2)
   },
   {
     name: (_ua = __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) != null ? _ua : "news-video___tr",
@@ -1629,19 +1207,19 @@ const _routes = [
     meta: __nuxt_page_meta,
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect) || void 0,
-    component: () => import('./_nuxt/index.291891de.mjs').then((m2) => m2.default || m2)
+    component: () => import('./_nuxt/index.f413099d.mjs').then((m2) => m2.default || m2)
   }
 ];
 const routerOptions0 = {
   scrollBehavior: (to, from, savedPosition) => {
     const nuxtApp = useNuxtApp();
-    return new Promise((resolve) => {
+    return new Promise((resolve2) => {
       nuxtApp.hooks.hookOnce("page:finish", async () => {
         await nextTick();
         setTimeout(() => {
           if (savedPosition)
-            resolve(savedPosition);
-          resolve({ top: 0 });
+            resolve2(savedPosition);
+          resolve2({ top: 0 });
         }, 150);
       });
     });
@@ -1664,13 +1242,13 @@ const routerOptions1 = {
     }
     const hasTransition = to.meta.pageTransition !== false && from.meta.pageTransition !== false;
     const hookToWait = hasTransition ? "page:transition:finish" : "page:finish";
-    return new Promise((resolve) => {
+    return new Promise((resolve2) => {
       nuxtApp.hooks.hookOnce(hookToWait, async () => {
         await nextTick();
         if (to.hash) {
           position = { el: to.hash, top: _getHashElementScrollMarginTop(to.hash) };
         }
-        resolve(position);
+        resolve2(position);
       });
     });
   }
@@ -1714,7 +1292,7 @@ const globalMiddleware = [
   validate
 ];
 const namedMiddleware = {
-  auth: () => import('./_nuxt/auth.5c7562da.mjs')
+  auth: () => import('./_nuxt/auth.60816069.mjs')
 };
 const node_modules_nuxt_dist_pages_runtime_router_mjs_qNv5Ky2ZmB = defineNuxtPlugin(async (nuxtApp) => {
   var _a2, _b2, _c2, _d2;
@@ -1895,6 +1473,8 @@ const node_modules__64huntersofbook_naive_ui_nuxt_dist_runtime_plugin_mjs_dUrdF0
     document.head.appendChild(meta);
   });
 });
+const isVue2 = false;
+const isVue3 = true;
 const preference = "system";
 const node_modules__64nuxtjs_color_mode_dist_runtime_plugin_server_mjs_XNCxeHyTuP = defineNuxtPlugin((nuxtApp) => {
   const colorMode = useState("color-mode", () => reactive({
@@ -1919,7 +1499,7 @@ const node_modules__64nuxtjs_color_mode_dist_runtime_plugin_server_mjs_XNCxeHyTu
   nuxtApp.provide("colorMode", colorMode);
 });
 /*!
-  * shared v9.3.0-beta.6
+  * shared v9.3.0-beta.10
   * (c) 2022 kazuya kawaguchi
   * Released under the MIT License.
   */
@@ -1947,11 +1527,11 @@ const objectToString = Object.prototype.toString;
 const toTypeString = (value) => objectToString.call(value);
 const isPlainObject$1 = (val) => toTypeString(val) === "[object Object]";
 /*!
-  * vue-i18n v9.3.0-beta.6
+  * vue-i18n v9.3.0-beta.10
   * (c) 2022 kazuya kawaguchi
   * Released under the MIT License.
   */
-const VERSION = "9.3.0-beta.6";
+const VERSION = "9.3.0-beta.10";
 function initFeatureFlags() {
   if (typeof __INTLIFY_PROD_DEVTOOLS__ !== "boolean") {
     getGlobalThis().__INTLIFY_PROD_DEVTOOLS__ = false;
@@ -1980,7 +1560,7 @@ const I18nErrorCodes = {
 function createI18nError(code2, ...args) {
   return createCompileError(code2, null, void 0);
 }
-const TransrateVNodeSymbol = /* @__PURE__ */ makeSymbol$1("__transrateVNode");
+const TranslateVNodeSymbol = /* @__PURE__ */ makeSymbol$1("__translateVNode");
 const DatetimePartsSymbol = /* @__PURE__ */ makeSymbol$1("__datetimeParts");
 const NumberPartsSymbol = /* @__PURE__ */ makeSymbol$1("__numberParts");
 const SetPluralRulesSymbol = makeSymbol$1("__setPluralRules");
@@ -2263,7 +1843,7 @@ function createComposer(options = {}, VueI18nLegacy) {
     interpolate,
     type: "vnode"
   };
-  function transrateVNode(...args) {
+  function translateVNode(...args) {
     return wrapWithDeps(
       (context) => {
         let ret;
@@ -2278,7 +1858,7 @@ function createComposer(options = {}, VueI18nLegacy) {
       },
       () => parseTranslateArgs(...args),
       "translate",
-      (root) => root[TransrateVNodeSymbol](...args),
+      (root) => root[TranslateVNodeSymbol](...args),
       (key) => [createTextNode(key)],
       (val) => isArray$1(val)
     );
@@ -2478,7 +2058,7 @@ function createComposer(options = {}, VueI18nLegacy) {
     composer.setNumberFormat = setNumberFormat;
     composer.mergeNumberFormat = mergeNumberFormat;
     composer[InejctWithOption] = options.__injectWithOption;
-    composer[TransrateVNodeSymbol] = transrateVNode;
+    composer[TranslateVNodeSymbol] = translateVNode;
     composer[DatetimePartsSymbol] = datetimeParts;
     composer[NumberPartsSymbol] = numberParts;
   }
@@ -2550,7 +2130,7 @@ const Translation = {
         options.plural = isString$1(props.plural) ? +props.plural : props.plural;
       }
       const arg = getInterpolateArg(context, keys);
-      const children = i18n[TransrateVNodeSymbol](props.keypath, arg, options);
+      const children = i18n[TranslateVNodeSymbol](props.keypath, arg, options);
       const assignedAttrs = assign$2({}, attrs);
       const tag = isString$1(props.tag) || isObject$1(props.tag) ? props.tag : getFragmentableTag();
       return h$1(tag, assignedAttrs, children);
@@ -2749,6 +2329,11 @@ function createI18n(options = {}, VueI18nLegacy) {
       async install(app2, ...options2) {
         app2.__VUE_I18N_SYMBOL__ = symbol;
         app2.provide(app2.__VUE_I18N_SYMBOL__, i18n);
+        if (isPlainObject$1(options2[0])) {
+          const opts = options2[0];
+          i18n.__composerExtend = opts.__composerExtend;
+          i18n.__vueI18nExtend = opts.__vueI18nExtend;
+        }
         if (__globalInjection) {
           injectGlobalFields(app2, i18n.global);
         }
@@ -2809,6 +2394,9 @@ function useI18n(options = {}) {
       composerOptions.__root = global2;
     }
     composer = createComposer(composerOptions);
+    if (i18nInternal.__composerExtend) {
+      i18nInternal.__composerExtend(composer);
+    }
     setupLifeCycle(i18nInternal, instance);
     i18nInternal.__setInstance(instance, composer);
   }
@@ -2870,7 +2458,7 @@ const globalExportProps = [
   "fallbackLocale",
   "availableLocales"
 ];
-const globalExportMethods = ["t", "rt", "d", "n", "tm"];
+const globalExportMethods = ["t", "rt", "d", "n", "tm", "te"];
 function injectGlobalFields(app2, composer) {
   const i18n = /* @__PURE__ */ Object.create(null);
   globalExportProps.forEach((prop) => {
@@ -3302,6 +2890,29 @@ function getI18nRoutingOptions(router, proxy, {
     dynamicRouteParamsKey: proxy.dynamicRouteParamsKey || options.dynamicRouteParamsKey || dynamicRouteParamsKey
   };
 }
+function split(str, index) {
+  const result = [str.slice(0, index), str.slice(index)];
+  return result;
+}
+function resolve(router, route, strategy, locale) {
+  if (strategy === "prefix") {
+    if (isArray(route.matched) && route.matched.length > 0) {
+      return route.matched[0];
+    }
+    const [rootSlash, restPath] = split(route.path, 1);
+    const targetPath = `${rootSlash}${locale}${restPath === "" ? restPath : `/${restPath}`}`;
+    const _route = router.options.routes.find((r2) => r2.path === targetPath);
+    if (_route == null) {
+      return route;
+    } else {
+      const _resolevableRoute = assign$1({}, _route);
+      _resolevableRoute.path = targetPath;
+      return router.resolve(_resolevableRoute);
+    }
+  } else {
+    return router.resolve(route);
+  }
+}
 const RESOLVED_PREFIXED = /* @__PURE__ */ new Set(["prefix_and_default", "prefix_except_default"]);
 function prefixable(optons) {
   const { currentLocale, defaultLocale, strategy } = optons;
@@ -3348,7 +2959,7 @@ function resolveRoute(route, locale) {
   if (localizedRoute.path && !localizedRoute.name) {
     let _resolvedRoute = null;
     try {
-      _resolvedRoute = router.resolve(localizedRoute);
+      _resolvedRoute = resolve(router, localizedRoute, strategy, _locale);
     } catch {
     }
     const resolvedRoute = _resolvedRoute;
@@ -3591,7 +3202,10 @@ const locale_tr = {
 const localeCodes = ["en", "tr"];
 const localeMessages = {
   "tr": () => Promise.resolve(locale_tr),
-  "en": () => import('./_nuxt/en-US.5829c3d6.mjs')
+  "en": () => import(
+    /* webpackChunkName: "lang-en" */
+    './_nuxt/en-US.5829c3d6.mjs'
+  )
 };
 const additionalMessages = Object({ "en": [], "tr": [] });
 const resolveNuxtI18nOptions = async (context) => {
@@ -4699,7 +4313,7 @@ const _sfc_main$9 = {
   __name: "nuxt-root",
   __ssrInlineRender: true,
   setup(__props) {
-    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.4be8bd35.mjs').then((r2) => r2.default || r2));
+    const ErrorComponent = defineAsyncComponent(() => import('./_nuxt/error-component.2d141ee0.mjs').then((r2) => r2.default || r2));
     const nuxtApp = useNuxtApp();
     nuxtApp.deferHydration();
     provide("_route", useRoute());
@@ -5872,7 +5486,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
               default: withCtx((_2, _push3, _parent3, _scopeId2) => {
                 if (_push3) {
                   _push3(`<!--[-->`);
-                  ssrRenderList(availableColor.value, (color) => {
+                  ssrRenderList(unref(availableColor), (color) => {
                     _push3(ssrRenderComponent(unref(Ae), {
                       key: color.id,
                       value: color.name,
@@ -5902,7 +5516,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
                   _push3(`<!--]-->`);
                 } else {
                   return [
-                    (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
+                    (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableColor), (color) => {
                       return openBlock(), createBlock(unref(Ae), {
                         key: color.id,
                         value: color.name,
@@ -5945,7 +5559,7 @@ const _sfc_main$4 = /* @__PURE__ */ defineComponent({
               }),
               createVNode(unref(Ve), { class: "absolute mt-3 ring-1 ring-black ring-opacity-5 top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0" }, {
                 default: withCtx(() => [
-                  (openBlock(true), createBlock(Fragment$1, null, renderList(availableColor.value, (color) => {
+                  (openBlock(true), createBlock(Fragment$1, null, renderList(unref(availableColor), (color) => {
                     return openBlock(), createBlock(unref(Ae), {
                       key: color.id,
                       value: color.name,
@@ -5985,6 +5599,7 @@ const phoneRegex = /^09\d{8}$/;
 const emailRegex = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
 const idCardRegex = /^[A-Z]+[0-9]{9}$/;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+const htmlTag = /<[^>]*>/g;
 const storage = {
   suffix: "_deadtime",
   get(key) {
@@ -6138,7 +5753,6 @@ const useUserStore = defineStore("user", () => {
       if (!error) {
         setToken(data);
         await get();
-        set2(data);
       }
     } catch (e2) {
       logout();
@@ -6327,7 +5941,7 @@ const useUserStore = defineStore("user", () => {
     clear();
   }
   async function clear() {
-    return await new Promise((resolve) => {
+    return await new Promise((resolve2) => {
       var _a2;
       storage.remove("userInfo");
       storage.remove("token");
@@ -6341,7 +5955,7 @@ const useUserStore = defineStore("user", () => {
       const middleware = (_a2 = route.meta.middleware) != null ? _a2 : [];
       if (middleware && middleware.includes("auth"))
         router.push("/");
-      resolve("");
+      resolve2("");
     });
   }
   return {
@@ -6527,7 +6141,7 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
                   default: withCtx((_2, _push3, _parent3, _scopeId2) => {
                     if (_push3) {
                       _push3(`<!--[-->`);
-                      ssrRenderList(userMenu.value, (menu, index) => {
+                      ssrRenderList(unref(userMenu), (menu, index) => {
                         _push3(ssrRenderComponent(unref(Ae), { key: index }, {
                           default: withCtx((_3, _push4, _parent4, _scopeId3) => {
                             if (_push4) {
@@ -6556,7 +6170,7 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
                       _push3(`<!--]-->`);
                     } else {
                       return [
-                        (openBlock(true), createBlock(Fragment$1, null, renderList(userMenu.value, (menu, index) => {
+                        (openBlock(true), createBlock(Fragment$1, null, renderList(unref(userMenu), (menu, index) => {
                           return openBlock(), createBlock(unref(Ae), { key: index }, {
                             default: withCtx(() => [
                               createVNode("div", {
@@ -6624,7 +6238,7 @@ const _sfc_main$3 = /* @__PURE__ */ defineComponent({
                   class: "absolute ring-1 ring-black mt-3 ring-opacity-5 top-full right-0 z-[999] mt-2 w-32 overflow-hidden rounded-sm bg-white text-sm font-semibold text-gray-700 shadow-md shadow-gray-300/[0.2] outline-none dark:bg-gray-800 dark:text-white dark:shadow-gray-500/[0.2] dark:ring-0"
                 }, {
                   default: withCtx(() => [
-                    (openBlock(true), createBlock(Fragment$1, null, renderList(userMenu.value, (menu, index) => {
+                    (openBlock(true), createBlock(Fragment$1, null, renderList(unref(userMenu), (menu, index) => {
                       return openBlock(), createBlock(unref(Ae), { key: index }, {
                         default: withCtx(() => [
                           createVNode("div", {
@@ -6704,7 +6318,7 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
         }, _parent));
       }, _push, _parent);
       _push(`<div class="relative ml-auto flex lt-lg:hidden"><nav class="flex items-center text-sm font-semibold leading-6 text-gray-600 dark:text-gray-300" role="navigation"><ul class="flex items-center space-x-8"><!--[-->`);
-      ssrRenderList(menus.value, (item, i) => {
+      ssrRenderList(unref(menus), (item, i) => {
         _push(`<li>`);
         if (item.type === "link") {
           _push(ssrRenderComponent(_component_UIAnchor, {
@@ -6765,8 +6379,8 @@ const _wrapIf = (component, props, slots) => {
   return { default: () => props ? h$1(component, props === true ? {} : props, slots) : h$1(Fragment, {}, slots) };
 };
 const layouts = {
-  blog: () => import('./_nuxt/blog.b600b748.mjs').then((m2) => m2.default || m2),
-  default: () => import('./_nuxt/default.5da8bb43.mjs').then((m2) => m2.default || m2)
+  blog: () => import('./_nuxt/blog.ad9692f0.mjs').then((m2) => m2.default || m2),
+  default: () => import('./_nuxt/default.c31e02c0.mjs').then((m2) => m2.default || m2)
 };
 const LayoutLoader = defineComponent({
   props: {
@@ -7004,7 +6618,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       const _component_NuxtLink = __nuxt_component_0$1;
       const _component_UnoIcon = __nuxt_component_1;
       _push(`<div${ssrRenderAttrs(mergeProps({ class: "md:hidden h-15 fixed flex items-center w-screen bottom-0 left-0 flex-none transition-colors duration-300 z-20 bg-white border-t border-gray-900/10 dark:bg-gray-900 dark:border-gray-700" }, _attrs))}><div class="flex justify-around w-full"><!--[-->`);
-      ssrRenderList(menus.value, (menu, index) => {
+      ssrRenderList(unref(menus), (menu, index) => {
         _push(ssrRenderComponent(_component_NuxtLink, {
           key: index,
           class: "text-center px-2",
@@ -7056,6 +6670,22 @@ const __nuxt_component_0 = defineComponent({
       const fallbackTag = props.fallbackTag || props.placeholderTag || "span";
       return createElementBlock(fallbackTag, null, fallbackStr);
     };
+  }
+});
+const useDictStore = defineStore("dict", {
+  state: () => ({
+    data: null
+  }),
+  actions: {
+    async get() {
+      if (this.data)
+        return this.data;
+      const { data: dictData } = await useHttpFetchPost("/dict/data");
+      this.data = dictData;
+    },
+    reset() {
+      this.data = [];
+    }
   }
 });
 async function userController() {
@@ -7125,8 +6755,12 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
           content: "Nuxt 3 Awesome Starter"
         }
       ],
-      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
+      link: [
+        { rel: "icon", type: "image/png", href: "/favicon.png" }
+      ]
     });
+    const dictStore = useDictStore();
+    dictStore.get();
     return (_ctx, _push, _parent, _attrs) => {
       const _component_Html = Html;
       const _component_Body = Body;
@@ -7239,5 +6873,5 @@ const plugins = normalizePlugins(_plugins);
 }
 const entry$1 = (ctx) => entry(ctx);
 
-export { defineNuxtRouteMiddleware as A, useAppConfig as B, O$1 as O, P, R, _export_sfc as _, u as a, __nuxt_component_1 as b, c, __nuxt_component_0$1 as d, entry$1 as default, useHead as e, f$2 as f, useHttpPost as g, useRouter as h, phoneRegex as i, useHttpFetchPost as j, useBaseStore as k, l, emailRegex as m, useRoute as n, o, p, idCardRegex as q, __nuxt_component_0 as r, storeToRefs as s, t, useState as u, passwordRegex as v, w, __nuxt_component_2 as x, _imports_0$1 as y, _sfc_main$8 as z };
+export { _sfc_main$8 as A, defineNuxtRouteMiddleware as B, useAppConfig as C, O$1 as O, P, R, _export_sfc as _, u as a, __nuxt_component_1 as b, c, __nuxt_component_0$1 as d, entry$1 as default, useHead as e, f$2 as f, useHttpPost as g, useRouter as h, phoneRegex as i, useHttpFetchPost as j, useBaseStore as k, l, emailRegex as m, useRoute as n, o, p, idCardRegex as q, __nuxt_component_0 as r, storeToRefs as s, t, useState as u, passwordRegex as v, w, __nuxt_component_2 as x, _imports_0$1 as y, htmlTag as z };
 //# sourceMappingURL=server.mjs.map

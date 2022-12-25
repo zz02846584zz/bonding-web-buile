@@ -24,7 +24,7 @@ const categories_post = defineEventHandler(async () => {
       code,
       message = "",
       data = null
-    } = await request.post("/news/article/categories");
+    } = await request.post("/industry/category/list");
     return { error: code !== 1e3, code, message, data };
   } catch (err) {
     const { code, message = "" } = err;

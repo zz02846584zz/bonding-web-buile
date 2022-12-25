@@ -84,16 +84,12 @@ const upload_post = defineEventHandler(async (event) => {
     const fileType = (_a = event == null ? void 0 : event.req) == null ? void 0 : _a.file.originalname.split(".").pop();
     formData.append("file", fs.createReadStream((_b = event == null ? void 0 : event.req) == null ? void 0 : _b.file.path));
     formData.append("key", `${fileName}.${fileType}`);
-    const {
-      code,
-      message = "",
-      data = null
-    } = await request.post("/comm/upload", formData, {
+    const data = await request.post("/comm/upload", formData, {
       headers: formData.getHeaders()
     });
     fs.unlink((_c = event == null ? void 0 : event.req) == null ? void 0 : _c.file.path, () => {
     });
-    return { error: code !== 1e3, code, message, data };
+    return { error: false, code: 1e3, message: "\u4E0A\u50B3\u6210\u529F", data };
   } catch (err) {
     const { code, message = "" } = err;
     return { error: code !== 1e3, code, message };

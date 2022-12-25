@@ -1,0 +1,1 @@
+import{bY as u,V as r,$ as i,b as l,bZ as n}from"./entry.880fa512.js";const h=u((t,e)=>{{const{user:s}=r(),{isLogin:a}=i(s),o=l("showAuth");if(!a.value&&t.fullPath!==e.fullPath)return o.value=!0,n()}});export{h as default};

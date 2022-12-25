@@ -25,7 +25,7 @@ const info_post = defineEventHandler(async (event) => {
       code,
       message = "",
       data = null
-    } = await request.post("/industry-category/info", { slug });
+    } = await request.post("/industry/category/info", { slug });
     return { error: code !== 1e3, code, message, data };
   } catch (err) {
     const { code, message = "" } = err;
