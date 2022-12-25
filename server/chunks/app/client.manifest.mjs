@@ -518,15 +518,15 @@ const client_manifest = {
     "file": "Alert.17d057d1.css",
     "src": "components/global/Alert.css"
   },
-  "components/global/Message.css": {
-    "resourceType": "style",
-    "file": "Message.019921e9.css",
-    "src": "components/global/Message.css"
-  },
   "components/global/Loading.css": {
     "resourceType": "style",
     "file": "Loading.3aa882a9.css",
     "src": "components/global/Loading.css"
+  },
+  "components/global/Message.css": {
+    "resourceType": "style",
+    "file": "Message.019921e9.css",
+    "src": "components/global/Message.css"
   },
   "pages/index.css": {
     "resourceType": "style",
@@ -543,20 +543,35 @@ const client_manifest = {
     "file": "identity-verify.40ade001.css",
     "src": "pages/my/account/identity-verify.css"
   },
-  "RowLoading.css": {
-    "resourceType": "style",
-    "file": "RowLoading.814d0167.css",
-    "src": "RowLoading.css"
-  },
   "Row.css": {
     "resourceType": "style",
     "file": "Row.e3b90b88.css",
     "src": "Row.css"
   },
+  "RowLoading.css": {
+    "resourceType": "style",
+    "file": "RowLoading.814d0167.css",
+    "src": "RowLoading.css"
+  },
   "Editor.css": {
     "resourceType": "style",
     "file": "Editor.42d46a6e.css",
     "src": "Editor.css"
+  },
+  "../node_modules/@nuxt/ui-templates/dist/templates/error-500.css": {
+    "resourceType": "style",
+    "file": "error-500.3e50ac36.css",
+    "src": "../node_modules/@nuxt/ui-templates/dist/templates/error-500.css"
+  },
+  "pages/news/article/[articleSlug].css": {
+    "resourceType": "style",
+    "file": "_articleSlug_.1f14dbe5.css",
+    "src": "pages/news/article/[articleSlug].css"
+  },
+  "../node_modules/@nuxt/ui-templates/dist/templates/error-404.css": {
+    "resourceType": "style",
+    "file": "error-404.dfdebc1f.css",
+    "src": "../node_modules/@nuxt/ui-templates/dist/templates/error-404.css"
   },
   "pages/news/categories.css": {
     "resourceType": "style",
@@ -568,25 +583,10 @@ const client_manifest = {
     "file": "my.1b38eee1.css",
     "src": "pages/my.css"
   },
-  "pages/news/article/[articleSlug].css": {
-    "resourceType": "style",
-    "file": "_articleSlug_.1f14dbe5.css",
-    "src": "pages/news/article/[articleSlug].css"
-  },
   "layouts/blog.css": {
     "resourceType": "style",
     "file": "blog.6fe8dcd2.css",
     "src": "layouts/blog.css"
-  },
-  "../node_modules/@nuxt/ui-templates/dist/templates/error-404.css": {
-    "resourceType": "style",
-    "file": "error-404.dfdebc1f.css",
-    "src": "../node_modules/@nuxt/ui-templates/dist/templates/error-404.css"
-  },
-  "../node_modules/@nuxt/ui-templates/dist/templates/error-500.css": {
-    "resourceType": "style",
-    "file": "error-500.3e50ac36.css",
-    "src": "../node_modules/@nuxt/ui-templates/dist/templates/error-500.css"
   },
   "../node_modules/nuxt/dist/app/entry.css": {
     "resourceType": "style",
